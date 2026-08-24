@@ -1,0 +1,68 @@
+# Issue hygiene — a required check on the PR, not on the tracker.
+#
+# Copy to .github/workflows/issue-hygiene.yml, then make it a required check in branch
+# protection. Until you do that it reports but blocks nothing.
+#
+# It checks exactly two things, because a gate that fails for six reasons gets disabled:
+#
+#   1. the PR references an issue          — "real work has an issue"
+#   2. that issue has a task list          — "break it down before you build"
+#
+# Everything else in the working contract is judgement, and judgement doesn't belong in CI.
+# Add `no-issue` to a PR to skip it deliberately — the escape hatch is the point. A gate with
+# no legitimate bypass gets bypassed illegitimately.
+
+name: Issue hygiene
+
+on:
+  pull_request:
+    types: [opened, edited, synchronize, ready_for_review, labeled, unlabeled]
+
+permissions:
+  contents: read
+  issues: read
+  pull-requests: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    if: "!contains(github.event.pull_request.labels.*.name, 'no-issue')"
+    steps:
+      - name: PR references an issue, and that issue is broken down
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const body = context.payload.pull_request.body || "";
+            const refs = [...body.matchAll(/(?:closes|fixes|resolves|refs)\s+#(\d+)/gi)]
+              .map(m => Number(m[1]));
+
+            if (refs.length === 0) {
+              core.setFailed(
+                "This PR doesn't reference an issue.\n\n" +
+                "Add `Closes #123` to the PR body (or `Refs #123` if it only partly satisfies it).\n" +
+                "If this genuinely has no issue behind it — a typo fix, a dependency bump — add the " +
+                "`no-issue` label and re-run."
+              );
+              return;
+            }
+
+            // Only the first reference is checked. Requiring every linked issue to be broken
+            // down punishes PRs that helpfully mention related work.
+            const number = refs[0];
+            const { data: issue } = await github.rest.issues.get({
+              ...context.repo, issue_number: number,
+            });
+
+            const tasks = (issue.body || "").match(/^\s*[-*]\s+\[[ xX]\]\s+\S/gm) || [];
+            if (tasks.length === 0) {
+              core.setFailed(
+                `Issue #${number} has no task list.\n\n` +
+                "Break the work down before building it — one item per meaningful piece, and a " +
+                "plain acceptance item at the end. The list is the to-do list, and it's what lets " +
+                "a fresh session pick up where this one stopped."
+              );
+              return;
+            }
+
+            const done = tasks.filter(t => /\[[xX]\]/.test(t)).length;
+            core.notice(`#${number} — ${done}/${tasks.length} items ticked.`);
