@@ -1,0 +1,58 @@
+#!/usr/bin/env bash
+# Block a commit that mentions anything on your private wordlist.
+#
+# This repo is public. The likeliest leak is not something you wrote but something you
+# copied in: a template, a worked example, a config carried over from a private repo.
+#
+# Enable it:  git config core.hooksPath .githooks
+#
+# The wordlist lives OUTSIDE the repo, because a committed list of your clients is a
+# published list of your clients. One term per line, '#' for comments:
+#
+#   ~/.config/lore-wordlist.txt
+#
+# Override the path with LORE_WORDLIST. If the file is missing the hook warns and lets the
+# commit through, so a fresh clone isn't blocked on setup.
+#
+# It is a net, not a gate. It catches verbatim names. It will not catch a paraphrase, an
+# oblique detail, or a client you never added. Read the diff.
+
+set -uo pipefail
+
+LIST="${LORE_WORDLIST:-$HOME/.config/lore-wordlist.txt}"
+
+if [[ ! -f "$LIST" ]]; then
+  echo "pre-commit: no wordlist at $LIST, skipping the confidentiality check." >&2
+  echo "            create one (one term per line) to enable it." >&2
+  exit 0
+fi
+
+# Added lines only. Deleting a client name should never be blocked.
+ADDED=$(git diff --cached --unified=0 --no-color | grep '^+' | grep -v '^+++' || true)
+[[ -z "$ADDED" ]] && exit 0
+
+HITS=""
+while IFS= read -r term; do
+  term="${term%%#*}"                     # strip comments
+  term="$(echo "$term" | xargs || true)" # trim
+  [[ -z "$term" ]] && continue
+  if match=$(echo "$ADDED" | grep -i -m3 -- "$term" 2>/dev/null); then
+    HITS+="  ${term}"$'\n'
+    while IFS= read -r line; do HITS+="    ${line:0:100}"$'\n'; done <<< "$match"
+  fi
+done < "$LIST"
+
+if [[ -n "$HITS" ]]; then
+  cat >&2 <<MSG
+
+  COMMIT BLOCKED — staged changes mention something on your wordlist.
+
+$HITS
+  If it is genuinely safe, either reword it or commit with --no-verify.
+  If you are not sure, it belongs in the private repo it came from.
+
+MSG
+  exit 1
+fi
+
+exit 0
