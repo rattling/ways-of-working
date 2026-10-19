@@ -10,7 +10,7 @@ A spec is a PRD, and it lives in the repo, not in an issue.
 1. Write it to `specs/prd/<feature-slug>.md` on a branch `spec/<feature-slug>`.
 2. Put a line at the top: `**Tracking:** #<n> · **Status:** draft · **Owner:** <person>`.
 3. Add two sections if the template lacks them: **Must not exist yet** (things a builder might reasonably add that we don't want now) and **Human verification** (how someone who didn't build it confirms it).
-4. Create the parent issue with a short summary and `Spec: specs/prd/<feature-slug>.md`, then fill in its number on the Tracking line.
+4. The parent issue. **If an issue already asks for this work** (the request that was triaged or grilled, or one the person names), it becomes the parent: add a short summary and `Spec: specs/prd/<feature-slug>.md` at the top of its body, keeping the original request below. Don't create a second issue. Only when no issue asks for it, create the parent with the summary and the `Spec:` line. Either way, fill in its number on the Tracking line.
 5. Open a PR titled `spec: <feature>` with `Refs #<n>`. A person merges it; that is the spec being agreed.
 
 A feature needs a PRD only if it needs more than one ticket or changes an invariant or a contract between systems. Otherwise the issue is the spec.
