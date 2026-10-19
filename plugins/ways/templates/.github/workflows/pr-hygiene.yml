@@ -1,0 +1,49 @@
+# PR hygiene: a required check on the PR, not on the tracker.
+#
+# Make it a required check in branch protection once the first PR has passed it.
+#
+# It checks two things, because a gate that fails for six reasons gets disabled:
+#
+#   1. the PR references an issue        (real work has an issue)
+#   2. the PR body says how to check it  (the PR body is the report)
+#
+# Add the `no-issue` label to skip it deliberately: a typo, a dependency bump. A gate with no
+# legitimate bypass gets bypassed illegitimately.
+
+name: PR hygiene
+
+on:
+  pull_request:
+    types: [opened, edited, synchronize, ready_for_review, labeled, unlabeled]
+
+permissions:
+  pull-requests: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    if: "!contains(github.event.pull_request.labels.*.name, 'no-issue') && !github.event.pull_request.draft"
+    steps:
+      - name: PR references an issue and says how to check it
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const body = context.payload.pull_request.body || "";
+            const problems = [];
+
+            if (!/(?:closes|fixes|resolves|refs)\s+#\d+/i.test(body)) {
+              problems.push(
+                "No issue reference. Add `Closes #123` (or `Refs #123` if it only partly " +
+                "satisfies it). No issue behind it at all? Add the `no-issue` label."
+              );
+            }
+
+            const howTo = body.match(/^##\s*How to check\s*\n([\s\S]*?)(?=^##\s|$(?![\s\S]))/im);
+            if (!howTo || howTo[1].replace(/<!--[\s\S]*?-->/g, "").trim().length < 20) {
+              problems.push(
+                "The `## How to check` section is missing or empty. Say what to run, with what " +
+                "input, and what should happen, so someone who didn't build it can confirm it."
+              );
+            }
+
+            if (problems.length) core.setFailed(problems.join("\n\n"));

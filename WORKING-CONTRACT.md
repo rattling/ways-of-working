@@ -48,11 +48,19 @@ it you are taking the builder's word for it.
 
 ## 3 · Altitude and escalation
 
-Default is autonomous within the issue: plan it, work the task list, branch, commit, refactor,
-fix tests, open and merge PRs as the repo's gitflow allows. Don't stop for routine decisions.
+Default is autonomous within the issue: plan it, branch, commit, refactor, fix tests, open and
+merge PRs as the repo's merge policy allows. Don't stop for routine decisions. Work too big for
+one PR is split into sub-issues, one slice each, not a checklist inside one issue.
 
-The human can set the altitude lower for a given request ("interactive", "pause per PR"). Shift
-accordingly, then back.
+The human can set the altitude lower for a given request ("interactive", "pause per PR"), or for
+an issue by labelling it `ready-for-human` rather than `ready-for-agent`. Shift accordingly, then
+back.
+
+Independent issues can run in parallel without being asked, each in its own worktree. It only
+works when every brief stands alone, which is another reason to finish the brief. The lead
+agent doesn't take the builders' word for it: it reads their evidence (screenshots, diffs,
+test output), merges one at a time in the human's order, and resolves conflicts itself.
+Parallel costs tokens, so it's for independent work, not a default.
 
 Escalate for:
 
@@ -82,15 +90,22 @@ The last one matters because an agent re-reading its own diff catches typos, not
 that now contradicts the code or the invariant that checks a result against its own arithmetic.
 That needs a reader who wasn't in the room.
 
+In practice that reader is a fresh subagent: no access to the conversation, briefed with the
+diff, what it is meant to do and the specific risks to check, and told to separate confirmed
+defects from suspicions. The author verifies each finding before acting on it, and answers
+every one: fixed, or why not. Three rounds at most; whatever is still disputed goes to the
+human in the PR body. Whether a
+change is structural is the author's call; a small change proven by running it can skip.
+
 ## 5 · Done
 
-**Done means the PR is merged, the issue is closed, and a session report is posted as a comment
-on the issue.** Not "ready when you are".
+**Done means the PR is merged and the issue is closed.** Not "ready when you are".
 
-The report covers what was attempted and completed, important decisions, deviations from the
-plan and why, approaches that failed or were abandoned, unexpected findings, validation run and
-its results, limitations, open questions, recommended next step, git and PR state, and a
-**Verify this** section with the exact commands and what to look for.
+The PR body is the report. There is no separate one: it's what someone reads at the moment
+they decide whether to accept the work, so it carries what they need. Why, what changed, **how
+to check it** with the exact commands and what to look for, the evidence, deviations and
+abandoned approaches, what's left open, and the merge danger: risk tier, whether the door is
+one-way, blast radius, rollback.
 
 The report is throwaway. Anything in it that should last goes to the charter, an ADR,
 `AGENTS.md` or a new issue.
@@ -102,11 +117,15 @@ wrong one and then had to be maintained in both places.
 
 | Where | What belongs | What doesn't |
 |---|---|---|
-| `docs/CHARTER.md` | purpose, success criteria, scope ladder (supported / next / deferred / out), invariants, non-goals | implementation |
-| `AGENTS.md` | what this is, repo state, read order, rules, gate commands | domain docs, current status |
-| `arch/` + `arch/adr/` | shape of the system, and decisions that are hard to reverse | local choices |
+| `specs/charter.md` | purpose, success criteria, scope ladder (supported / next / deferred / out), invariants, non-goals | implementation, anything true only this phase |
+| `specs/operating-context.md` | the current phase: goals, constraints, what's in focus now | durable intent |
+| `specs/roadmap.md` | the sequence of milestones and what each delivers | status |
+| `specs/prd/` | one PRD per feature that needs more than one slice or changes an invariant or contract | live status (that's the issue) |
+| `README.md` | for people: what this is in a paragraph, how to run it, where to go next | process, status, anything `AGENTS.md` or the specs own |
+| `AGENTS.md` | what this is, repo state, a map of where things are and when to read them, rules, gate commands | domain docs, current status |
+| `GLOSSARY.md` | the domain's terms, and the words to avoid | implementation detail |
+| `docs/ARCHITECTURE.md` + `docs/adr/` | shape of the system, and decisions that are hard to reverse | local choices |
 | Issues | the live state: what's being done, where it stands, what's next | anything already in the repo |
-| `specs/` | PRDs, and seed specs (historical once distributed) | live truth |
 
 If a doc describes *how* to build something, it's at the wrong altitude. Delete it or turn it
 into an issue.

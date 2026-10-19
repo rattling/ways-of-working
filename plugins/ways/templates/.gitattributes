@@ -1,0 +1,6 @@
+# LF in the repo and on checkout, Windows included: hooks run in bash and code may run in
+# Linux containers, and both break on CRLF. Windows-only scripts keep CRLF.
+* text=auto eol=lf
+*.bat text eol=crlf
+*.cmd text eol=crlf
+*.ps1 text eol=crlf

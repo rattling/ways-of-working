@@ -1,0 +1,21 @@
+{
+  "name": "ways",
+  "displayName": "Ways of working",
+  "version": "0.3.0",
+  "description": "How a team works with Matt Pocock's skills: specs in the repo, status in GitHub, interactive and autonomous modes with a gate that holds, merge policy by risk, and the PR body as the report.",
+  "author": {
+    "name": "John Curry"
+  },
+  "repository": "https://github.com/rattling/ways-of-working",
+  "license": "MIT",
+  "keywords": [
+    "sdlc",
+    "specs",
+    "issues",
+    "review",
+    "mattpocock-skills"
+  ],
+  "dependencies": [
+    "mattpocock-skills@claude-plugins-official"
+  ]
+}

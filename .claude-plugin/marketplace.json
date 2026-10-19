@@ -1,0 +1,22 @@
+{
+  "name": "ways-of-working",
+  "description": "A delivery method for Claude Code, built on Matt Pocock's skills.",
+  "owner": {
+    "name": "John Curry"
+  },
+  "plugins": [
+    {
+      "name": "ways",
+      "source": "./plugins/ways",
+      "description": "The operating model around Matt Pocock's skills (installed with it): repo setup, working an issue interactively or autonomously, the autonomous gate, and merge policy by risk."
+    },
+    {
+      "name": "ways-band",
+      "source": "./plugins/ways-band",
+      "description": "A mod: a status band above the prompt (mode, issue, last gate result, merge dial, context use) and /gate to run the gate instantly. Optional, and a small worked example of a mod."
+    }
+  ],
+  "allowCrossMarketplaceDependenciesOn": [
+    "claude-plugins-official"
+  ]
+}

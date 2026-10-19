@@ -1,0 +1,7 @@
+# High-risk paths: a change here needs a code owner's approval, whatever the merge dial says.
+# Keep it in step with REVIEW.md's high-risk list. Replace @owner with a person or team.
+
+/.github/workflows/  @owner
+/.github/CODEOWNERS  @owner
+# /db/migrations/    @owner
+# /src/Auth/         @owner

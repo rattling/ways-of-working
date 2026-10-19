@@ -1,0 +1,29 @@
+{
+  "extraKnownMarketplaces": {
+    "ways-of-working": {
+      "source": {
+        "source": "github",
+        "repo": "rattling/ways-of-working"
+      }
+    },
+    "claude-plugins-official": {
+      "source": {
+        "source": "github",
+        "repo": "anthropics/claude-plugins-official"
+      }
+    }
+  },
+  "enabledPlugins": {
+    "ways@ways-of-working": true,
+    "mattpocock-skills@claude-plugins-official": true,
+    "ways-band@ways-of-working": true
+  },
+  "permissions": {
+    "deny": [
+      "Read(./.env)",
+      "Read(./.env.*)",
+      "Read(**/.env)",
+      "Read(**/.env.*)"
+    ]
+  }
+}

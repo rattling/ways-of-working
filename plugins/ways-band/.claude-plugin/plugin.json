@@ -1,0 +1,12 @@
+{
+  "name": "ways-band",
+  "displayName": "Ways band",
+  "version": "0.1.0",
+  "description": "A mod: a status band above the prompt showing the ways mode, the issue being worked, the last gate result, the merge dial and context use, plus /gate to run the gate instantly without a Claude turn.",
+  "author": {
+    "name": "John Curry"
+  },
+  "repository": "https://github.com/rattling/ways-of-working",
+  "license": "MIT",
+  "keywords": ["mod", "status", "ways"]
+}

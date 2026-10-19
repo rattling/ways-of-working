@@ -1,0 +1,4 @@
+{
+  "description": "The ways-band hooks module",
+  "modules": ["./register.js"]
+}

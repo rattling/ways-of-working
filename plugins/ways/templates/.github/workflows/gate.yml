@@ -1,0 +1,22 @@
+# The gate: the same command the Stop hook runs in autonomous mode, read from .claude/ways.json
+# so there is one place to change it. Make this a required check in branch protection.
+#
+# Add whatever the gate needs before it runs (a language runtime, a database service).
+
+name: Gate
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  gate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run the gate
+        run: bash -c "$(jq -r .gate .claude/ways.json)"

@@ -1,82 +1,59 @@
 # Ways of working
 
-How I set up and run software projects. Repo structure, light architecture, the delivery loop,
-and the engineering standards worth writing down once and reusing.
+How I run software projects with Claude Code, packaged as a plugin: Matt Pocock's skills for the engineering disciplines, and on top of them the operating model a team needs to agree once. Specs in the repo, status in GitHub, interactive and autonomous modes with a gate that holds, merge policy by risk, and the PR body as the report.
 
-Most of this predates coding agents and would be worth doing without them. It is written for an
-agent to read, for two reasons. An agent reads it at the start of every session, where a person
-reads it once and then works from memory, so it has to be accurate rather than aspirational. And
-writing it for something that cannot infer context forced me to make explicit a lot of things I
-had been carrying in my head.
+## Install
 
-## What's here
+```bash
+claude plugin marketplace add anthropics/claude-plugins-official   # if you haven't already
+claude plugin marketplace add rattling/ways-of-working
+claude plugin install ways@ways-of-working
+```
 
-**Project setup.** What a repo needs so someone arriving cold can work in it: what the project
-is for, where the architectural lines are, what the gate is, what to read first.
+Installing `ways` also installs [`mattpocock-skills`](https://github.com/mattpocock/skills) from Anthropic's official marketplace, at the version that marketplace currently lists.
 
-**The working contract.** How work is specified, delegated, verified and handed back. Who
-decides what. What "done" means.
+Then, in a repo, run `/setup-matt-pocock-skills` (accept GitHub, the default labels and single-context), then `/ways:setup`. It seeds the files and labels below, never overwrites what's there, and opens a PR. Run it again later to pick up a newer version; the repo is stamped with the version it was set up at.
 
-**The delivery loop.** Issues, branches, PRs, reports. Light, and the same everywhere.
+A repo set up this way declares both marketplaces and plugins in `.claude/settings.json`, so anyone who opens it in Claude Code is offered the same setup.
 
-**Light architecture.** A charter, an architecture note, ADRs for the decisions that are
-expensive to reverse. Enough to stop the same argument happening twice, not enough to become a
-documentation project.
+## The flow
 
-**Engineering standards.** Currently a couple of lines in the AGENTS section: clear contracts at
-module boundaries, small cohesive modules, tests for behaviour rather than implementation. This
-is the part I expect to grow, general stances on contracts, interfaces, and how much structure
-a system actually needs. Not language or cloud specifics; those go in
-[lore](https://github.com/rattling/lore).
-
-## The two things a repo needs
-
-| # | What | Where |
+| Step | Skill | What comes out |
 |---|---|---|
-| 1 | An entry point read at the start of every session | `AGENTS.md`, see [`AGENTS-SECTION.md`](AGENTS-SECTION.md) |
-| 2 | Work tracked as issues, kept true as part of doing it | GitHub Issues |
+| Triage what comes in | `/triage` | A brief on each issue, or a precise request for information |
+| Shape big work | `/grill-with-docs`, then `/to-spec` | A PRD in `specs/prd/` with a parent issue; terms in `GLOSSARY.md`; ADRs in `docs/adr/` where earned |
+| Plan it | `/to-tickets` | Sub-issues of the parent: thin slices with blocking edges |
+| Do one ticket | `/ways:work <issue> [interactive\|autonomous]` | A PR whose body is the report, reviewed by `code-review` first |
+| Do a whole spec | `/implement-spec` | One integration branch, one reviewed PR |
 
-Everything in [`guidance/`](guidance/) is optional and says when it's worth having. Declining
-any of it is fine.
+A feature needs a PRD only if it needs more than one ticket or changes an invariant or a contract between systems. Otherwise the issue is the spec.
 
-## The parts that do most of the work
+## What a repo holds
 
-**Split ownership explicitly.** The human owns outcomes, problem semantics, product intent,
-architectural boundaries and acceptance. The agent owns planning, implementation, refactoring,
-tests, docs, tooling and git hygiene. Neither asks permission inside its own half. Most of the
-wasted turns I see are one of two mistakes: asking about something you own, or quietly deciding
-something you don't.
+| Where | What | Who owns it |
+|---|---|---|
+| `specs/` | `charter.md`, `roadmap.md`, `operating-context.md`, `prd/` | People |
+| `GLOSSARY.md`, `docs/adr/`, `docs/ARCHITECTURE.md` | Language, decisions, shape | People decide; Claude drafts |
+| `docs/agents/` | Where Pocock's skills find the tracker, labels and domain docs, plus this repo's conventions | Setup writes it |
+| Everything else | `AGENTS.md`, `CODING_STANDARDS.md`, `REVIEW.md`, `.github/`, `.claude/`, issues, PR bodies, tests | Claude builds; people review |
 
-**Make the brief the unit of work.** Five fields: outcome, context, guardrails, acceptance,
-human verification. If one is missing, ask once and then proceed on a stated assumption. If it
-is written as a *how*, push back, because the how belongs to whoever is building it.
+## What `ways` adds to Pocock's skills
 
-**Have one definition of done.** The PR is merged, the issue is closed, and a session report is
-posted. Not "ready when you are".
+- **`/ways:setup`:** the files above, labels, a `pr-hygiene` CI check, settings, and this repo's conventions appended to Pocock's tracker config: PRDs as files, closing work through PRs.
+- **`/ways:work`:** one issue in interactive or autonomous mode: branch, plan comment, early draft PR, `tdd`, `code-review` with every finding answered, risk tier, PR body, merge policy.
+- **Hooks:** a SessionStart hook that orients Claude in an opted-in repo, and a Stop hook that won't let an autonomous run end on a red gate.
+- **Reference:** risk tiers, branching and merge policy, in `plugins/ways/reference/`.
 
-## Using it
+## `ways-band`: a mod
 
-Tell your agent:
+An optional second plugin, and a small worked example of a [mod](https://code.claude.com/docs/en/plugins/mods/overview): JavaScript that runs inside Claude Code and can draw in its interface.
 
-> Read `https://raw.githubusercontent.com/rattling/ways-of-working/main/INITIATE.md`
-> and follow it for this repo.
+- **A band above the prompt** in an opted-in repo: `ways 0.3.0 · autonomous #3 · gate ✔ 2m ago · dial default · feature/3-walking-skeleton · context 42%`.
+- **`/gate`** runs the repo's gate at once, without a Claude turn or any tokens, and records the result for the band.
 
-Works on a new repo or an existing one. [`INITIATE.md`](INITIATE.md) has merge rules, so
-existing content is folded in rather than replaced. Run it again later to pick up changes; it
-stamps a version so a session can tell whether a repo is behind.
+`claude plugin install ways-band@ways-of-working`. Its code is one file, `plugins/ways-band/hooks/register.js`, with tests beside it (`claude plugin test` in that directory). Mods run unsandboxed with your permissions; this one reads a few files under `.claude/` and `AGENTS.md`, runs `git branch` and, on `/gate`, the gate.
 
-No install, no package, no server. It is markdown at a URL. Anything that depends on a local
-path only works for the person who wrote it.
-
-## The files
-
-| | |
-|---|---|
-| [`WORKING-CONTRACT.md`](WORKING-CONTRACT.md) | Ownership, the brief, escalation, verification, done, documentation altitude. Cross-repo: symlink it to `~/.claude/CLAUDE.md` or `~/.codex/AGENTS.md`. |
-| [`AGENTS-SECTION.md`](AGENTS-SECTION.md) | The section that goes in a repo's `AGENTS.md`: issues, labels, branches, PRs, reports, standards. |
-| [`INITIATE.md`](INITIATE.md) | What an agent reads to apply this to a repo. |
-| [`guidance/`](guidance/) | Charter, architecture, ADRs, lore, seed spec, operating context. Optional. |
-| [`enforcement/`](enforcement/) | A GitHub Action and label conventions for the parts worth enforcing. |
+[`WORKING-CONTRACT.md`](WORKING-CONTRACT.md) is the reasoning behind it: who owns what, and why.
 
 ## Where it came from
 
@@ -105,9 +82,6 @@ moment someone is deciding whether to accept it.
 
 [**lore**](https://github.com/rattling/lore) is the technical counterpart: patterns, gotchas and
 architectural lessons that outlive the project that taught them.
-
-If it is about running a project it belongs here. If it is about building the thing it belongs
-there.
 
 ## Licence
 
