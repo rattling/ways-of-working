@@ -70,6 +70,23 @@ async function refresh($) {
   }
 }
 
+// The bash to run the gate in. On Windows, `bash` on PATH is usually WSL's
+// (C:\Windows\System32\bash.exe), which fails with no distro installed, so use Git Bash,
+// as Claude Code's hooks and Bash tool do: CLAUDE_CODE_GIT_BASH_PATH if set, else the
+// bash.exe of the Git for Windows that `git` comes from.
+async function findBash($) {
+  if ((await $.env.get('OS')) !== 'Windows_NT') return 'bash'
+  const configured = await $.env.get('CLAUDE_CODE_GIT_BASH_PATH')
+  if (configured) return configured
+  try {
+    const r = await $.process.run(['git', '--exec-path'])
+    // C:/Program Files/Git/mingw64/libexec/git-core -> C:/Program Files/Git/bin/bash.exe
+    const root = r.exitCode === 0 && r.stdout.trim().replace(/\\/g, '/').match(/^(.*?)\/(?:mingw64|mingw32|clangarm64|usr)\/libexec\/git-core\/?$/i)
+    if (root) return root[1] + '/bin/bash.exe'
+  } catch {}
+  return 'bash'
+}
+
 async function runGate($) {
   const gate = view && view.gate
   if (!gate) return 'No gate in .claude/ways.json.'
@@ -77,7 +94,7 @@ async function runGate($) {
   $.ui.invalidate('ui.render')
   let line
   try {
-    const r = await $.process.run(['bash', '-c', gate], { timeoutMs: 600_000 })
+    const r = await $.process.run([await findBash($), '-c', gate], { timeoutMs: 600_000 })
     const result = r.exitCode === 0 ? 'pass' : 'fail'
     await $.fs.write('.claude/ways/last-gate', result + ' ' + Math.round(Date.now() / 1000) + '\n')
     // On a pass, the end of stdout is the useful part (test totals); on a fail, show stderr too.
