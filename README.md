@@ -18,13 +18,17 @@ A repo set up this way declares both marketplaces and plugins in `.claude/settin
 
 ## The flow
 
-| Step | Skill | What comes out |
+Big work goes in three parts: **requirements** (what and why), **design** (how, at system level), then **build**. Small work skips to build: the issue is the spec.
+
+| Part | Skill | What comes out |
 |---|---|---|
-| Triage what comes in | `/triage` | A brief on each issue, or a precise request for information |
-| Shape big work | `/grill-with-docs`, then `/to-spec` | A PRD in `specs/prd/` with a parent issue; terms in `GLOSSARY.md`; ADRs in `docs/adr/` where earned |
-| Plan it | `/to-tickets` | Sub-issues of the parent: thin slices with blocking edges |
-| Do one ticket | `/ways:work <issue> [interactive\|autonomous]` | A PR whose body is the report, reviewed by `code-review` first |
-| Do a whole spec | `/implement-spec` | One integration branch, one reviewed PR |
+| | `/triage` | Each incoming issue briefed, or a precise request for information |
+| **1. Requirements** | `/grill-with-docs`, then `/to-spec` | A PRD in `specs/prd/` (problem, user stories, scope) with a parent issue; terms in `GLOSSARY.md` |
+| **2. Design** | `/ways:design` | The PRD's design sections (parts, contracts, data, seams, NFRs), `docs/ARCHITECTURE.md` updated, ADRs where earned. On the spec's branch, so one PR agrees both |
+| **3. Build** | `/to-tickets`, then `/implement-spec` | Slices cut along the seams, one integration branch, one reviewed PR |
+| | `/ways:work <issue> [interactive\|autonomous]` | One ticket: a PR whose body is the report, reviewed by `code-review` first |
+
+The flow commands are typed by a person: Claude doesn't start them itself, because each is a point where someone decides to move on.
 
 A feature needs a PRD only if it needs more than one ticket or changes an invariant or a contract between systems. Otherwise the issue is the spec.
 
@@ -42,6 +46,7 @@ A feature needs a PRD only if it needs more than one ticket or changes an invari
 
 - **`/ways:setup`:** the files above, including the standards, labels, a `pr-hygiene` CI check, settings, and this repo's conventions appended to Pocock's tracker config: PRDs as files, closing work through PRs.
 - **`/ways:work`:** one issue in interactive or autonomous mode: branch, plan comment, early draft PR, `tdd`, `code-review` with every finding answered, risk tier, PR body, merge policy.
+- **`/ways:design`:** the design part, which Pocock's flow goes from requirements to slicing without: the system-level how, grilled outside in (C4 context and containers, parts, contracts, data, seams, NFRs), written into the PRD, `docs/ARCHITECTURE.md` and ADRs.
 - **`/ways:arch-review`:** a guided architecture walkthrough, lens by lens in the shape of TOGAF's ADM (plus the Well-Architected pillars for hosted systems), at the start of a repo, before a big change or at intervals. It ends in findings for people to turn into tickets, not documents.
 - **Hooks:** a SessionStart hook that orients Claude in an opted-in repo, a Stop hook that won't let an autonomous run end on a red gate, and a nudge when the agent grows a file past about 500 lines.
 - **Reference:** risk tiers, branching and merge policy, in `plugins/ways/reference/`.

@@ -20,7 +20,7 @@ gate="$(json_field gate "$stamp")"
 echo "This repo works the ways-of-working way on Matt Pocock's skills (ways ${plugin_version}, repo set up at ${repo_version:-unknown})."
 echo
 echo "- Read AGENTS.md first. Specs: specs/ (charter, roadmap, operating-context, prd/). Language: GLOSSARY.md. Decisions: docs/adr/. Status lives in GitHub issues, not in files."
-echo "- Flow: /triage, /grill-with-docs, /to-spec, /to-tickets, then /ways:work <issue> for one ticket or /implement-spec for a whole spec. docs/agents/issue-tracker.md says how this repo publishes specs and closes work."
+echo "- Flow: /triage what comes in. Big work in three parts, each typed by a person: requirements (/grill-with-docs, /to-spec: the PRD), design (/ways:design: parts, contracts, data, seams, NFRs), build (/to-tickets, /implement-spec). One ticket: /ways:work <issue>. docs/agents/issue-tracker.md says how this repo publishes specs and closes work."
 echo "- Merge policy and risk tiers: ${root}/reference/REVIEW-AND-MERGE.md"
 echo "- Gate: ${gate:-not set in .claude/ways.json}"
 marker="$project/.claude/ways/autonomous"
@@ -34,6 +34,7 @@ if [[ -f "$marker" ]]; then
     echo "- You are leading a batch: issues $(printf '#%s ' "${issues[@]}")in that merge order. If you don't remember the details, the context was compacted or cleared: before doing anything else, check each issue's state and its PR (\`gh pr list --search \"<n> in:body\"\`). Merged ones are done; for the rest, resume from the PR and its commits. Don't start a builder for an issue that already has a PR in progress."
   fi
 fi
-if [[ -n "$repo_version" && -n "$plugin_version" && "$repo_version" != "$plugin_version" ]]; then
+# Only a minor or major release changes what setup lays down; a patch release doesn't.
+if [[ -n "$repo_version" && -n "$plugin_version" && "${repo_version%.*}" != "${plugin_version%.*}" ]]; then
   echo "- The repo was set up with ${repo_version}; the plugin is ${plugin_version}. Suggest running /ways:setup to update it."
 fi

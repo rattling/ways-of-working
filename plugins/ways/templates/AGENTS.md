@@ -24,6 +24,10 @@ This file is the only one read every time. Open the rest when the work needs the
 
 `<command>`: the same command CI runs, and the one in `.claude/ways.json`.
 
+## How work goes
+
+Big work goes in three parts, each started by a person typing it: **requirements** (`/grill-with-docs`, then `/to-spec`: the PRD), **design** (`/ways:design`: parts, contracts, data, seams, NFRs, into the PRD, `docs/ARCHITECTURE.md` and ADRs), then **build** (`/to-tickets`, then `/implement-spec`). Small work is one issue and goes straight to build.
+
 ## Working an issue
 
 Use `/ways:work <issue>`. It runs interactively for `ready-for-human` and autonomously for `ready-for-agent`. For a whole spec at once, `/implement-spec`, with `.claude/ways/autonomous` created first so the gate holds.
