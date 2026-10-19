@@ -18,19 +18,26 @@ A repo set up this way declares both marketplaces and plugins in `.claude/settin
 
 ## The flow
 
-Big work goes in three parts: **requirements** (what and why), **design** (how, at system level), then **build**. Small work skips to build: the issue is the spec.
+Pick the path by the size of the work:
+
+| The work | Path |
+|---|---|
+| New and not sized yet | `/triage`: briefs it as one ticket, or says it's big work |
+| Typo-sized | Just do it: a PR labelled `no-issue` |
+| One ticket: a bug, a small enhancement | `/ways:work <issue> [interactive\|autonomous]`: a PR whose body is the report, reviewed by `code-review` first |
+| **Big work:** more than one ticket, or it changes an invariant or a contract | The three parts below |
+
+Big work goes in three parts, each ending in something a person agrees:
 
 | Part | Skill | What comes out |
 |---|---|---|
-| | `/triage` | Each incoming issue briefed, or a precise request for information |
-| **1. Requirements** | `/grill-with-docs`, then `/to-spec` | A PRD in `specs/prd/` (problem, user stories, scope) with a parent issue; terms in `GLOSSARY.md` |
-| **2. Design** | `/ways:design` | The PRD's design sections (parts, contracts, data, seams, NFRs), `docs/ARCHITECTURE.md` updated, ADRs where earned. On the spec's branch, so one PR agrees both |
+| **1. Requirements** (what and why) | `/grill-with-docs`, then `/to-spec` | A PRD in `specs/prd/` (problem, user stories, scope) with a parent issue; terms in `GLOSSARY.md` |
+| **2. Design** (how, at system level) | `/ways:design` | The PRD's design sections (parts, contracts, data, seams, NFRs), `docs/ARCHITECTURE.md` updated, ADRs where earned. On the spec's branch, so one PR agrees both |
 | **3. Build** | `/to-tickets`, then `/implement-spec` | Slices cut along the seams, one integration branch, one reviewed PR |
-| | `/ways:work <issue> [interactive\|autonomous]` | One ticket: a PR whose body is the report, reviewed by `code-review` first |
 
-The flow commands are typed by a person: Claude doesn't start them itself, because each is a point where someone decides to move on.
+Only two skips: no grill when the requirements are already written and agreed (share them, then `/to-spec`), and no `/ways:design` when the work stays inside one part and touches no contract, schema or data store. If any other step feels unnecessary, the work is probably one ticket.
 
-A feature needs a PRD only if it needs more than one ticket or changes an invariant or a contract between systems. Otherwise the issue is the spec.
+The flow commands are typed by a person: Claude doesn't start them itself, because each is a point where someone decides to move on. When one finishes, Claude says which comes next. The same table is in every repo's `AGENTS.md`, and `/triage` uses it to size what comes in.
 
 ## What a repo holds
 

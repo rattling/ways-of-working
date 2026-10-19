@@ -10,6 +10,8 @@ Big work goes in three parts: **requirements** (`/grill-with-docs`, then `/to-sp
 
 Input: the PRD, by path or parent issue. Without one, use the PRD written in this conversation; with none, stop and say to run `/to-spec` first.
 
+If the work stays inside one part and touches no contract, schema or data store, there's no design to do: say so, add "Design: no change of shape" to the PRD, and hand on to `/to-tickets`.
+
 ## 1. Read first
 
 Finding facts is your job, never the person's. Read:

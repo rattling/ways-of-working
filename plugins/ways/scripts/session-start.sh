@@ -20,7 +20,7 @@ gate="$(json_field gate "$stamp")"
 echo "This repo works the ways-of-working way on Matt Pocock's skills (ways ${plugin_version}, repo set up at ${repo_version:-unknown})."
 echo
 echo "- Read AGENTS.md first. Specs: specs/ (charter, roadmap, operating-context, prd/). Language: GLOSSARY.md. Decisions: docs/adr/. Status lives in GitHub issues, not in files."
-echo "- Flow: /triage what comes in. Big work in three parts, each typed by a person: requirements (/grill-with-docs, /to-spec: the PRD), design (/ways:design: parts, contracts, data, seams, NFRs), build (/to-tickets, /implement-spec). One ticket: /ways:work <issue>. docs/agents/issue-tracker.md says how this repo publishes specs and closes work."
+echo "- Flow: pick the path by size (AGENTS.md, How work goes). New and unsized: /triage. One ticket: /ways:work <issue>. Big work in three parts, each typed by a person: requirements (/grill-with-docs, /to-spec: the PRD), design (/ways:design), build (/to-tickets, /implement-spec). When a step finishes, say which command comes next. docs/agents/issue-tracker.md says how this repo publishes specs and closes work."
 echo "- Merge policy and risk tiers: ${root}/reference/REVIEW-AND-MERGE.md"
 echo "- Gate: ${gate:-not set in .claude/ways.json}"
 marker="$project/.claude/ways/autonomous"

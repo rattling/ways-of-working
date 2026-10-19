@@ -26,7 +26,22 @@ This file is the only one read every time. Open the rest when the work needs the
 
 ## How work goes
 
-Big work goes in three parts, each started by a person typing it: **requirements** (`/grill-with-docs`, then `/to-spec`: the PRD), **design** (`/ways:design`: parts, contracts, data, seams, NFRs, into the PRD, `docs/ARCHITECTURE.md` and ADRs), then **build** (`/to-tickets`, then `/implement-spec`). Small work is one issue and goes straight to build.
+Pick the path by the size of the work. A person types each command; when a step finishes, say which command comes next.
+
+| The work | Path |
+|---|---|
+| New and not sized yet: a report, a request, an idea | `/triage`. It briefs it as one ticket, or says it's big work |
+| Typo-sized | Just do it: a PR labelled `no-issue` |
+| One ticket: a bug, a small enhancement | `/ways:work <issue>` |
+| **Big work:** more than one ticket, or it changes an invariant or a contract | **1 Requirements:** `/grill-with-docs` → `/to-spec` (the PRD)<br>**2 Design:** `/ways:design` (parts, contracts, data, seams, NFRs)<br>**3 Build:** `/to-tickets` → `/implement-spec` |
+
+Skips, and only these:
+
+- **Requirements already written and agreed** (a brief someone wrote): skip the grill. Share the brief, then `/to-spec`.
+- **Big work that stays inside one part and touches no contract, schema or data store:** skip `/ways:design`. `/to-spec`'s seam sketch is enough; the PRD says "Design: no change of shape".
+- Nothing else is skipped. If a step feels unnecessary, the work is probably one ticket, not big work.
+
+Also: `/ways:explain` before working in code you don't know; `/ways:arch-review` at the start of a repo, before a big change, and every so often.
 
 ## Working an issue
 

@@ -31,6 +31,13 @@ Work closes through a PR, never by closing the issue directly.
 
 An agent brief also has a **Human verification** line: how someone who didn't build it confirms it.
 
+### Sizing, when triaging
+
+Say which path an issue takes, using the table in `AGENTS.md` under **How work goes**:
+
+- **One ticket** (fits one PR, changes no invariant or contract): brief it as usual. It's worked with `/ways:work`.
+- **Big work** (more than one ticket, or it changes an invariant or a contract): don't brief it as a ticket. Label it `ready-for-human`, and say in the comment that it needs the three parts, starting with `/grill-with-docs`.
+
 ### Labels beyond the triage roles
 
 - `needs-human`: a run is waiting on a decision, an acceptance or information only a person has.
