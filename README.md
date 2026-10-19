@@ -33,7 +33,7 @@ Big work goes in three parts, each ending in something a person agrees:
 |---|---|---|
 | **1. Requirements** (what and why) | `/grill-with-docs`, then `/to-spec` | A PRD in `specs/prd/` (problem, user stories, scope) with a parent issue; terms in `GLOSSARY.md` |
 | **2. Design** (how, at system level) | `/ways:design` | The PRD's design sections (parts, contracts, data, seams, NFRs), `docs/ARCHITECTURE.md` updated, ADRs where earned. On the spec's branch, so one PR agrees both |
-| **3. Build** | `/to-tickets`, then `/implement-spec` | Slices cut along the seams, one integration branch, one reviewed PR |
+| **3. Build** | `/to-tickets`, then `/implement-spec` | Slices cut along the seams, built one at a time unless you ask for parallel, on one integration branch, with one reviewed PR |
 
 Only two skips: no grill when the requirements are already written and agreed (share them, then `/to-spec`), and no `/ways:design` when the work stays inside one part and touches no contract, schema or data store. If any other step feels unnecessary, the work is probably one ticket.
 

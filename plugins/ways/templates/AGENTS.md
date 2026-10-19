@@ -45,7 +45,7 @@ Also: `/ways:explain` before working in code you don't know; `/ways:arch-review`
 
 ## Working an issue
 
-Use `/ways:work <issue>`. It runs interactively for `ready-for-human` and autonomously for `ready-for-agent`. For a whole spec at once, `/implement-spec`, with `.claude/ways/autonomous` created first so the gate holds.
+Use `/ways:work <issue>`. It runs interactively for `ready-for-human` and autonomously for `ready-for-agent`. For a whole spec at once, `/implement-spec`, with `.claude/ways/autonomous` created first so the gate holds. It builds one ticket at a time unless you ask for parallel (`docs/agents/issue-tracker.md` says why).
 
 ## Merging
 

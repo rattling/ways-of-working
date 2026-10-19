@@ -19,6 +19,10 @@ A feature needs a PRD only if it needs more than one ticket or changes an invari
 
 Read the parent issue, follow its `Spec:` line, and read the file.
 
+### When implementing a whole spec (`/implement-spec`)
+
+**One ticket at a time**, in the order the blocking edges allow: one implementer at a time, merged to the integration branch before the next starts. Go parallel only when the person asks for it in this session. Parallel implementers each run the gate, so each brings up its own containers and database, and the run is harder to follow and costs more.
+
 ### When a skill says "resolve a ticket the way the tracker closes work"
 
 Work closes through a PR, never by closing the issue directly.
