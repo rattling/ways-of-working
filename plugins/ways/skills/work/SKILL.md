@@ -26,7 +26,7 @@ Work with the person turn by turn, and keep the gate green as you go. Then go to
 ## 3. Autonomous mode
 
 1. **Plan comment.** Post a short plan on the issue: the approach, the seams you'll test at, anything you're assuming, and how you'll prove each acceptance item. Wait for a person to say go, unless they've said in this session that you needn't.
-2. **Marker.** Write the issue number to `.claude/ways/autonomous` (`echo <n> > .claude/ways/autonomous`). While it exists, the Stop hook runs the gate and won't let a turn end on red, and after a compaction the SessionStart hook points you back at the issue.
+2. **Marker.** Write the issue number to `.claude/ways/autonomous` (`echo <n> > .claude/ways/autonomous`). While it exists, the Stop hook runs the gate and won't let a turn end on red (after three blocks in a row it tells you to hand over, then lets the turn end), and after a compaction the SessionStart hook points you back at the issue.
 3. **Draft PR early.** After the first meaningful commit, push and open a draft PR with `Closes #<n>`. Commits are the progress record.
 4. **Build.** Use `tdd` at the seams in your plan comment, and `diagnosing-bugs` for a bug. Commit in small steps with messages that say why.
 5. **Keep the state outside your context.** Your plan comment, the draft PR and the commits are what a fresh context resumes from. If the plan changes materially, update the plan comment.
