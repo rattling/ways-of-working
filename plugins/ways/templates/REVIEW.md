@@ -9,6 +9,7 @@ Changes touching these are high risk: a senior approval, a rollback plan, and `/
 - Authentication and permissions
 - Data migrations
 - CI and deploy workflows
+- <data where an error causes harm (safety, health, money), if this repo has any>
 - <areas specific to this repo>
 
 ## What we care about here

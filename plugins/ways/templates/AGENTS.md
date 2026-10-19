@@ -16,6 +16,7 @@ This file is the only one read every time. Open the rest when the work needs the
 | `specs/prd/` | The spec an issue points to |
 | `docs/ARCHITECTURE.md`, then `docs/adr/` | A change that crosses a part's boundary or a contract |
 | `GLOSSARY.md` | Naming things: use its terms |
+| `CODING_STANDARDS.md`, then `docs/standards/` | Writing or reviewing code: this repo's rules, then the shared standards and what checks each |
 
 <Add the two or three files worth knowing before touching code, with when.>
 

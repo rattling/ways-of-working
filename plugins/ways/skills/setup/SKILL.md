@@ -32,6 +32,8 @@ Templates live in `${CLAUDE_PLUGIN_ROOT}/templates/`. For each one, except `over
 
 `docs/ARCHITECTURE.md`: draft it from the code as it is, marked as a draft. An empty repo keeps the template.
 
+`docs/standards/`: copy the shared files and only the stack files this repo uses (`php.md`, `dotnet.md`); if its stack has none, say so in the report. Fill a stack file's **Today** line from the code, marked as a draft, and leave **Moving to** for people. A repo that already has standards keeps them: list what overlaps in the report rather than merging.
+
 **A new repo starts with a walking skeleton.** If there's no code yet, the roadmap's first milestone is the walking skeleton, and the report suggests its issue: the thinnest end-to-end path through the real stack, showing one real thing from the real data store, with the gate running locally and in CI.
 
 **Existing code without a working gate starts with a gate skeleton.** If there's code but no gate that can run (no tests, no way to run it locally, no CI), the first milestone is the gate skeleton, and the report suggests its issue. Its outcome: the app runs locally (containerised, if today it only runs on a hand-built server); characterisation tests pin the behaviour that matters most, as it is now, bugs included, with suspected bugs listed as issues rather than fixed; and the gate runs locally and in CI. Until then the gate is a placeholder, and the report says so.

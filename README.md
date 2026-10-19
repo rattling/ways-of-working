@@ -35,13 +35,14 @@ A feature needs a PRD only if it needs more than one ticket or changes an invari
 | `specs/` | `charter.md`, `roadmap.md`, `operating-context.md`, `prd/` | People |
 | `GLOSSARY.md`, `docs/adr/`, `docs/ARCHITECTURE.md` | Language, decisions, shape | People decide; Claude drafts |
 | `docs/agents/` | Where Pocock's skills find the tracker, labels and domain docs, plus this repo's conventions | Setup writes it |
+| `docs/standards/` | Engineering standards: architecture, code, testing, security, delivery, the stack, and what checks each rule | Starts as the plugin's; the team makes it its own |
 | Everything else | `AGENTS.md`, `CODING_STANDARDS.md`, `REVIEW.md`, `.github/`, `.claude/`, issues, PR bodies, tests | Claude builds; people review |
 
 ## What `ways` adds to Pocock's skills
 
-- **`/ways:setup`:** the files above, labels, a `pr-hygiene` CI check, settings, and this repo's conventions appended to Pocock's tracker config: PRDs as files, closing work through PRs.
+- **`/ways:setup`:** the files above, including the standards, labels, a `pr-hygiene` CI check, settings, and this repo's conventions appended to Pocock's tracker config: PRDs as files, closing work through PRs.
 - **`/ways:work`:** one issue in interactive or autonomous mode: branch, plan comment, early draft PR, `tdd`, `code-review` with every finding answered, risk tier, PR body, merge policy.
-- **Hooks:** a SessionStart hook that orients Claude in an opted-in repo, and a Stop hook that won't let an autonomous run end on a red gate.
+- **Hooks:** a SessionStart hook that orients Claude in an opted-in repo, a Stop hook that won't let an autonomous run end on a red gate, and a nudge when the agent grows a file past about 500 lines.
 - **Reference:** risk tiers, branching and merge policy, in `plugins/ways/reference/`.
 
 ## `ways-band`: a mod
@@ -54,6 +55,16 @@ An optional second plugin, and a small worked example of a [mod](https://code.cl
 `claude plugin install ways-band@ways-of-working`. Its code is one file, `plugins/ways-band/hooks/register.js`, with tests beside it (`claude plugin test` in that directory). Mods run unsandboxed with your permissions; this one reads a few files under `.claude/` and `AGENTS.md`, runs `git branch` and, on `/gate`, the gate.
 
 [`WORKING-CONTRACT.md`](WORKING-CONTRACT.md) is the reasoning behind it: who owns what, and why.
+
+## Make it yours
+
+The standards are a starting point, and a team should end up owning its own. Pick one:
+
+- **Edit the repo's copy.** `docs/standards/` belongs to the repo once setup has copied it. Enough for one repo or a small team.
+- **Fork this repo.** Rewrite the standards and templates, point your repos' `.claude/settings.json` at your fork, and change it by PR with a version bump.
+- **Add your own plugin on top.** Keep `ways` as it is and add a plugin for what's yours: your standards, and skills for your deploys, environments and internal services, loaded when needed. Distribute both through managed settings on a Teams or Enterprise plan.
+
+Whichever you choose, keep the rule from `docs/standards/README.md`: a rule nothing checks is advice, so every rule you add says what enforces it.
 
 ## Where it came from
 
