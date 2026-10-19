@@ -11,7 +11,11 @@ function stubRepo(
   on: any,
   files: Record<string, string>,
   written: Record<string, string> = {},
-  { env = {}, runs = [] }: { env?: Record<string, string>; runs?: string[][] } = {},
+  {
+    env = {},
+    runs = [],
+    rateLimits = [],
+  }: { env?: Record<string, string>; runs?: string[][]; rateLimits?: unknown[] } = {},
 ) {
   on('fs.exists', ($: any, e: any) => ({ value: rel(e.path) in files }))
   on('fs.read', ($: any, e: any) => ({ value: files[rel(e.path)] }))
@@ -26,7 +30,7 @@ function stubRepo(
     if (e.argv[1] === '--exec-path') return { value: { exitCode: 0, stdout: 'C:/Program Files/Git/mingw64/libexec/git-core\n', stderr: '' } }
     return { value: { exitCode: 0, stdout: 'feature/3-walking-skeleton\n', stderr: '' } }
   })
-  on('session.usage', () => ({ value: { startedAt: 0, context: { tokens: 1, window: 2, percent: 41.6 }, rateLimits: [], cost: 0 } }))
+  on('session.usage', () => ({ value: { startedAt: 0, context: { tokens: 1, window: 2, percent: 41.6 }, rateLimits, cost: 0 } }))
   on('command.register', () => ({ value: undefined }))
   mock.clock(on)
   mock.env(on, env)
@@ -68,6 +72,36 @@ test('a batch shows every issue the lead is running, in merge order', async ($, 
   await $.session.start({ cwd: '/repo' })
   const ui = await $.ui.mount(BAND as any)
   expect(await ui.find({ type: 'Text', text: 'autonomous batch #12 #14 #17' })).toBeDefined()
+  await ui.unmount()
+})
+
+// The plan's usage windows: shown in the band, and written where an autonomous run can
+// read them, so an integration PR can report usage at the start and after each ticket.
+const WINDOWS = [
+  { kind: 'five_hour', percentUsed: 34, resetsAt: '2026-10-19T19:00:00Z' },
+  { kind: 'seven_day', percentUsed: 8.5, resetsAt: '2026-10-24T09:00:00Z' },
+]
+
+test('the band shows the usage windows and writes them for the agent', async ($, on) => {
+  const written: Record<string, string> = {}
+  stubRepo(on, REPO, written, { rateLimits: WINDOWS })
+  await $.session.start({ cwd: '/repo' })
+  const ui = await $.ui.mount(BAND as any)
+  expect(await ui.find({ type: 'Text', text: 'usage 5h 34% · wk 9%' })).toBeDefined()
+  const usage = JSON.parse(written['.claude/ways/usage'])
+  expect(usage.five_hour).toEqual({ percentUsed: 34, resetsAt: '2026-10-19T19:00:00Z' })
+  expect(usage.seven_day.percentUsed).toBe(8.5)
+  expect(typeof usage.at).toBe('string')
+  await ui.unmount()
+})
+
+test('with no usage reading, the band leaves usage out and writes nothing', async ($, on) => {
+  const written: Record<string, string> = {}
+  stubRepo(on, REPO, written)
+  await $.session.start({ cwd: '/repo' })
+  const ui = await $.ui.mount(BAND as any)
+  expect(await ui.find({ type: 'Text', text: /^usage/ })).toBeUndefined()
+  expect(written['.claude/ways/usage']).toBeUndefined()
   await ui.unmount()
 })
 

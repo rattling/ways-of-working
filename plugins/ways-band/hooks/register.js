@@ -1,13 +1,18 @@
 // ways-band: a status band above the prompt for repos that work the ways-of-working way,
 // and a /gate command that runs the gate at once, without a Claude turn.
 //
-// It only reads: .claude/ways.json (version, gate), .claude/ways/autonomous (the issue or
+// It reads: .claude/ways.json (version, gate), .claude/ways/autonomous (the issue or
 // issues an autonomous run is on), .claude/ways/last-gate (written by the ways Stop hook and by /gate),
 // the Dial line in AGENTS.md, and the current git branch. In a repo without .claude/ways.json
 // it draws nothing.
+//
+// It writes .claude/ways/usage: the plan's usage windows (five-hour, weekly) as JSON, whenever
+// they move. The agent can't read them itself, and an autonomous run reports them in its
+// integration PR at the start and after each ticket.
 
 let view = null // what the band shows; null means "not a ways repo"
 let gateRunning = false
+let lastUsage = null // the windows last written, so the file only changes when they move
 
 async function readText($, path) {
   try {
@@ -51,9 +56,20 @@ async function refresh($) {
   } catch {}
 
   let context = null
+  const windows = {}
   try {
-    context = (await $.session.usage()).context.percent
+    const usage = await $.session.usage()
+    context = usage.context.percent
+    for (const w of usage.rateLimits || []) windows[w.kind] = { percentUsed: w.percentUsed, resetsAt: w.resetsAt }
   } catch {}
+  // Empty off a subscription, or before the first response: then there's nothing to write.
+  const usage = JSON.stringify(windows)
+  if (usage !== '{}' && usage !== lastUsage) {
+    try {
+      await $.fs.write('.claude/ways/usage', JSON.stringify({ ...windows, at: new Date().toISOString() }, null, 2) + '\n')
+      lastUsage = usage
+    } catch {}
+  }
 
   const [result, at] = (lastGate || '').trim().split(/\s+/)
   view = {
@@ -67,6 +83,7 @@ async function refresh($) {
     dial: agents ? (agents.match(/\*\*Dial:\*\*\s*([a-z]+)/i) || [])[1] || null : null,
     branch,
     context,
+    windows,
   }
 }
 
@@ -157,6 +174,14 @@ export function register(on) {
     if (typeof view.context === 'number') {
       const pct = Math.round(view.context)
       parts.push(sep(), Text({ color: pct >= 75 ? 'red' : pct >= 50 ? 'yellow' : undefined, dimColor: pct < 50, children: ['context ' + pct + '%'] }))
+    }
+    // The plan's windows: amber from 75%, red from 90%, when a run may hit the limit.
+    const five = view.windows.five_hour
+    const week = view.windows.seven_day
+    if (five || week) {
+      const shown = [five && '5h ' + Math.round(five.percentUsed) + '%', week && 'wk ' + Math.round(week.percentUsed) + '%'].filter(Boolean)
+      const top = Math.max(five ? five.percentUsed : 0, week ? week.percentUsed : 0)
+      parts.push(sep(), Text({ color: top >= 90 ? 'red' : top >= 75 ? 'yellow' : undefined, dimColor: top < 75, children: ['usage ' + shown.join(' · ')] }))
     }
 
     // Keep whatever other mods draw in the band.
