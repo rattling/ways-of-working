@@ -42,6 +42,7 @@ A feature needs a PRD only if it needs more than one ticket or changes an invari
 
 - **`/ways:setup`:** the files above, including the standards, labels, a `pr-hygiene` CI check, settings, and this repo's conventions appended to Pocock's tracker config: PRDs as files, closing work through PRs.
 - **`/ways:work`:** one issue in interactive or autonomous mode: branch, plan comment, early draft PR, `tdd`, `code-review` with every finding answered, risk tier, PR body, merge policy.
+- **`/ways:arch-review`:** a guided architecture walkthrough, lens by lens in the shape of TOGAF's ADM (plus the Well-Architected pillars for hosted systems), at the start of a repo, before a big change or at intervals. It ends in findings for people to turn into tickets, not documents.
 - **Hooks:** a SessionStart hook that orients Claude in an opted-in repo, a Stop hook that won't let an autonomous run end on a red gate, and a nudge when the agent grows a file past about 500 lines.
 - **Reference:** risk tiers, branching and merge policy, in `plugins/ways/reference/`.
 
