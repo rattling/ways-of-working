@@ -62,7 +62,7 @@ The flow commands are typed by a person: Claude doesn't start them itself, becau
 
 An optional second plugin, and a small worked example of a [mod](https://code.claude.com/docs/en/plugins/mods/overview): JavaScript that runs inside Claude Code and can draw in its interface.
 
-- **A band above the prompt** in an opted-in repo: `ways 0.7.0 · autonomous #3 · gate ✔ 2m ago · dial default · feature/3-walking-skeleton · context 42% · usage 5h 34% · wk 9%`.
+- **A band above the prompt** in an opted-in repo: `ways 0.7.0 · autonomous #9 · 2 of 9 · gate ✔ 2m ago · dial default · feature/3-walking-skeleton · context 42% · usage 5h 34% · wk 9%`.
 - **`/gate`** runs the repo's gate at once, without a Claude turn or any tokens, and records the result for the band.
 - **The plan's usage windows** (five-hour and weekly) go in `.claude/ways/usage` whenever they move. The agent can't read them itself, and an autonomous run reports them in its integration PR. Where Claude Code has no reading (off a subscription, and possibly some plan types), the band leaves usage out.
 

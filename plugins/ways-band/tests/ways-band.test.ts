@@ -105,6 +105,14 @@ test('with no usage reading, the band leaves usage out and writes nothing', asyn
   await ui.unmount()
 })
 
+test('a spec run shows how many of its tickets are done', async ($, on) => {
+  stubRepo(on, { ...REPO, '.claude/ways/autonomous': '9\n', '.claude/ways/progress': '2 9\n' })
+  await $.session.start({ cwd: '/repo' })
+  const ui = await $.ui.mount(BAND as any)
+  expect(await ui.find({ type: 'Text', text: 'autonomous #9 · 2 of 9' })).toBeDefined()
+  await ui.unmount()
+})
+
 test('the band draws nothing in a repo that has not opted in', async ($, on) => {
   stubRepo(on, {})
   await $.session.start({ cwd: '/repo' })

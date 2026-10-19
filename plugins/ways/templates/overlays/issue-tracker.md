@@ -29,6 +29,8 @@ Read the parent issue, follow its `Spec:` line, and read the file.
 - **Opus** for the rules that must never be wrong (the charter's invariants), a high-risk path in `REVIEW.md` or `CODEOWNERS`, a contract other systems read, or a ticket that leaves judgement calls.
 - The code review and its fixes stay on the session's model.
 
+**Progress, without being asked.** The draft PR's body opens with a checklist of the tickets in build order, plus the code review, and you tick each one as it merges. Every update you post starts with "N of M done", saying what's building and what's next. After each merge, write `<done> <total>` to `.claude/ways/progress` (for example `2 9`), and the band shows it. Delete the file at handover, with the marker.
+
 **What the run cost, in the integration PR.** People need to know whether a spec is a sensible size for their usage. The plan's usage windows are in `.claude/ways/usage` (five-hour and weekly, as percentages, written by the `ways-band` mod). If the file isn't there, ask the person to run `/usage` and tell you the two figures.
 
 - **At the start**, in the draft PR body: the usage windows now, and a rough estimate (the number of tickets, and what one ticket has cost so far in this repo, if a previous run says).
