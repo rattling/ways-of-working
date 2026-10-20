@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Brightwater · Book an engineer</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header><strong>Brightwater Heating &amp; Plumbing</strong></header>
+  <main>
+    <div class="card">
+      <h2>Book an engineer</h2>
+      <label>Your name <input id="name"></label>
+      <label>Address <input id="addr"></label>
+      <label>Phone <input id="phone"></label>
+      <label>What's the problem?
+        <select id="type">
+          <option>Annual service</option>
+          <option>Boiler breakdown</option>
+          <option>Leak</option>
+          <option>New boiler quote</option>
+        </select>
+      </label>
+      <label>Preferred date <input id="date" type="date"></label>
+      <label>Slot
+        <select id="slot"><option>Morning</option><option>Afternoon</option></select>
+      </label>
+      <p>A £30 deposit secures your booking.</p>
+      <button onclick="book()">Pay deposit &amp; book</button>
+      <p id="done"></p>
+    </div>
+  </main>
+  <script>
+    function book() {
+      const bookings = JSON.parse(localStorage.getItem("bw_bookings") || "[]");
+      bookings.push({
+        name: document.getElementById("name").value,
+        address: document.getElementById("addr").value,
+        phone: document.getElementById("phone").value,
+        type: document.getElementById("type").value,
+        date: document.getElementById("date").value,
+        slot: document.getElementById("slot").value,
+      });
+      localStorage.setItem("bw_bookings", JSON.stringify(bookings));
+      // TODO take the deposit
+      document.getElementById("done").textContent = "Booked! We'll see you then.";
+    }
+  </script>
+</body>
+</html>

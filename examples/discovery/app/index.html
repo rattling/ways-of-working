@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Brightwater · Login</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="auth.js"></script>
+</head>
+<body>
+  <main>
+    <div class="card" style="max-width:360px;margin:80px auto">
+      <h2>Brightwater staff login</h2>
+      <label>Username <input id="u"></label>
+      <label>Password <input id="p" type="password"></label>
+      <button onclick="go()">Log in</button>
+      <p id="err" style="color:#b00"></p>
+    </div>
+  </main>
+  <script>
+    function go() {
+      if (login(document.getElementById("u").value, document.getElementById("p").value)) {
+        window.location = currentUser().role === "engineer" ? "jobsheet.html" : "dashboard.html";
+      } else {
+        document.getElementById("err").textContent = "Wrong username or password";
+      }
+    }
+  </script>
+</body>
+</html>

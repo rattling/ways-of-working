@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Brightwater · Vans</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="auth.js"></script>
+</head>
+<body>
+  <script>requireLogin(); document.write(nav());</script>
+  <main>
+    <h1>Where are the vans?</h1>
+    <div class="card"><div id="van-map"></div></div>
+    <p>Engineers' phones report their location every minute while the app is open.</p>
+  </main>
+  <script>
+    // Demo positions until the phones report in
+    const vans = ["Tom", "Aisha", "Kev", "Marek", "Lee", "Raj", "Chris", "Ollie", "Ben"];
+    document.getElementById("van-map").innerHTML = vans
+      .map(v => `<span class="van" title="${v}" style="left:${Math.random() * 90}%;top:${Math.random() * 85}%">🚐</span>`)
+      .join("");
+
+    // Engineers: send our position to the office
+    const user = currentUser();
+    if (user && user.role === "engineer" && navigator.geolocation) {
+      setInterval(() => navigator.geolocation.getCurrentPosition(pos => {
+        localStorage.setItem("bw_pos_" + user.username, JSON.stringify([pos.coords.latitude, pos.coords.longitude, Date.now()]));
+      }), 60000);
+    }
+  </script>
+</body>
+</html>
