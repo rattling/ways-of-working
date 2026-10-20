@@ -13,6 +13,7 @@ This file is the only one read every time. Open the rest when the work needs the
 | `README.md` | How to run it |
 | `specs/operating-context.md` | Choosing or planning work: what matters this phase |
 | `specs/charter.md` | Anything that touches scope or an invariant |
+| `specs/brief/` | The discovery behind big work: what the problem is, and why this scope |
 | `specs/prd/` | The spec an issue points to |
 | `docs/ARCHITECTURE.md`, then `docs/adr/` | A change that crosses a part's boundary or a contract |
 | `GLOSSARY.md` | Naming things: use its terms |
@@ -30,10 +31,11 @@ Pick the path by the size of the work. A person types each command; when a step 
 
 | The work | Path |
 |---|---|
+| The problem isn't understood yet: a wish list of solutions, an idea, a half-built app nobody's sure about | `/ways:discover` first, quick or deep. It ends in a brief in `specs/brief/` and an intake issue for `/triage` |
 | New and not sized yet: a report, a request, an idea | `/triage`. It briefs it as one ticket, or says it's big work |
 | Typo-sized | Just do it: a PR labelled `no-issue` |
 | One ticket: a bug, a small enhancement | `/ways:work <issue>` |
-| **Big work:** more than one ticket, or it changes an invariant or a contract | **1 Requirements:** `/grill-with-docs` → `/to-spec` (the PRD)<br>**2 Design:** `/ways:design` (parts, contracts, data, seams, NFRs)<br>**3 Build:** `/to-tickets` → `/implement-spec` |
+| **Big work:** more than one ticket, or it changes an invariant or a contract | **1 Requirements:** `/grill-with-docs` → `/to-spec` (the PRD; the grill starts from the discovery brief if there is one)<br>**2 Design:** `/ways:design` (parts, contracts, data, seams, NFRs)<br>**3 Build:** `/to-tickets` → `/implement-spec` |
 
 Skips, and only these:
 

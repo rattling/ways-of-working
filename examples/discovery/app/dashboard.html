@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Brightwater · Dashboard</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="auth.js"></script>
+</head>
+<body>
+  <script>requireLogin(); document.write(nav());</script>
+  <main>
+    <h1>Business at a glance</h1>
+    <div class="grid">
+      <div class="card"><h3>Jobs this week</h3><p id="jobs" style="font-size:32px"></p></div>
+      <div class="card"><h3>Revenue this week</h3><p id="rev" style="font-size:32px"></p></div>
+      <div class="card"><h3>Jobs per day</h3><p id="jpd" style="font-size:32px"></p></div>
+    </div>
+    <div class="card"><h3>Jobs per engineer</h3><div id="bars"></div></div>
+  </main>
+  <script>
+    // Live data (random until hooked up to the spreadsheet)
+    const engineers = ["Tom", "Aisha", "Kev", "Marek", "Lee", "Raj", "Chris", "Ollie", "Ben"];
+    const r = (min, max) => Math.floor(min + Math.random() * (max - min));
+    const jobs = r(100, 140);
+    document.getElementById("jobs").textContent = jobs;
+    document.getElementById("rev").textContent = "£" + (jobs * r(150, 220)).toLocaleString();
+    document.getElementById("jpd").textContent = (jobs / 5).toFixed(1);
+    document.getElementById("bars").innerHTML = engineers
+      .map(e => { const n = r(8, 20); return `<div class="bar" style="width:${n * 4}%">${e} ${n}</div>`; })
+      .join("");
+  </script>
+</body>
+</html>

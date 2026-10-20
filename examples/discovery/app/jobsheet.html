@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Brightwater · Job sheet</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="auth.js"></script>
+</head>
+<body>
+  <script>requireLogin(); document.write(nav());</script>
+  <main>
+    <div class="card">
+      <h2>Job sheet</h2>
+      <form id="sheet">
+        <label>Job ref <input name="job_ref" placeholder="BW-4xxx"></label>
+        <label>Customer name <input name="customer"></label>
+        <label>Address <input name="address"></label>
+        <label>Time in <input name="time_in" type="time"></label>
+        <label>Time out <input name="time_out" type="time"></label>
+        <label>Work done <textarea name="work" rows="4"></textarea></label>
+        <label>Parts used (one per line, with part number) <textarea name="parts" rows="3"></textarea></label>
+        <label>Boiler make <input name="boiler_make"></label>
+        <label>Boiler model <input name="boiler_model"></label>
+        <label>Boiler serial number <input name="boiler_serial"></label>
+        <label>Notes for the office <textarea name="notes" rows="2"></textarea></label>
+        <label>Customer signature (type full name) <input name="signature"></label>
+        <button type="submit">Send to office</button>
+      </form>
+      <p id="status"></p>
+    </div>
+  </main>
+  <script>
+    // Google Sheets web app that appends a row (Jordan's test sheet)
+    const SHEET_WEBHOOK = "https://example.invalid/macros/s/REPLACE_ME/exec";
+
+    document.getElementById("sheet").addEventListener("submit", e => {
+      e.preventDefault();
+      const data = Object.fromEntries(new FormData(e.target));
+      data.engineer = currentUser().username;
+      e.target.reset(); // clear for the next job
+      fetch(SHEET_WEBHOOK, { method: "POST", body: JSON.stringify(data) })
+        .then(() => document.getElementById("status").textContent = "Sent ✔")
+        .catch(() => document.getElementById("status").textContent = "Couldn't send, try again");
+    });
+  </script>
+</body>
+</html>
