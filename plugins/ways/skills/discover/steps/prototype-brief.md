@@ -1,7 +1,4 @@
----
-name: prototype-brief
-description: Ranks a v1's assumptions by risk and testability, picks the single riskiest one a prototype can test, and writes a build-ready prototype brief — one flow, realistic mock data drawn from the interviews, what's real vs faked, success criteria, a user test script and a paste-ready build prompt. Use after scoping and before building, or when someone asks "what should we prototype first".
----
+<!-- Step 6 of /ways:discover. Adapted from `prototype-brief` in discovery-to-mvp 1.2.0 by Ofer Regev (MIT; see ../LICENSE-discovery-to-mvp). -->
 
 # Prototype brief (pipeline step 6)
 
@@ -9,9 +6,9 @@ The instinct is to prototype the whole v1, or the most fun screen. Both waste th
 
 ## Inputs
 
-- `out/05-scope.md` (required), especially the Assumptions and Adoption plan sections.
+- `out/05-scope.md` (required), especially the Assumptions and Adoption plan sections, and `out/05b-case.md` for the riskiest assumption it names.
 - `out/02-extract-*.md` and `out/01-merged-*.md`, for realistic mock data.
-- Build constraints from the user if any (tool: Claude Code, v0, Lovable; deploy target; time box). Default: Claude Code, deploy to Vercel, half a day.
+- Build constraints from the user if any (tool: Claude Code, v0, Lovable; deploy target; time box). Default: Claude Code, plain static files that open from disk, no deploy, half a day.
 
 ## Process
 
@@ -83,7 +80,7 @@ Entry point / Steps / End state
 
 ## Stop here: show the results and ask how to continue
 
-This step always ends with a stop, including when it runs inside a full pipeline or the user said "run everything". Never start the next step, and never apply a decision, until the user answers. The one exception is a delegated run, as the orchestrator defines it: show the results, log the delegated decision and continue.
+In deep mode this step always ends with a stop, including when the user said "run everything". Never start the next step, and never apply a decision, until the user answers. Two exceptions, both defined in `SKILL.md`: a delegated run (show the results, log the delegated decision and continue), and quick mode (no stop here; carry this step's decisions to the next quick-mode checkpoint).
 
 1. **Show the results in the chat**, not only the file path: the top three ranked assumptions, the test question, the flow steps, the success criteria and the kill signal. Then say where the full file is.
 2. **Ask the decisions below.** Give your recommended answer for each, clearly marked as a recommendation.

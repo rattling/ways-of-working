@@ -1,7 +1,4 @@
----
-name: persona-extract
-description: Pulls one persona's evidence out of a merged interview transcript — pains with verbatim quotes and severity, workarounds, numbers, prompted vs unprompted signals, stated vs revealed gaps, what must not change, and conspicuous silences — every line tied to a turn ID. Use after transcripts are cleaned, when someone asks what a customer or stakeholder "really said", or before comparing personas.
----
+<!-- Step 2 of /ways:discover. Adapted from `persona-extract` in discovery-to-mvp 1.2.0 by Ofer Regev (MIT; see ../LICENSE-discovery-to-mvp). -->
 
 # Persona extract (pipeline step 2)
 
@@ -12,14 +9,14 @@ Run once per persona. If several interviews share a persona, run once over all o
 ## Inputs
 
 - `out/01-merged-<CODE>.md` for this persona (required). If only raw transcripts exist, stop and suggest running `transcript-reconcile` first; quoting raw transcripts carries their attribution errors forward.
-- `context/brief.md`, for what the team expected to hear, the beliefs it lists, and whether the call was real or roleplayed. If it was roleplayed, add a line at the top of the extract: `Roleplayed call: accounts are plausible, not representative.` Scores stay evidence-based, and nothing counts as prevalence.
+- `context.md`, for what the team expected to hear, the beliefs it lists, and whether the call was real or roleplayed. If it was roleplayed, add a line at the top of the extract: `Roleplayed call: accounts are plausible, not representative.` Scores stay evidence-based, and nothing counts as prevalence.
 
 ## Process
 
 Read the whole transcript once without writing. Then go through it turn by turn.
 
 ### 1. Who they are
-Role, team size, how long they've been in the relationship, scale numbers (volumes, frequencies). Only what they said. Then the call: its recorded length and how it was captured (one source or two). A booked slot is not the recorded length; later steps and the deck quote the recorded length.
+Role, team size, how long they've been in the relationship, scale numbers (volumes, frequencies). Only what they said. Then the call: its recorded length and how it was captured (one source or two). A booked slot is not the recorded length; later steps quote the recorded length.
 
 ### 2. Mark every interviewer question as open or leading
 A leading question names an answer ("Would a dashboard help with that?"). Any answer to a leading question is **prompted**. A pain the person raised before being asked about that topic is **unprompted**. Unprompted signals weigh more. List the leading questions you found; the PM needs to know.
@@ -41,6 +38,8 @@ The strongest signal in discovery. Anything they built or do by hand to cope: a 
 
 ### 5. Numbers
 Table of every number, count, frequency, duration or percentage they said, with the turn ID and the exact words. Keep their hedges ("maybe half, maybe less").
+
+Where `out/01-data.md` measures the same thing, add a column: what the data says, with its `DAT` ID (added by ways). A gap between the two is a stated-vs-revealed row in section 6. People are often wrong about their own numbers in both directions, and which way they're wrong is a finding.
 
 ### 6. Stated vs revealed
 Where what they **say** differs from what their **stories** show. Typical patterns:
@@ -73,7 +72,7 @@ Topics the brief expected, or that the workflow obviously includes, that this pe
 5 to 10 short verbatim phrases worth reusing in problem statements and product copy ("evidence folder", "a lottery every morning").
 
 ### 12. Recent changes (triggers)
-Anything the person says has changed lately, is about to change, or forces a decision soon: a season, a volume, a new menu, a new rule, a new competitor, a failed earlier attempt, a deadline. One row each: what changed, when, why it makes this problem worse or more urgent for them, and the turn ID. Don't infer a trigger the person didn't mention. If there is none, write `none named`. This feeds the "why now" in step 4 and the deck.
+Anything the person says has changed lately, is about to change, or forces a decision soon: a season, a volume, a new menu, a new rule, a new competitor, a failed earlier attempt, a deadline. One row each: what changed, when, why it makes this problem worse or more urgent for them, and the turn ID. Don't infer a trigger the person didn't mention. If there is none, write `none named`. This feeds the "why now" in step 4.
 
 ## Rules
 
@@ -118,7 +117,7 @@ Parked ideas: ...
 
 ## Stop here: show the results and ask how to continue
 
-This step always ends with a stop, including when it runs inside a full pipeline or the user said "run everything". Never start the next step, and never apply a decision, until the user answers. The one exception is a delegated run, as the orchestrator defines it: show the results, log the delegated decision and continue.
+In deep mode this step always ends with a stop, including when the user said "run everything". Never start the next step, and never apply a decision, until the user answers. Two exceptions, both defined in `SKILL.md`: a delegated run (show the results, log the delegated decision and continue), and quick mode (no stop here; carry this step's decisions to the next quick-mode checkpoint).
 
 1. **Show the results in the chat**, not only the file path: the top three pains with quote, turn ID and severity (and any `Named top pain`); the leading questions you found; the stated-vs-revealed rows; the trust table; and the silences. Then say where the full file is.
 2. **Ask the decisions below.** Give your recommended answer for each, clearly marked as a recommendation.

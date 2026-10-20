@@ -1,7 +1,4 @@
----
-name: mvp-scope-cutlist
-description: Scopes a v1 from a framed problem and discovery evidence — what v1 does, what it explicitly doesn't, a cut list where every cut has a reason, a cost and a revisit trigger, and an adoption plan for getting busy users off their current channel. Invites and handles the PM's pushback. Use when deciding what goes in an MVP, writing a cut list, or when someone asks "what's the smallest thing we can ship that solves this".
----
+<!-- Step 5 of /ways:discover. Adapted from `mvp-scope-cutlist` in discovery-to-mvp 1.2.0 by Ofer Regev (MIT; see ../LICENSE-discovery-to-mvp). -->
 
 # MVP scope and cut list (pipeline step 5)
 
@@ -11,12 +8,15 @@ This is the step where the PM argues with the model. The first scope any model p
 
 - `out/04-problem.md` and the chosen framing from `out/decisions.md` (required)
 - `out/03-collisions.md`, `out/02-extract-*.md` (required)
-- `context/brief.md` constraints: team, time, budget, data and integrations that exist or don't. If constraints are missing, ask once: "What can the team build in the next 4–6 weeks, and what data or integrations do we definitely not have?"
+- `context.md` constraints: team, time, budget, data and integrations that exist or don't. If constraints are missing, ask once: "What can the team build in the next 4–6 weeks, and what data or integrations do we definitely not have?"
 - Every `Parked ideas` line from earlier outputs
+- `out/01-built.md`, if something has already been built
 
 ## Process
 
 ### 1. Build the candidate list
+**Start with the option that builds nothing** (added by ways). Before any feature: is there a change to how people work, using what they already have, that would move the business outcome or test its weakest link? A habit, a rule, a shared folder, a person doing a step by hand for a few weeks. Often the evidence holds one already: someone who doesn't have the problem because they work differently. Write it as candidate zero with the evidence for it, and say what it would and wouldn't fix. It usually doesn't replace v1. It goes first in the order of work, because it's free and it tests the bet. If there's honestly none, say why.
+
 Collect every possible feature from:
 - Each severity-2 and severity-3 pain (one or more candidates per pain).
 - Each collision's "what v1 must choose".
@@ -40,7 +40,7 @@ Where a top collision forces a choice, make it, and write which side v1 favors a
 
 **Re-check step 3's defaults.** The defaults the PM accepted at step 3 are provisional until they pass these rules. For each, run rules 1 to 7 on the capability it implies. If one fails (it sits on no link of the business chain, or depends on data the team doesn't have), say so before locking the scope and ask the PM whether to keep the default or reverse it.
 
-**Centrality check.** Take each persona's `Named top pain` from the extracts. The key persona's (see the orchestrator) has to be one of the core capabilities of v1, with the effort and depth to actually address it. If it appears only as a small field, a label or a "later", stop and decide on the record: (a) promote it to the core and cut something else, or (b) keep it small and write what the small version cannot prove (for example, "a one-line reason tells us whether clients read it, not whether they understand why the concept was built"). Never shrink the customer's biggest complaint to make room for the easiest-to-build items without saying so in the "Collisions decided" or "Argue with me" section. Any other persona's Named top pain is either addressed by a capability or written here as unaddressed, with the reason and what that costs; it does not get to disappear.
+**Centrality check.** Take each persona's `Named top pain` from the extracts. The key persona's (see `SKILL.md`) has to be one of the core capabilities of v1, with the effort and depth to actually address it. If it appears only as a small field, a label or a "later", stop and decide on the record: (a) promote it to the core and cut something else, or (b) keep it small and write what the small version cannot prove (for example, "a one-line reason tells us whether clients read it, not whether they understand why the concept was built"). Never shrink the customer's biggest complaint to make room for the easiest-to-build items without saying so in the "Collisions decided" or "Argue with me" section. Any other persona's Named top pain is either addressed by a capability or written here as unaddressed, with the reason and what that costs; it does not get to disappear.
 
 **Rank by evidence and outcome, not just pain score.** Operational pains (relays, lost requests) score high because they leave workarounds. Confidence pains (not understanding why, feeling it's random) leave none. Before locking the in-scope list, look at the ranking once without the severity scores and ask which capability moves the business outcome the most. If that differs from the severity order, say so.
 
@@ -48,7 +48,8 @@ Where a top collision forces a choice, make it, and write which side v1 favors a
 - **One sentence**: who does what, where, and what changes for them.
 - **In scope**: 3 to 6 capabilities, each with persona served, evidence IDs, and the workaround or relay it removes.
 - **v1 does not**: explicit list, in plain sentences. "v1 does not show performance data." "v1 does not replace the account manager's message."
-- **What v1 is the first step of**: two sentences on where it leads, taken from the business case (step 8 runs later; if it has already run, from `out/08-future-ideas.md`). After step 8, offer to update this section to match its position. A v1 with no direction reads as a fix for the current process. Write which parts of today's cut list are the next steps along that direction.
+- **What v1 is the first step of**: two sentences on where it leads, taken from the business case. A v1 with no direction reads as a fix for the current process. Write which parts of today's cut list are the next steps along that direction.
+- **The to-be workflow** (added by ways): step 3's as-is diagram redrawn with v1 in place, as a Mermaid `flowchart LR` with the same node names where a step doesn't change. Then **the gap**, in a few lines: which steps change, which disappear, which stay exactly as they are, and who does something new. If the gap is wider than the framed problem (v1 redraws steps nobody had a pain with), that's scope creep: say so and narrow it.
 
 ### 4. Write the cut list
 Every candidate not in v1 goes here. The cut list should be at least as long as the in-scope list; if it isn't, you haven't considered enough.
@@ -56,6 +57,11 @@ Every candidate not in v1 goes here. The cut list should be at least as long as 
 | Feature | Why it was considered [IDs] | Why it's cut (which rule) | What we lose by cutting it | Revisit when |
 
 "What we lose" must be honest. If the honest answer is "a client who wanted it will be disappointed", write that. "Revisit when" is a trigger, not a date: "when we have read access to client ad accounts", "when 3+ clients ask unprompted".
+
+### 4b. What's already built: keep, rework or delete
+Only if `out/01-built.md` exists (added by ways). For each part it lists: **keep** (serves v1 as it is), **rework** (the idea serves v1 but the code doesn't, say what's wrong), or **delete** (serves something cut, or is unsafe). Delete is the default for anything that serves a cut feature. Name the risky things plainly (secrets in the code, a path that loses data, personal data in the wrong place), because whoever built it will want to keep it. The table goes in the cut list's spirit: every verdict has a reason, and "it already exists" is not one.
+
+| Part [BLT] | Verdict | Why | What it costs to keep it anyway |
 
 ### 5. Adoption plan
 - **Current channel:** where each persona does this today.
@@ -90,9 +96,15 @@ Don't defend the original scope beyond one sentence. If you think the PM is wron
 ## Centrality check
 Named top pain: ... / Where it sits in v1: core | small | later / If small, what the small version can't prove: ...
 ## First step of
+## Candidate zero: what changes without building anything
+## To-be
+(a Mermaid flowchart LR: the as-is with v1 in place)
+### The gap
 ## v1 does not
 ## Cut list
 | Feature | Considered because [IDs] | Cut because | What we lose | Revisit when |
+## What's already built
+| Part [BLT] | Verdict (keep / rework / delete) | Why | What it costs to keep it anyway |
 ## Collisions decided
 | Collision | v1 favors | Why |
 ## Adoption plan
@@ -103,11 +115,11 @@ Named top pain: ... / Where it sits in v1: core | small | later / If small, what
 
 ## Stop here: show the results and ask how to continue
 
-This step always ends with a stop, including when it runs inside a full pipeline or the user said "run everything". Never start the next step, and never apply a decision, until the user answers. The one exception is a delegated run, as the orchestrator defines it: show the results, log the delegated decision and continue.
+In deep mode this step always ends with a stop, including when the user said "run everything". Never start the next step, and never apply a decision, until the user answers. Two exceptions, both defined in `SKILL.md`: a delegated run (show the results, log the delegated decision and continue), and quick mode (no stop here; carry this step's decisions to the next quick-mode checkpoint).
 
-1. **Show the results in the chat**, not only the file path: v1 in one sentence, the in-scope table, the centrality check, the full cut list table and the "Argue with me" items. Then say where the full file is.
+1. **Show the results in the chat**, not only the file path: v1 in one sentence, candidate zero, the to-be diagram and the gap, the in-scope table, the centrality check, the full cut list table, the keep/rework/delete table and the "Argue with me" items. Then say where the full file is.
 2. **Ask the decisions below.** Give your recommended answer for each, clearly marked as a recommendation.
-3. **Ask how to continue**, offering: Continue to step 6, `prototype-brief` · redo this step with changes · edit the output together · stop here.
+3. **Ask how to continue**, offering: Continue to step 5b, `cost-and-order` · redo this step with changes · edit the output together · stop here.
 
 Then wait for the user.
 

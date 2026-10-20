@@ -1,7 +1,4 @@
----
-name: transcript-reconcile
-description: Cleans and merges one or two auto-generated transcripts of the same call into a single trustworthy transcript with correct speaker attribution, glossary fixes, numbered turn IDs and a log of every judgment call. Use before any interview synthesis, when transcripts come from Zoom, Meet, Otter, Granola or similar, when speaker labels look wrong, when two transcripts of one call disagree, or when a transcript needs translating.
----
+<!-- Step 1 of /ways:discover. Adapted from `transcript-reconcile` in discovery-to-mvp 1.2.0 by Ofer Regev (MIT; see ../LICENSE-discovery-to-mvp). -->
 
 # Transcript reconcile (pipeline step 1)
 
@@ -10,12 +7,19 @@ Auto-transcripts lie in two ways. Speaker diarization puts one person's words in
 ## Inputs
 
 - One or two transcripts of the **same call** in `raw/`. Formats vary (Zoom `.txt`/`.vtt`, Otter export, Meet doc, pasted text).
-- The glossary from `context/brief.md` (product names, tool names, acronyms, people's names).
+- The glossary from `context.md` (product names, tool names, acronyms, people's names).
 - Optional: a speaker code for each person (default: first three letters of the interviewee's first name, uppercase, e.g. `TAM`). The interviewer is always `INT`.
 
 If you're handed transcripts of two different calls, process each call separately and produce one merged file per call.
 
 **One source only, or a source that is already merged.** Sometimes there is no second transcript to reconcile (a single export, or a merge someone did in an earlier session). Don't invent a second source. Diagnose the one you have, say in the diagnosis that it is single-source or pre-merged, keep any merge notes it carries, add turn IDs, apply the glossary and log every change. If the source has no timestamps, number the turns without them and say so in the header. If it contains a translation, see step 8.
+
+**Sources that aren't transcripts** (added by ways). Discovery in a small team rarely starts from recordings. Handle each kind like this, and list every source in `context.md` with its code:
+
+- **Typed-up interview notes.** No reconciling: there is one source. Number each line or bullet as a turn (`[PRI-004]`), and say in the header that most lines are the note-taker's paraphrase and only text in quote marks is the speaker's own words. A line where the note-taker gives their own view is an interpretation, not the speaker's: log it.
+- **The ask itself** (an email, a wish list, a brief from whoever wants the work). Copy it into `raw/` and number its lines with its own code (`[ASK-003]`). It's evidence of what that person believes, and step 4 audits it as premises.
+- **Data** (a spreadsheet export, a log, a report). Don't number it. Work out the numbers that matter with a short script, and write them to `out/01-data.md`: each number with how it was computed, the file, and an ID (`[DAT-02]`). Later steps put these next to what people said: where a stated number and the data disagree, both are kept and the data wins unless there's a reason it's wrong.
+- **What's already been built** (a half-built app, a prototype, a spreadsheet tool). Read it, with a subagent if it's large, and write `out/01-built.md`: one row per part, with what it does, whether it works, what's risky in it (secrets in code, data that can be lost, personal data in the wrong place), and an ID (`[BLT-03]`). Don't judge it against the problem yet; step 5 decides what to keep.
 
 ## Process
 
@@ -59,7 +63,7 @@ Watch for **meaning-changing** errors: words that are real words but wrong ("ene
 
 ### 7. Number the turns
 
-Give every turn an ID: speaker code + three-digit sequence over the whole call, e.g. `[INT-001]`, `[TAM-002]`, `[INT-003]`. Sequence numbers are shared across speakers so IDs sort in call order. Keep the original timestamp after the ID. The interviewer's code `INT` repeats in every call, so `INT-025` can mean a different turn in each. In any file that covers more than one call (collisions, problem, scope, audit, deck), cite an interviewer turn with its call: `INT-025 (TAM)`. A per-persona extract may cite it bare.
+Give every turn an ID: speaker code + three-digit sequence over the whole call, e.g. `[INT-001]`, `[TAM-002]`, `[INT-003]`. Sequence numbers are shared across speakers so IDs sort in call order. Keep the original timestamp after the ID. The interviewer's code `INT` repeats in every call, so `INT-025` can mean a different turn in each. In any file that covers more than one call (collisions, problem, scope, case), cite an interviewer turn with its call: `INT-025 (TAM)`. A per-persona extract may cite it bare.
 
 ### 8. Translate if needed
 
@@ -100,7 +104,7 @@ Put attribution and meaning fixes at the top of the merge notes. Those are the o
 
 ## Stop here: show the results and ask how to continue
 
-This step always ends with a stop, including when it runs inside a full pipeline or the user said "run everything". Never start the next step, and never apply a decision, until the user answers. The one exception is a delegated run, as the orchestrator defines it: show the results, log the delegated decision and continue.
+In deep mode this step always ends with a stop, including when the user said "run everything". Never start the next step, and never apply a decision, until the user answers. Two exceptions, both defined in `SKILL.md`: a delegated run (show the results, log the delegated decision and continue), and quick mode (no stop here; carry this step's decisions to the next quick-mode checkpoint).
 
 1. **Show the results in the chat**, not only the file path: the two-line diagnosis of each source, the turn counts, and every note in "Check these first" with the original text and the merged text side by side. Then say where the full file is.
 2. **Ask the decisions below.** Give your recommended answer for each, clearly marked as a recommendation.

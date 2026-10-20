@@ -1,7 +1,4 @@
----
-name: problem-framing
-description: Turns discovery evidence into a solution-free problem statement under 80 words, compares it with how the original brief framed the problem, offers rejected alternative framings with reasons, and defines what "solved" would look like per persona. Use after synthesizing interviews and before scoping, or when someone asks "what problem are we actually solving" or suspects the brief asked for the wrong thing.
----
+<!-- Step 4 of /ways:discover. Adapted from `problem-framing` in discovery-to-mvp 1.2.0 by Ofer Regev (MIT; see ../LICENSE-discovery-to-mvp). -->
 
 # Problem framing (pipeline step 4)
 
@@ -11,7 +8,7 @@ Briefs usually arrive with a solution baked in ("customers keep complaining abou
 
 - `out/03-collisions.md` (required)
 - `out/02-extract-*.md` (required)
-- `context/brief.md` (required, for the original framing)
+- `context.md` (required, for the original framing)
 - The PM's answers at the step 3 checkpoint, from `out/decisions.md`
 
 ## Process
@@ -46,7 +43,7 @@ Run each check and write pass/fail with a line of reasoning:
 - **Not a feature in disguise:** you can name at least two different solutions that would solve it.
 - **Explains the workarounds:** the shadow spreadsheets, DMs and relays from step 2 make sense if this problem is true.
 - **Explains the silences:** the things nobody mentioned are consistent with it.
-- **Names every Named top pain:** for each extract with a `Named top pain`, the statement covers it, in that person's words. If one can't fit, write which is dropped and why, and treat this check as failed until the PM agrees. The key persona's (see the orchestrator) can't be the one dropped.
+- **Names every Named top pain:** for each extract with a `Named top pain`, the statement covers it, in that person's words. If one can't fit, write which is dropped and why, and treat this check as failed until the PM agrees. The key persona's (see `SKILL.md`) can't be the one dropped.
 
 ### 5. Reject the alternatives, in writing
 For each of the other two framings: why it's tempting and why you'd reject it (or keep it as a fallback). Cite evidence. "The brief's framing would produce an ordering app; the vendor already built a web portal that 8% of customers used [AVI-031], and the customer asked for no new apps [TAM-036]."
@@ -56,7 +53,7 @@ For each persona, 2 to 3 observable changes in behavior if the problem were gone
 
 ### 6b. Business case
 Say why the company should care, in terms of one number. Without this, step 5 will rank by who complained loudest.
-- **Outcome:** the one business number this should move (retention or renewal, revenue per client, cost to serve, time to deliver, win rate). Take it from the brief if it names one; otherwise propose one and mark it `proposed`. Don't write two outcomes to be safe.
+- **Outcome:** the one business number this should move (retention or renewal, revenue per client, cost to serve, time to deliver, win rate). Take it from the brief if it names one; otherwise propose one and mark it `proposed`. Don't write two outcomes to be safe. Give its value **today**, from `out/01-data.md` where it can (or an estimate, labelled), and a **target** v1 should reach, so success is a number someone can check later (added by ways).
 - **Chain:** the links from "solved looks like" to that number, in order, each labelled `evidence [ID]` or `assumption`. Example: "restaurant sees why an item was substituted (assumption) → stops phoning the rep to check (assumption) → fewer calls per order (evidence [AVI-031]) → rep time freed for selling (stated) → more accounts per rep." If a link is a leap (cost savings in one link, a different benefit in the next), say it. Two different outcomes in one chain is two bets.
 - **Consequence named by people:** the lines from the business-consequence sections of the extracts. If none, write "nobody named a cost" and treat it as a risk for step 5.
 - **Weakest link:** the link with the least evidence. It goes to step 6 as the leading candidate for the riskiest assumption.
@@ -82,7 +79,7 @@ Problems that are real but not this one, so step 5 doesn't scope them in by acci
 ### <Persona A>
 ### <Persona B>
 ## Business case
-Outcome: ... (given | proposed)
+Outcome: ... (given | proposed). Today: ... [DAT-nn | estimate]. Target: ...
 Chain: link → link → link (each marked evidence [ID] | assumption)
 Consequence named by people: ...
 Weakest link: ...
@@ -94,7 +91,7 @@ Parked ideas: ...
 
 ## Stop here: show the results and ask how to continue
 
-This step always ends with a stop, including when it runs inside a full pipeline or the user said "run everything". Never start the next step, and never apply a decision, until the user answers. The one exception is a delegated run, as the orchestrator defines it: show the results, log the delegated decision and continue.
+In deep mode this step always ends with a stop, including when the user said "run everything". Never start the next step, and never apply a decision, until the user answers. Two exceptions, both defined in `SKILL.md`: a delegated run (show the results, log the delegated decision and continue), and quick mode (no stop here; carry this step's decisions to the next quick-mode checkpoint).
 
 1. **Show the results in the chat**, not only the file path: the premise audit (contradicted premises first), the brief's framing, the proposed problem statement with its word count, the checks table, each rejected framing in one line, and the business case with its weakest link. Then say where the full file is.
 2. **Ask the decisions below.** Give your recommended answer for each, clearly marked as a recommendation.

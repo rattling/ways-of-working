@@ -53,8 +53,9 @@ An agent brief also has a **Human verification** line: how someone who didn't bu
 
 Say which path an issue takes, using the table in `AGENTS.md` under **How work goes**:
 
+- **The problem isn't understood yet** (the ask is a list of solutions, or nobody can say who it's for or how we'd know it worked): don't size it. Label it `needs-info`, and say in the comment that it needs `/ways:discover` first.
 - **One ticket** (fits one PR, changes no invariant or contract): brief it as usual. It's worked with `/ways:work`.
-- **Big work** (more than one ticket, or it changes an invariant or a contract): don't brief it as a ticket. Label it `ready-for-human`, and say in the comment that it needs the three parts, starting with `/grill-with-docs`.
+- **Big work** (more than one ticket, or it changes an invariant or a contract): don't brief it as a ticket. Label it `ready-for-human`, and say in the comment that it needs the three parts, starting with `/grill-with-docs`. An intake from `/ways:discover` has a `Brief:` line: read the brief and size from it, and the grill starts from it.
 
 ### Labels beyond the triage roles
 

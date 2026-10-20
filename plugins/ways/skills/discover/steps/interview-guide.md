@@ -1,7 +1,4 @@
----
-name: interview-guide
-description: Writes a discovery interview guide before customer or stakeholder calls — learning goals, the riskiest assumption behind each, and event-anchored questions per persona, plus recording setup that makes later synthesis reliable. Use when someone is about to run discovery interviews, asks "what should I ask them", or wants to prep calls with clients, users or internal teams.
----
+<!-- Step 0 of /ways:discover. Adapted from `interview-guide` in discovery-to-mvp 1.2.0 by Ofer Regev (MIT; see ../LICENSE-discovery-to-mvp). -->
 
 # Interview guide (pipeline step 0)
 
@@ -9,7 +6,7 @@ Good synthesis starts before the call. Most bad discovery data comes from hypoth
 
 ## Inputs
 
-- `context/brief.md`: the problem space, who will be interviewed, what the team already believes. If it's missing, ask for these three things in one message.
+- `context.md`: the problem space, who will be interviewed, what the team already believes. If it's missing, ask for these three things in one message.
 - Optional: an existing solution idea the team is attached to. Ask for it explicitly. It's better to know the bias than to have it leak into the questions.
 - Whether the calls are **real or roleplayed** (a colleague playing the client, a mock stakeholder). Ask once if the brief doesn't say. Roleplayed calls are still useful for practice and for finding questions, but their answers are plausible accounts, not behavior of real customers. Record the answer in the brief; later steps carry it into their caveats.
 
@@ -77,7 +74,7 @@ Keep it to two pages. An interviewer has to be able to glance at it mid-call.
 
 ## Stop here: show the results and ask how to continue
 
-This step always ends with a stop, including when it runs inside a full pipeline or the user said "run everything". Never start the next step, and never apply a decision, until the user answers. The one exception is a delegated run, as the orchestrator defines it: show the results, log the delegated decision and continue.
+In deep mode this step always ends with a stop, including when the user said "run everything". Never start the next step, and never apply a decision, until the user answers. Two exceptions, both defined in `SKILL.md`: a delegated run (show the results, log the delegated decision and continue), and quick mode (no stop here; carry this step's decisions to the next quick-mode checkpoint).
 
 1. **Show the results in the chat**, not only the file path: the business and customer outcome lines, the beliefs-to-break table, the learning goals table and the first three questions for each persona. Then say where the full file is.
 2. **Ask the decisions below.** Give your recommended answer for each, clearly marked as a recommendation.

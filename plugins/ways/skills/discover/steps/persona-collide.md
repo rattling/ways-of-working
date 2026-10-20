@@ -1,7 +1,4 @@
----
-name: persona-collide
-description: Compares two or more persona extracts to find where people want opposite things, tell different stories about the same event, or both assume someone else owns a step — including a workflow map with an owner for every step and a list of what nobody mentioned. Use when discovery covers more than one side of a relationship (client and vendor, buyer and user, customer and internal team) and before scoping a product that has to serve both.
----
+<!-- Step 3 of /ways:discover. Adapted from `persona-collide` in discovery-to-mvp 1.2.0 by Ofer Regev (MIT; see ../LICENSE-discovery-to-mvp). -->
 
 # Persona collide (pipeline step 3)
 
@@ -11,7 +8,7 @@ In B2B, the person who pays, the person who uses the product and the person who 
 
 - Two or more `out/02-extract-*.md` files (required).
 - The matching `out/01-merged-*.md` files, to check quotes and look for context the extracts didn't carry.
-- `context/brief.md`.
+- `context.md`, and `out/01-data.md` and `out/01-built.md` if step 1 wrote them.
 
 ## Process
 
@@ -28,6 +25,8 @@ Then flag every step where:
 - The step is **invisible to one side** (one persona describes it, the other doesn't know it exists).
 
 The map usually produces the most important findings of the whole pipeline. Spend time here.
+
+**Draw it as-is** (added by ways). Under the table, draw the same workflow as a Mermaid `flowchart LR`: one node per step, labelled with who does it, the channel on each edge where it matters, and a dotted edge for where work gets lost or waits (`-. lost or late .->`). Mark flagged steps in the node text. Keep it to what happens today, from the evidence; it's the "before" picture step 5 draws the "after" against. Put the data's numbers on the waits where `out/01-data.md` has them ("pad in the van: median 4 days [DAT-02]").
 
 ### 2. Find collisions
 Go through every pain, workaround, stated-vs-revealed row and silence in each extract and ask whether the other persona says something that conflicts with it, explains it, or is silent about it. Classify each collision:
@@ -60,6 +59,8 @@ Things both personas want, with IDs from both. This is the safe core of any v1.
 # Collisions — <persona A> × <persona B>
 ## Workflow map
 | Step | What happens | Owner per A [ID] | Owner per B [ID] | Channel | Flag |
+### As-is
+(a Mermaid flowchart LR of the map, with the waits and losses dotted)
 ## Collisions
 | # | Topic | Type | <A> says [ID] | <B> says [ID] | What v1 must choose | Severity |
 ## Same event, two stories
@@ -73,9 +74,9 @@ Parked ideas: ...
 
 ## Stop here: show the results and ask how to continue
 
-This step always ends with a stop, including when it runs inside a full pipeline or the user said "run everything". Never start the next step, and never apply a decision, until the user answers. The one exception is a delegated run, as the orchestrator defines it: show the results, log the delegated decision and continue.
+In deep mode this step always ends with a stop, including when the user said "run everything". Never start the next step, and never apply a decision, until the user answers. Two exceptions, both defined in `SKILL.md`: a delegated run (show the results, log the delegated decision and continue), and quick mode (no stop here; carry this step's decisions to the next quick-mode checkpoint).
 
-1. **Show the results in the chat**, not only the file path: the flagged rows of the workflow map, the collisions table (at most 6 rows), the "same event, two stories" items and the "neither mentioned" list. Then say where the full file is.
+1. **Show the results in the chat**, not only the file path: the as-is diagram, the flagged rows of the workflow map, the collisions table (at most 6 rows), the "same event, two stories" items and the "neither mentioned" list. Then say where the full file is.
 2. **Ask the decisions below.** Give your recommended answer for each, clearly marked as a recommendation.
 3. **Ask how to continue**, offering: Continue to step 4, `problem-framing` · redo this step with changes · edit the output together · stop here.
 

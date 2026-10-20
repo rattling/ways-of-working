@@ -27,6 +27,12 @@ Who it hurts: the office (about 12 hours a week of retyping and chasing), the ow
 
 Also worth noticing: follow-up work gets lost (the flue note on the job sheet that nobody quoted for).
 
+**What the evidence doesn't cover, and a good run says so:**
+
+- **What happens after the invoice.** The pack stops at "invoiced". If customers then take weeks to pay, invoicing faster moves cash less than it looks. Ask Priya how long payment takes and who chases it.
+- **Sam hasn't been heard.** He's the buyer, and his goal (more jobs a day) is not the problem found. He has to agree the problem before the scope means anything.
+- **Jordan leaves in two weeks.** Whatever is kept from `app/`, ask him this week how it stores data and whether any of it works offline.
+
 ## 2. As-is and to-be
 
 As-is:
@@ -118,6 +124,7 @@ A run on this pack passes if its brief:
 - [ ] States the problem as slow and lost billing, not as missing features
 - [ ] Gives an outcome with today's number and a target, from the export
 - [ ] Notices that interview and data disagree, and trusts the data
+- [ ] Names what the evidence doesn't cover: payment after the invoice, Sam's agreement, Jordan's knowledge
 - [ ] Draws as-is and to-be, and puts the gap at job done → clean record
 - [ ] Has engineer and office personas, each changing a decision
 - [ ] Offers a no-build or cheaper step first
