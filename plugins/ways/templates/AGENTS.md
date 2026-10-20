@@ -35,7 +35,7 @@ Pick the path by the size of the work. A person types each command; when a step 
 | New and not sized yet: a report, a request, an idea | `/triage`. It briefs it as one ticket, or says it's big work |
 | Typo-sized | Just do it: a PR labelled `no-issue` |
 | One ticket: a bug, a small enhancement | `/ways:work <issue>` |
-| **Big work:** more than one ticket, or it changes an invariant or a contract | **1 Requirements:** `/grill-with-docs` → `/to-spec` (the PRD; the grill starts from the discovery brief if there is one)<br>**2 Design:** `/ways:design` (parts, contracts, data, seams, NFRs)<br>**3 Build:** `/to-tickets` → `/implement-spec` |
+| **Big work:** more than one ticket, or it changes an invariant or a contract | **1 Requirements:** `/grill-with-docs` → `/to-spec` (the PRD; the grill starts from the discovery brief if there is one). Visual result: `/ways:mock` before `/to-spec`<br>**2 Design:** `/ways:design` (parts, contracts, data, seams, NFRs)<br>**3 Build:** `/to-tickets` → `/implement-spec` |
 
 Skips, and only these:
 

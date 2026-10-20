@@ -25,7 +25,7 @@ Don't explain what you couldn't find. A missing file is worth one line ("no glos
 One page, readable in five minutes. In this order:
 
 1. **What this is**, in two sentences from the charter.
-2. **How work flows**, as a diagram: (a problem not understood yet: `/ways:discover` → a brief in `specs/brief/` and an intake issue) → raw report → `/triage` → brief → (big work, in three parts: requirements `/grill-with-docs` → `/to-spec` → PRD; design `/ways:design` → architecture, ADRs, the PRD's design sections; build `/to-tickets`) → `/ways:work` or `/implement-spec` → PR → review → merge, with the human decision points marked.
+2. **How work flows**, as a diagram: (a problem not understood yet: `/ways:discover` → a brief in `specs/brief/` and an intake issue) → raw report → `/triage` → brief → (big work, in three parts: requirements `/grill-with-docs` → (`/ways:mock` for a visual result) → `/to-spec` → PRD; design `/ways:design` → architecture, ADRs, the PRD's design sections; build `/to-tickets`) → `/ways:work` or `/implement-spec` → PR → review → merge, with the human decision points marked.
 3. **Where things live**: specs, glossary, decisions, architecture, issues, PRs. Who owns each.
 4. **Interactive or autonomous**: what each means here, what the gate is, what holds an autonomous run.
 5. **Who merges what**: the dial's current setting and what it means for each risk tier.
