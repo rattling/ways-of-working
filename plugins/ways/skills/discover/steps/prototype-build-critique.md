@@ -14,8 +14,8 @@ Two phases with different mindsets. Phase A builds exactly what the brief says a
 ## Phase A — Build
 
 1. **Read the brief's build prompt and screens.** Build only the flow described. If you think something is missing, write it in `prototype/NOTES.md` instead of building it.
-2. **Stack defaults** (override if the brief says otherwise): plain HTML, CSS and JavaScript that open from disk, no build step and no backend, state in memory or `localStorage`, mock data in `prototype/data.json` exactly as specified (with a copy embedded in the page, since browsers block `fetch` from a file). No auth. Works at phone width. Pocock's `prototype` skill is an alternative when the question is about logic or state rather than a flow.
-3. **Mock data first.** Write the JSON from the brief's spec before any UI. Check it contains the values that make the test bite (e.g. the items that are out of stock).
+2. **Build it as a mock** (added by ways): follow `${CLAUDE_PLUGIN_ROOT}/skills/mock/SKILL.md`, so there's one way to mock in ways. One clickable HTML file at `prototype/index.html` that opens from disk, the brief's mock data embedded in it exactly as specified, no backend, no auth, working at phone width if the persona is on a phone. Override only if the brief says otherwise. Pocock's `prototype` skill is an alternative when the question is about logic or state rather than a flow.
+3. **Mock data first.** Write the data from the brief's spec before any UI. Check it contains the values that make the test bite (e.g. the items that are out of stock).
 4. **Build the entry point first**, then the flow in order, then the second-persona view if specified.
 5. **Make the end state obvious.** After the last action, the screen should show what changed in plain words.
 6. **Walk the flow yourself.** Open it, go through every step of the brief's flow, and check each success criterion is something a user could actually do on screen. Fix what isn't.

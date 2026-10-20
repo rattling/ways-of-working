@@ -29,6 +29,8 @@ Read the parent issue, follow its `Spec:` line, and read the file.
 - **Opus** for the rules that must never be wrong (the charter's invariants), a high-risk path in `REVIEW.md` or `CODEOWNERS`, a contract other systems read, or a ticket that leaves judgement calls.
 - The code review and its fixes stay on the session's model.
 
+**Screenshots of visual changes.** Each implementer attaches headless-browser screenshots of what it changed on screen (and print previews, if it's printed) to its PR's evidence, and the integration PR collects them.
+
 **Progress, without being asked.** The draft PR's body opens with a checklist of the tickets in build order, plus the code review, and you tick each one as it merges. Every update you post starts with "N of M done", saying what's building and what's next. After each merge, write `<done> <total>` to `.claude/ways/progress` (for example `2 9`), and the band shows it. Delete the file at handover, with the marker.
 
 **What the run cost, in the integration PR.** People need to know whether a spec is a sensible size for their usage. The plan's usage windows are in `.claude/ways/usage` (five-hour and weekly, as percentages, written by the `ways-band` mod). If the file isn't there, ask the person to run `/usage` and tell you the two figures.
@@ -47,7 +49,7 @@ Work closes through a PR, never by closing the issue directly.
 
 ### Briefs
 
-An agent brief also has a **Human verification** line: how someone who didn't build it confirms it.
+An agent brief also has a **Human verification** line: how someone who didn't build it confirms it. For visual work, say what to look at, not just "the page renders": for example, "print preview at A3, in mono", or "matches `specs/prd/<slug>-mock.html`: same columns, same empty state".
 
 ### Sizing, when triaging
 
@@ -55,6 +57,7 @@ Say which path an issue takes, using the table in `AGENTS.md` under **How work g
 
 - **The problem isn't understood yet** (the ask is a list of solutions, or nobody can say who it's for or how we'd know it worked): don't size it. Label it `needs-info`, and say in the comment that it needs `/ways:discover` first.
 - **One ticket** (fits one PR, changes no invariant or contract): brief it as usual. It's worked with `/ways:work`.
+- **One ticket in disguise:** if every part of big work except the build would be skipped (no real requirements question, nothing to design), it's one ticket. Brief it as one, or say what's missing; often it's the real-world problem the work is meant to fix.
 - **Big work** (more than one ticket, or it changes an invariant or a contract): don't brief it as a ticket. Label it `ready-for-human`, and say in the comment that it needs the three parts, starting with `/grill-with-docs`. An intake from `/ways:discover` has a `Brief:` line: read the brief and size from it, and the grill starts from it.
 
 ### Labels beyond the triage roles
