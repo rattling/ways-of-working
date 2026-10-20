@@ -6,7 +6,7 @@ The files in `steps/` started as that plugin's step skills, copied unchanged in 
 
 ## What ways changed
 
-- **One skill, two modes.** His orchestrator became `SKILL.md`, with a quick mode (three checkpoints, lighter checking) beside his step-by-step mode, which is deep mode here. Each step's "stop here" says so.
+- **One skill, two modes.** His orchestrator became `SKILL.md`, with a quick mode beside his step-by-step mode, which is deep mode here. Quick mode runs the same steps but writes two working files instead of one per step, cites sources where they are instead of copying them, caps its tables and stops three times. Each step's "stop here" says so.
 - **Layout.** Everything for one discovery lives in `specs/brief/<slug>/`; `context/brief.md` became `context.md`.
 - **Sources beyond transcripts** (step 1): typed notes, the ask itself, data worked into numbers, and what's already been built.
 - **Data beside what people said** (step 2): stated numbers set against measured ones.

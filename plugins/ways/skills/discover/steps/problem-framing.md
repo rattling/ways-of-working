@@ -31,7 +31,7 @@ Rules for this audit:
 
 ### 3. Write the chosen-by-default problem statement
 Default to the evidence framing unless the evidence is thin. The statement:
-- Is **under 80 words**.
+- Is **under 80 words**, not counting IDs.
 - Says **who** (both personas if it's a seam problem), **what's broken**, **what it costs** (time, money, a missed outcome, trust), and cites **turn IDs** for the evidence.
 - Contains **no solution words**. Banned: platform, portal, dashboard, app, tool, feature, AI, automate, build, integrate, system, interface, page, view, bot. If one slips in, rewrite.
 - Uses the personas' own words where they're sharper than yours (from the "Their words" section of each extract).

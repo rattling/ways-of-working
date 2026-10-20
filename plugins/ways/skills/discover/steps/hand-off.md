@@ -6,7 +6,7 @@ Discovery is finished when someone who wasn't there can read one page and decide
 
 ## Inputs
 
-- Everything in `out/`, at least `04-problem.md`, `05-scope.md` and `05b-case.md`.
+- Everything in `out/`: at least `04-problem.md`, `05-scope.md` and `05b-case.md` in deep mode, or `q1-heard.md` and `q2-decide.md` in quick.
 - `out/decisions.md`.
 - `${CLAUDE_PLUGIN_ROOT}/skills/discover/brief-template.md`.
 
@@ -23,7 +23,7 @@ Rules for the page:
 - **Plain words.** No IDs in the opening paragraph; IDs are fine in the sections below it.
 
 ### 2. Check it with fresh eyes
-Give a subagent only the front page and this question: "What would you decide from this, and what's missing for you to decide it?" Fix what it finds that the evidence supports, and when you show the page, say what it found and what you changed. In quick mode, do this check yourself if there's no subagent, and say so.
+In deep mode, give a subagent only the front page and this question: "What would you decide from this, and what's missing for you to decide it?" Fix what it finds that the evidence supports, and when you show the page, say what it found and what you changed. In quick mode, ask yourself the same question of the page as a stranger would read it, and fix what you find.
 
 ### 3. Agree it
 Show the page in the chat, or its path and its opening paragraph if it's long, and ask the person to approve it or say what to change. This stop holds in every mode, including a delegated run: the page goes into the tracker next, where other people see it. Ask about `raw/` (below) in the same message. One approval covers the page, the commit, the issue and the PR.

@@ -25,7 +25,7 @@ Come out with a brief someone could build from:
 | `brief.md` | The owner's email: a wish list, mostly solutions |
 | `notes/office.md` | Interview notes with the office manager |
 | `notes/engineer.md` | Interview notes with an engineer |
-| `evidence/jobs-export.csv` | 30 jobs from two weeks, four engineers, from the office spreadsheet |
+| `evidence/jobs-export.csv` | A sample of 30 of the roughly 240 jobs in two weeks, across four engineers, from the office spreadsheet |
 | `evidence/job-sheet.md` | One paper job sheet, transcribed |
 | `app/` | What's been built so far. Open `app/index.html` in a browser; the logins are in `app/auth.js` |
 | `FACILITATOR.md` | What a good discovery finds. **Don't open it until you've done yours.** |

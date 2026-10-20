@@ -16,25 +16,36 @@ The steps are adapted from [discovery-to-mvp](https://github.com/oferregev81pt/d
 
 `/ways:discover [quick|deep] [where the sources are]`
 
-Both modes produce the same front page, the same files and the same decisions. Quick checks less and stops less.
+Both modes produce the same front page, from the same steps, with the same decisions. Quick does the thinking and skips the paperwork: fewer files, shorter tables, fewer stops. Aim for under an hour of the person's time and a working file they can read in ten minutes.
 
 | | Quick | Deep |
 |---|---|---|
 | Stops for decisions | Three checkpoints (below) | After every step |
-| Sources | Numbered as they are; no reconciling | Two transcripts of a call reconciled into one |
+| Working files | Two: `out/q1-heard.md` and `out/q2-decide.md` (below) | One per step, as each step file says |
+| Sources | Cited where they are, as `[CODE:line]` into `raw/`; no merged copies | Numbered into merged files; two transcripts of a call reconciled into one |
 | Checking quotes and IDs | By reading | Mechanically, with a script (step 2's self-check) |
-| Rows per table | The few that matter | As many as the evidence holds |
-| Prototype | Only if the riskiest assumption (step 5b names it) is about whether people can or will use it, and then the brief only | Brief, build and an independent critique |
+| Rows per table | Capped (below) | As many as the evidence holds |
+| Fresh-eyes check at hand-off | Do it yourself | A subagent |
+| Prototype | Not unless the person asks | Brief, build and an independent critique |
 
 If the person didn't say, recommend one and ask once. **Deep** when there are recordings, more than two personas, a contested problem with real money at stake, or a reader senior enough to pick holes. **Quick** otherwise, and for a first pass that a deep run can follow.
 
-**Quick-mode checkpoints.** Run the steps in order without stopping, then stop at:
+### Quick mode
 
-1. **After steps 1–3** (what we heard): the as-is diagram, each persona's top pain with its evidence, where people collide, where what was said and the data disagree, and any premise of the ask that the evidence already contradicts. Decisions: who the key persona is, which side v1 favours in each top tension, and which gaps to carry as assumptions.
-2. **After steps 4, 5 and 5b** (what to do): the problem statement and the framing rejected, the business number today and its target, candidate zero, v1 and the to-be diagram, the cut list, what to keep or delete from what's built, the benefit, the sizes and the recommendation. Decisions: the framing, one push back on the scope, and go, test first or stop.
+Read the step files for what each part means and how to judge it, then write the results into two files instead of one per step. Where a step file says to write its own file, quick mode writes the matching section of these instead.
+
+- **`out/q1-heard.md`** (steps 1–3), in this order: the data's numbers with how each was worked out (`[DAT-nn]`); what's already built, one line per part (`[BLT-nn]`); for each persona: who, their top pains (three at most, each with a quote, severity and whether it was prompted), their workarounds, their numbers set against the data, what must not change, and their silences; then where they collide (four rows at most), what neither mentioned, the as-is diagram, and the top three tensions.
+- **`out/q2-decide.md`** (steps 4, 5 and 5b): the premise audit (contradicted premises only), the problem statement, the framing rejected in a line each, what solved looks like (a line per persona), the business case (outcome today and target, chain, weakest link, why now); candidate zero, v1 in a sentence, in scope (five rows at most), the centrality check in a line, v1 does not, the to-be diagram and the gap, the cut list (eight rows at most), keep or delete for what's built, the adoption plan (entry point and what happens if people ignore it), assumptions (six at most), "Argue with me" (two items); then benefit with its working, cost, sizes, the riskiest assumption, risks (four rows at most), order of work and the recommendation.
+
+**Citing in quick mode.** List each source in `context.md` with a short code (`ASK`, `PRI`, `DAT`); a code can name a person, so two people in one file get a code each, pointing at the same file. Cite a line by its code and line number in `raw/` (`[PRI:12]`), and data and what's built by their `DAT` and `BLT` IDs. Every rule about IDs in the step files is met by these.
+
+**Checkpoints.** Run the steps in order without stopping, then stop at:
+
+1. **After `q1-heard.md`** (what we heard): the as-is diagram, each persona's top pain with its evidence, where people collide, where what was said and the data disagree, and any premise of the ask that the evidence already contradicts. Decisions: who the key persona is, which side v1 favours in each top tension, and which gaps to carry as assumptions.
+2. **After `q2-decide.md`** (what to do): the problem statement and the framing rejected, the business number today and its target, candidate zero, v1 and the to-be diagram, the cut list, what to keep or delete from what's built, the benefit, the sizes and the recommendation. Decisions: the framing, one push back on the scope, and go, test first or stop.
 3. **The hand-off's approval** of the front page, which holds in every mode.
 
-At a checkpoint, ask its decisions above, plus any step decision whose answer would change the outcome; the rest stand as your recommendations, logged as such. Log each checkpoint as one entry, headed `## Checkpoint N (steps a–b)`.
+At a checkpoint, ask its decisions above, plus any step decision whose answer would change the outcome; the rest stand as your recommendations, logged as such. Log each checkpoint as one entry, headed `## Checkpoint N`.
 
 ## Where things go
 
@@ -43,7 +54,7 @@ specs/brief/<slug>/
   README.md        the front page, written last by the hand-off
   context.md       what we're exploring, who we heard from, the sources, glossary, constraints
   raw/             the sources as given. Read-only: never edit, rename or delete
-  out/             every step's output, numbered by step
+  out/             the working: one file per step in deep mode, two in quick
   out/decisions.md who decided what, and why
   prototype/       only if step 7 runs
 ```
@@ -57,7 +68,7 @@ specs/brief/<slug>/
 
 Load each step's file when you reach it, from `${CLAUDE_PLUGIN_ROOT}/skills/discover/steps/`, and follow it. Its rules are stricter than this file and take precedence, except where the mode table above says quick mode does less.
 
-| # | Step | File | Writes |
+| # | Step | File | Writes (deep mode) |
 |---|---|---|---|
 | 0 | Interview guide (optional: no sources yet) | `interview-guide.md` | `out/00-interview-guide.md` |
 | 1 | Sources: number them, reconcile transcripts, read data and what's built | `transcript-reconcile.md` | `out/01-merged-<CODE>.md`, `out/01-data.md`, `out/01-built.md` |
@@ -74,7 +85,7 @@ All steps append to `out/decisions.md`. The step files say "the PM": that's whoe
 
 ## How to run
 
-1. **Find where we are.** If `specs/brief/<slug>/out/` exists, the highest-numbered complete file is the last finished step; carry on from there. If the person asked for a step, check its inputs exist first, and if one is missing, say which step makes it.
+1. **Find where we are.** If `specs/brief/<slug>/out/` exists, the highest-numbered complete file is the last finished step (in quick mode, `q1-heard.md` then `q2-decide.md`); carry on from there. If the person asked for a step, check its inputs exist first, and if one is missing, say which step makes it.
 2. **Run one step**, from its file.
 3. **Stop and show the results** (deep mode), or carry on to the next checkpoint (quick mode). At a stop, show the step's key results in the chat, then its decisions as numbered questions, each with your recommended answer, worded so that "yes" accepts it. Then wait. **Never go past a stop on your own**, even when the person asked to "run the whole thing": that means take me through it.
 4. **Log the decision** in `out/decisions.md`:
@@ -89,13 +100,13 @@ All steps append to `out/decisions.md`. The step files say "the PM": that's whoe
 
 There's no unattended mode. If nobody is there to answer, finish the current step, post its results and questions, and stop.
 
-**Delegated run.** If the person says in chat to go on without asking ("take your recommendations", "run the rest without me"), that is an instruction, and the only way past a stop. Show each step's results anyway, take your own recommendation at each stop, and log it as `Made by: <person> (delegated: "<their words>")`, with "took its own recommendation" as the reason. Don't invent their reasons. Where a step says to ask and no source answers, assume, label it `assumption`, and log it. Where a decision asks for push back on your own work, take the "Argue with me" item you're least sure of. It ends when they send a message that changes the plan. It never covers the hand-off's approval, or anything outward-facing: opening issues or PRs, deploying, sharing, sending, spending.
+**Delegated run.** If the person says in chat to go on without asking ("take your recommendations", "run the rest without me"), that is an instruction, and the only way past a stop. Show each step's results anyway, take your own recommendation at each stop, and log it as `Made by: <person> (delegated: "<their words>")`, with "took its own recommendation" as the reason. Don't invent their reasons. Where a step says to ask and no source answers, assume, label it `assumption`, and log it. Where a decision asks for push back on your own work, take the "Argue with me" item you're least sure of, reconsider it against the scoping rules, and either change the scope or log why it stays. It ends when they send a message that changes the plan. It never covers the hand-off's approval, or anything outward-facing: opening issues or PRs, deploying, sharing, sending, spending.
 
 ## Rules that hold across every step
 
 - **Finding facts is your job**, never the person's. Read every source, work out the data's numbers, read what's been built. Ask only for what no source holds.
-- **Traceability.** Every claim about what a person said or did carries an ID from step 1, like `[PRI-006]`; every number from data carries a `DAT` ID. A claim with neither is labelled `Interpretation:`, or deleted.
-- **Raw stays raw.** Never edit `raw/`. Quotes are checked against `out/01-*`, and against `raw/` when in doubt.
+- **Traceability.** Every claim about what a person said or did carries an ID from step 1, like `[PRI-006]` (or `[PRI:12]` in quick mode); every number from data carries a `DAT` ID. A claim with neither is labelled `Interpretation:`, or deleted.
+- **Raw stays raw.** Never edit `raw/`. Quotes are checked against `out/01-*` (deep) or `raw/` (quick).
 - **Verbatim means verbatim.** Quote marks are for a person's words or the ask's, copied exactly. Hedges ("maybe half, maybe less") are data: keep them.
 - **No solutions before step 5.** Park them in a `Parked ideas` line; step 5 picks them up.
 - **Challenge the starting point.** The ask's premises are checked against the evidence in step 4, and whenever a later step contradicts one. Say so as soon as you see it, before anyone has to push.

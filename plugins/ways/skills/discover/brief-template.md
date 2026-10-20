@@ -64,7 +64,7 @@ flowchart LR
 | Risk | Likelihood | Impact | What reduces it | Owner |
 |---|---|---|---|---|
 
-**Benefit:** <the range, per week or month, and the input it rests on most. The working is in `out/05b-case.md`.>
+**Benefit:** <the range, per week or month, and the input it rests on most. The working is in `out/`.>
 **Cost:** <build, run and change, roughly.>
 **Size:** v1 is <size>. The whole original ask is <size>.
 **Recommendation:** <go | test first | stop>, because <one reason>.
