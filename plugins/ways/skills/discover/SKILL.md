@@ -26,7 +26,7 @@ Both modes produce the same front page, from the same steps, with the same decis
 | Checking quotes and IDs | By reading | Mechanically, with a script (step 2's self-check) |
 | Rows per table | Capped (below) | As many as the evidence holds |
 | Fresh-eyes check at hand-off | Do it yourself | A subagent |
-| Prototype | Not unless the person asks | Brief, build and an independent critique |
+| Prototype | Offered at checkpoint 2; built only if the person says yes | Brief, build and an independent critique |
 
 If the person didn't say, recommend one and ask once. **Deep** when there are recordings, more than two personas, a contested problem with real money at stake, or a reader senior enough to pick holes. **Quick** otherwise, and for a first pass that a deep run can follow.
 
@@ -42,7 +42,7 @@ Read the step files for what each part means and how to judge it, then write the
 **Checkpoints.** Run the steps in order without stopping, then stop at:
 
 1. **After `q1-heard.md`** (what we heard): the as-is diagram, each persona's top pain with its evidence, where people collide, where what was said and the data disagree, and any premise of the ask that the evidence already contradicts. Decisions: who the key persona is, which side v1 favours in each top tension, and which gaps to carry as assumptions.
-2. **After `q2-decide.md`** (what to do): the problem statement and the framing rejected, the business number today and its target, candidate zero, v1 and the to-be diagram, the cut list, what to keep or delete from what's built, the benefit, the sizes and the recommendation. Decisions: the framing, one push back on the scope, and go, test first or stop.
+2. **After `q2-decide.md`** (what to do): the problem statement and the framing rejected, the business number today and its target, candidate zero, v1 and the to-be diagram, the cut list, what to keep or delete from what's built, the benefit, the sizes and the recommendation. Decisions: the framing, one push back on the scope, go, test first or stop, and **whether to prototype**. Always offer it, so the person knows it's on the table: name the riskiest assumption, say whether a clickable prototype could test it (and if not, what would), and offer a prototype brief (step 6) or a brief and a build (step 7). Recommend one only when the assumption is about whether people can or will use it.
 3. **The hand-off's approval** of the front page, which holds in every mode.
 
 At a checkpoint, ask its decisions above, plus any step decision whose answer would change the outcome; the rest stand as your recommendations, logged as such. Log each checkpoint as one entry, headed `## Checkpoint N`.
