@@ -23,10 +23,10 @@ Rules for the page:
 - **Plain words.** No IDs in the opening paragraph; IDs are fine in the sections below it.
 
 ### 2. Check it with fresh eyes
-Give a subagent only the front page and this question: "What would you decide from this, and what's missing for you to decide it?" Fix what it finds that the evidence supports. In quick mode, do this check yourself if there's no subagent, and say so.
+Give a subagent only the front page and this question: "What would you decide from this, and what's missing for you to decide it?" Fix what it finds that the evidence supports, and when you show the page, say what it found and what you changed. In quick mode, do this check yourself if there's no subagent, and say so.
 
 ### 3. Agree it
-Show the page in the chat, or its path and its opening paragraph if it's long, and ask the person to approve it or say what to change. This stop holds in every mode, including a delegated run: the page goes into the tracker next, where other people see it.
+Show the page in the chat, or its path and its opening paragraph if it's long, and ask the person to approve it or say what to change. This stop holds in every mode, including a delegated run: the page goes into the tracker next, where other people see it. Ask about `raw/` (below) in the same message. One approval covers the page, the commit, the issue and the PR.
 
 ### 4. Commit and open the intake issue
 1. **Check what's in `raw/` before committing.** Interview notes and exports can hold personal data or another company's material. Ask whether `raw/` belongs in this repo. If it doesn't, leave it out (add it to `.gitignore`), and say in `context.md` where the sources are kept instead.
@@ -41,7 +41,7 @@ Show the page in the chat, or its path and its opening paragraph if it's long, a
    ```
    If an issue already asks for this work (the request discovery started from), use it instead of a new one: put the lines above at the top of its body, keep the original below, and add `needs-triage`.
 4. Put the issue number in the page's **Intake** line, commit, and open a PR titled `discovery: <title>`, with `Refs #<n>` and a `## How to check` section: read the front page, and check its numbers against `out/`. A person merges it; that's the brief agreed.
-5. With no GitHub remote, skip the issue and the PR, and give the person the issue text to file.
+5. With no GitHub remote, skip the issue and the PR, write `not filed yet` on the **Intake** line, and give the person the issue text to file.
 
 ### 5. Say what's next
 `/triage #<n>`. Triage sizes it from the brief. Big work goes on to `/grill-with-docs`, which starts from this brief instead of from scratch, then `/to-spec`, `/ways:design` and the build. If the first step in the order of work needs no code (candidate zero), say so: it's a change for the team to try, not a ticket.

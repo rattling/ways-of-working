@@ -24,7 +24,7 @@ Both modes produce the same front page, the same files and the same decisions. Q
 | Sources | Numbered as they are; no reconciling | Two transcripts of a call reconciled into one |
 | Checking quotes and IDs | By reading | Mechanically, with a script (step 2's self-check) |
 | Rows per table | The few that matter | As many as the evidence holds |
-| Prototype | Only if the riskiest assumption is about whether people can or will use it, and then the brief only | Brief, build and an independent critique |
+| Prototype | Only if the riskiest assumption (step 5b names it) is about whether people can or will use it, and then the brief only | Brief, build and an independent critique |
 
 If the person didn't say, recommend one and ask once. **Deep** when there are recordings, more than two personas, a contested problem with real money at stake, or a reader senior enough to pick holes. **Quick** otherwise, and for a first pass that a deep run can follow.
 
@@ -33,6 +33,8 @@ If the person didn't say, recommend one and ask once. **Deep** when there are re
 1. **After steps 1–3** (what we heard): the as-is diagram, each persona's top pain with its evidence, where people collide, where what was said and the data disagree, and any premise of the ask that the evidence already contradicts. Decisions: who the key persona is, which side v1 favours in each top tension, and which gaps to carry as assumptions.
 2. **After steps 4, 5 and 5b** (what to do): the problem statement and the framing rejected, the business number today and its target, candidate zero, v1 and the to-be diagram, the cut list, what to keep or delete from what's built, the benefit, the sizes and the recommendation. Decisions: the framing, one push back on the scope, and go, test first or stop.
 3. **The hand-off's approval** of the front page, which holds in every mode.
+
+At a checkpoint, ask its decisions above, plus any step decision whose answer would change the outcome; the rest stand as your recommendations, logged as such. Log each checkpoint as one entry, headed `## Checkpoint N (steps a–b)`.
 
 ## Where things go
 
@@ -53,7 +55,7 @@ specs/brief/<slug>/
 
 ## The steps
 
-Load each step's file when you reach it, from `${CLAUDE_PLUGIN_ROOT}/skills/discover/steps/`, and follow it. Its rules are stricter than this file and take precedence.
+Load each step's file when you reach it, from `${CLAUDE_PLUGIN_ROOT}/skills/discover/steps/`, and follow it. Its rules are stricter than this file and take precedence, except where the mode table above says quick mode does less.
 
 | # | Step | File | Writes |
 |---|---|---|---|
@@ -79,7 +81,7 @@ All steps append to `out/decisions.md`. The step files say "the PM": that's whoe
    ```
    ## Step N: <step name> — <date> <time>
    - Decision: <what was decided>
-   - Made by: <person>
+   - Made by: <their name, or "the person running discovery">
    - Why: <one line, in their words when they gave a reason>
    - Changed in the output: <one line per file, `path: what changed`, or "nothing">
    ```
@@ -87,7 +89,7 @@ All steps append to `out/decisions.md`. The step files say "the PM": that's whoe
 
 There's no unattended mode. If nobody is there to answer, finish the current step, post its results and questions, and stop.
 
-**Delegated run.** If the person says in chat to go on without asking ("take your recommendations", "run the rest without me"), that is an instruction, and the only way past a stop. Show each step's results anyway, take your own recommendation at each stop, and log it as `Made by: <person> (delegated: "<their words>")`, with "took its own recommendation" as the reason. Don't invent their reasons. It ends when they send a message that changes the plan. It never covers the hand-off's approval, or anything outward-facing: opening issues or PRs, deploying, sharing, sending, spending.
+**Delegated run.** If the person says in chat to go on without asking ("take your recommendations", "run the rest without me"), that is an instruction, and the only way past a stop. Show each step's results anyway, take your own recommendation at each stop, and log it as `Made by: <person> (delegated: "<their words>")`, with "took its own recommendation" as the reason. Don't invent their reasons. Where a step says to ask and no source answers, assume, label it `assumption`, and log it. Where a decision asks for push back on your own work, take the "Argue with me" item you're least sure of. It ends when they send a message that changes the plan. It never covers the hand-off's approval, or anything outward-facing: opening issues or PRs, deploying, sharing, sending, spending.
 
 ## Rules that hold across every step
 

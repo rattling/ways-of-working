@@ -45,6 +45,9 @@ Not the assumptions again: those are tested in step 6. These are the things that
 
 For each: what could happen, how likely, how bad, what reduces it, and who owns it. Five rows at most; more are a list nobody reads.
 
+### 4b. Riskiest assumption
+The one assumption that, if wrong, makes v1 pointless: usually step 4's weakest link, or the scope's assumption with the highest impact and least evidence. Say how to test it, and the kill signal. Step 6 builds a prototype for it if a prototype can test it; otherwise the order of work tests it some other way (a pilot, a measurement, a conversation).
+
 ### 5. Order of work
 A numbered list, smallest useful step first. Candidate zero comes first unless there's a reason it can't. Then the prototype test from step 6, then v1 in slices, then what the cut list's "revisit when" triggers might bring in. For each step: what it proves or delivers, what decision it unlocks, and its size. A step that unlocks no decision is in the wrong place.
 
@@ -68,6 +71,8 @@ Range: ... Most sensitive to: ...
 Build: ... Run: ... Change: ...
 ## Size
 v1: <size>, because ... The whole original ask: <size>, because ...
+## Riskiest assumption
+<the assumption> · test: ... · kill signal: ...
 ## Risks
 | Risk | Likelihood | Impact | What reduces it | Owner |
 ## Order of work
@@ -80,7 +85,7 @@ go | test first | stop: <one reason>
 
 In deep mode this step always ends with a stop, including when the user said "run everything". Never start the next step, and never apply a decision, until the user answers. Two exceptions, both defined in `SKILL.md`: a delegated run (show the results, log the delegated decision and continue), and quick mode (no stop here; carry this step's decisions to the next quick-mode checkpoint).
 
-1. **Show the results in the chat**, not only the file path: the benefit range with its most sensitive input, the sizes, the risks table, the order of work and the recommendation. Then say where the full file is.
+1. **Show the results in the chat**, not only the file path: the benefit range with its most sensitive input, the sizes, the riskiest assumption, the risks table, the order of work and the recommendation. Then say where the full file is.
 2. **Ask the decisions below.** Give your recommended answer for each, clearly marked as a recommendation.
 3. **Ask how to continue**, offering: Continue to step 6, `prototype-brief` · skip the prototype and go to the hand-off · redo this step with changes · stop here.
 
