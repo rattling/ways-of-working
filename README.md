@@ -18,28 +18,21 @@ A repo set up this way declares both marketplaces and plugins in `.claude/settin
 
 ## The flow
 
-Pick the path by the size of the work:
+```
+0. Discovery     /ways:discover       → one-page brief + intake issue      only when the problem isn't understood
+                                        (with a test prototype: does the riskiest assumption hold?)
+   Sizing        /triage              → typo, one ticket, or big work
+   One ticket    /ways:work <issue>   → one reviewed PR                    skips 1 to 3
+1. Requirements  /grill-with-docs → /ways:mock → /to-spec   → PRD          the mock only when the result is visual
+2. Design        /ways:design         → architecture, contracts, ADRs      skipped when it stays in one part
+3. Build         /to-tickets → /implement-spec → one reviewed PR
 
-| The work | Path |
-|---|---|
-| The problem isn't understood yet: a wish list, an idea, a half-built app | `/ways:discover` first (below) |
-| New and not sized yet | `/triage`: briefs it as one ticket, or says it's big work |
-| Typo-sized | Just do it: a PR labelled `no-issue` |
-| One ticket: a bug, a small enhancement | `/ways:work <issue> [interactive\|autonomous]`: a PR whose body is the report, reviewed by `code-review` first |
-| **Big work:** more than one ticket, or it changes an invariant or a contract | The three parts below |
+Any time:        prototype (explore options) · /ways:explain (learn a repo) · /ways:arch-review (health check)
+```
 
-Big work goes in three parts, each ending in something a person agrees, with a part 0 when nobody can yet say what the problem is:
+Each part ends in something a person agrees. The commands are typed by a person: Claude doesn't start them itself, because each is a point where someone decides to move on. When one finishes, Claude says which comes next.
 
-| Part | Skill | What comes out |
-|---|---|---|
-| **0. Discovery** (which problem, and is it worth it), only when the problem isn't understood | `/ways:discover`, quick or deep | A one-page brief in `specs/brief/`: problem and outcome, as-is and to-be workflows, personas, the MVP and what to cut or throw away, risks, cost and benefit, a T-shirt size and an order of work. Plus an intake issue for `/triage` |
-| **1. Requirements** (what and why) | `/grill-with-docs`, then `/to-spec`; for a visual result, `/ways:mock` between them | A PRD in `specs/prd/` (problem, user stories, scope) with a parent issue; terms in `GLOSSARY.md`; for visual work, an agreed clickable mock beside it |
-| **2. Design** (how, at system level) | `/ways:design` | The PRD's design sections (parts, contracts, data, seams, NFRs), `docs/ARCHITECTURE.md` updated, ADRs where earned. On the spec's branch, so one PR agrees both |
-| **3. Build** | `/to-tickets`, then `/implement-spec` | Slices cut along the seams, built one at a time unless you ask for parallel, on one integration branch, with one reviewed PR |
-
-Only two skips: no grill when the requirements are already written and agreed (share them, then `/to-spec`), and no `/ways:design` when the work stays inside one part and touches no contract, schema or data store. If any other step feels unnecessary, the work is probably one ticket.
-
-The flow commands are typed by a person: Claude doesn't start them itself, because each is a point where someone decides to move on. When one finishes, Claude says which comes next. The same table is in every repo's `AGENTS.md`, and `/triage` uses it to size what comes in.
+The full table, with what counts as big work and the only two skips, is [How work goes](plugins/ways/templates/AGENTS.md#how-work-goes). It's written once: `/ways:setup` copies it into every repo's `AGENTS.md`, the SessionStart hook reads it from there, and `/triage` sizes against it.
 
 ## What a repo holds
 
@@ -56,7 +49,7 @@ The flow commands are typed by a person: Claude doesn't start them itself, becau
 - **`/ways:setup`:** the files above, including the standards, labels, a `pr-hygiene` CI check, settings, and this repo's conventions appended to Pocock's tracker config: PRDs as files, closing work through PRs.
 - **`/ways:work`:** one issue in interactive or autonomous mode: branch, plan comment, early draft PR, `tdd`, `code-review` with every finding answered, risk tier, PR body, merge policy.
 - **`/ways:discover`:** part 0, for the work that arrives as a list of solutions or a half-built app. It works from interviews, notes, data and whatever's been built to a one-page brief and an intake issue. Quick mode stops three times; deep mode stops after every step and checks every quote. Built on Ofer Regev's [discovery-to-mvp](https://github.com/oferregev81pt/discovery-to-mvp) (MIT), with ways adding the workflows, cost and benefit, the order of work and the hand-off. [`examples/discovery/`](examples/discovery/) is a sample case to practise on, with an answer key.
-- **`/ways:mock`:** for work whose result people look at (a page, a flow, a printout, a chart): one clickable HTML page with the repo's real data, iterated with a person two or three times, then kept beside the PRD as the picture the build must match. A ticket's human check becomes "matches the mock". `/ways:discover` builds its prototypes the same way.
+- **`/ways:mock`:** for work whose result people look at (a page, a flow, a printout, a chart): one clickable HTML page with the repo's real data, iterated with a person two or three times, then kept beside the PRD as the picture the build must match. A ticket's human check becomes "matches the mock". `/ways:discover`'s test prototype is built the same way but used the other way round: run with users against a kill signal, not iterated until someone likes it. If it passes, it's the mock's first draft.
 - **`/ways:design`:** the design part, which Pocock's flow goes from requirements to slicing without: the system-level how, grilled outside in (C4 context and containers, parts, contracts, data, seams, NFRs), written into the PRD, `docs/ARCHITECTURE.md` and ADRs.
 - **`/ways:arch-review`:** a guided architecture walkthrough, pillar by pillar in the shape of a Well-Architected Review (reliability, security, cost, operational excellence, performance), at the start of a repo, before a big change or at intervals. It ends in a critique for people to turn into tickets: what holds, the one that would sink it, the gaps by pillar, smaller questions.
 - **Hooks:** a SessionStart hook that orients Claude in an opted-in repo, a Stop hook that won't let an autonomous run end on a red gate, and a nudge when the agent grows a file past about 500 lines.

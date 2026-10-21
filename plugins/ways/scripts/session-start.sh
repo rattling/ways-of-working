@@ -20,7 +20,17 @@ gate="$(json_field gate "$stamp")"
 echo "This repo works the ways-of-working way on Matt Pocock's skills (ways ${plugin_version}, repo set up at ${repo_version:-unknown})."
 echo
 echo "- Read AGENTS.md first. Specs: specs/ (charter, roadmap, operating-context, brief/, prd/). Language: GLOSSARY.md. Decisions: docs/adr/. Status lives in GitHub issues, not in files."
-echo "- Flow: pick the path by size (AGENTS.md, How work goes). Problem not understood yet (a wish list, an idea, a half-built app): /ways:discover first. New and unsized: /triage. One ticket: /ways:work <issue>. Big work in three parts, each typed by a person: requirements (/grill-with-docs, then /ways:mock if the result is visual, then /to-spec: the PRD), design (/ways:design), build (/to-tickets, /implement-spec). When a step finishes, say which command comes next. docs/agents/issue-tracker.md says how this repo publishes specs and closes work."
+# The flow is written once, in the repo's AGENTS.md ("How work goes"): print that section, not a copy of it.
+flow=""
+[[ -f "$project/AGENTS.md" ]] && flow="$(awk '/^## How work goes/{f=1; next} /^## /{f=0} f' "$project/AGENTS.md" | sed '/./,$!d')"
+if [[ -n "$flow" ]]; then
+  echo "- How work goes, from AGENTS.md. docs/agents/issue-tracker.md says how this repo publishes specs and closes work."
+  echo
+  echo "$flow"
+  echo
+else
+  echo "- Flow: AGENTS.md has no \"How work goes\" section. Pick the path by size: /ways:discover when the problem isn't understood, /triage when it's unsized, /ways:work <issue> for one ticket, and say which command comes next when a step finishes. Suggest running /ways:setup to restore the section."
+fi
 echo "- Merge policy and risk tiers: ${root}/reference/REVIEW-AND-MERGE.md"
 echo "- Gate: ${gate:-not set in .claude/ways.json}"
 marker="$project/.claude/ways/autonomous"

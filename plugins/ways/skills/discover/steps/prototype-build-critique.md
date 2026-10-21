@@ -14,12 +14,13 @@ Two phases with different mindsets. Phase A builds exactly what the brief says a
 ## Phase A — Build
 
 1. **Read the brief's build prompt and screens.** Build only the flow described. If you think something is missing, write it in `prototype/NOTES.md` instead of building it.
-2. **Build it as a mock** (added by ways): follow `${CLAUDE_PLUGIN_ROOT}/skills/mock/SKILL.md`, so there's one way to mock in ways. One clickable HTML file at `prototype/index.html` that opens from disk, the brief's mock data embedded in it exactly as specified, no backend, no auth, working at phone width if the persona is on a phone. Override only if the brief says otherwise. Pocock's `prototype` skill is an alternative when the question is about logic or state rather than a flow.
+2. **Build it the mock way, as a test** (added by ways): follow section 2 of `${CLAUDE_PLUGIN_ROOT}/skills/mock/SKILL.md`, so there's one way to build in ways, but not its iterate-until-agreed rounds. A mock converges on what one person likes; a test prototype is run with users as it is, and has to be able to fail. One clickable HTML file at `prototype/index.html` that opens from disk, the brief's mock data embedded in it exactly as specified, no backend, no auth, working at phone width if the persona is on a phone. Override only if the brief says otherwise. Pocock's `prototype` skill is an alternative when the question is about logic or state rather than a flow.
 3. **Mock data first.** Write the data from the brief's spec before any UI. Check it contains the values that make the test bite (e.g. the items that are out of stock).
 4. **Build the entry point first**, then the flow in order, then the second-persona view if specified.
 5. **Make the end state obvious.** After the last action, the screen should show what changed in plain words.
 6. **Walk the flow yourself.** Open it, go through every step of the brief's flow, and check each success criterion is something a user could actually do on screen. Fix what isn't.
-7. **README.** `prototype/README.md`: what it tests (the test question), how to run it, what's faked, and the test script copied from the brief.
+6b. **Check it can fail** (added by ways). The script doesn't name the answer the user has to find; the facilitator does none of the user's steps (choosing, typing, signing); each kill signal is something that could happen on these screens; and invented data the persona would spot (part numbers, prices, product names) is marked to check with them first. Fix the script or the build where it can't fail.
+7. **README.** `prototype/README.md`: what it tests (the test question), how to run it, what's faked, the test script copied from the brief, and what happens next: if the test passes, this file is `/ways:mock`'s first draft in requirements; if it fails, scope (step 5) is redone.
 8. **Deploy only with the user's go-ahead.** Ask before deploying it anywhere, public or not. Don't put real client names or data in a public deploy.
 
 Phase A ends with a stop: show the results and ask (see the end of this file) whether to run the critique now. Don't start phase B on your own.
