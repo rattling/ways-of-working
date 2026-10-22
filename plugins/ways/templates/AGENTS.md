@@ -29,29 +29,34 @@ This file is the only one read every time. Open the rest when the work needs the
 
 <!-- Owned by the ways plugin: /ways:setup replaces this section on every run. Change the flow in the plugin, not here; put repo-specific rules under "Rules for this repo". -->
 
-Pick the path by the size of the work. A person types each command; when a step finishes, say which command comes next.
+Pick the path by what's known about the work. A person types each command; when one finishes, say which comes next.
 
-| The work | Path |
+| The work | Command |
 |---|---|
-| The problem isn't understood yet: a wish list of solutions, an idea, a half-built app nobody's sure about | `/ways:discover` first, quick or deep. It ends in a brief in `specs/brief/` and an intake issue for `/triage` |
-| New and not sized yet: a report, a request, an idea | `/triage`. It briefs it as one ticket, or says it's big work |
+| New and unsorted, or a pile of it | `/triage`. Optional: the commands below size an untriaged issue themselves |
+| Problem not understood: a wish list of solutions, an idea, a half-built app nobody's sure about | `/ways:discover`, quick or deep, then `/ways:plan`. Documents go in `specs/brief/inbox/` |
+| Known to be big: more than one ticket, or it changes an invariant or a contract | `/ways:plan #<n>`, then `/ways:build #<n>` |
+| Known to be small: a bug, a small enhancement | `/ways:work #<n>`, for one issue or several |
 | Typo-sized | Just do it: a PR labelled `no-issue` |
-| One ticket: a bug, a small enhancement | `/ways:work <issue>` |
-| **Big work:** more than one ticket, or it changes an invariant or a contract | One command per part, each typed by a person:<br>**2 Requirements:** `/ways:requirements #<n>`: the PRD's what and why, from the discovery brief if there is one, with a mock if the result is visual<br>**3 Design:** `/ways:design #<n>`: the PRD's how. The person merges the spec PR: requirements and design agreed together<br>**4 Build:** `/ways:build #<n>`: tickets, then the code on one integration branch. The person merges the integration PR |
 
-Discovery is part 1 when it runs. New and unsorted work starts with `/triage`; work already known to be big starts with `/ways:requirements`, which sizes an unsized issue first. Each part command says where you are when it starts, and ends with the one PR to merge, what merging means, and the next command. Pocock's skills run underneath (`grilling`, `domain-modeling`, `to-spec`, `to-tickets`, `implement-spec`, `code-review`) and can still be typed on their own.
+Big work is two commands, each ending in one PR a person merges:
+
+- **`/ways:plan #<n>`**: requirements (from the discovery brief if there is one), a mock if the result is visual, then the system-level design, in one sitting. Ends in one spec PR: merging it agrees what it should do and how the system changes. Don't clear the session during a plan.
+- **`/ways:build #<n>`**: tickets, then the code on one integration branch. Ends in the integration PR: merging it ships the feature. It resumes a build under way.
+
+When different people do the two halves of a plan, `/ways:requirements` and `/ways:design` run them separately, with the PRD file as the hand-off. Pocock's skills run underneath (`grilling`, `domain-modeling`, `to-spec`, `to-tickets`, `implement-spec`, `code-review`, `triage`) and can still be typed on their own.
 
 Skips, and only these:
 
-- **No grill when the requirements are already written and agreed:** put them in the issue, or in a file it links to, and `/ways:requirements` will ask.
-- **Big work that stays inside one part and touches no contract, schema or data store:** `/ways:design` says so and writes "Design: no change of shape" into the PRD.
+- **No grill when the requirements are already written and agreed:** put them in the issue, or in a file it links to, and `/ways:plan` will ask.
+- **Big work that stays inside one part and touches no contract, schema or data store:** the plan says so and writes "Design: no change of shape" into the PRD.
 - Nothing else is skipped. If a step feels unnecessary, the work is probably one ticket, not big work.
 
 Also: `/ways:explain` before working in code you don't know; `/ways:arch-review` at the start of a repo, before a big change, and every so often.
 
 ## Working an issue
 
-Use `/ways:work <issue>`. It runs interactively for `ready-for-human` and autonomously for `ready-for-agent`. For a whole spec at once, `/ways:build #<parent>`: it sets the autonomous marker itself so the gate holds, and builds one ticket at a time unless you ask for parallel (`docs/agents/issue-tracker.md` says why).
+Use `/ways:work #<n>`. It runs interactively for `ready-for-human` and autonomously for `ready-for-agent`. An untriaged issue is fine: it sizes it, reproduces a bug, and posts the brief it will work to before you say go. For a whole spec at once, `/ways:build #<parent>`: it sets the autonomous marker itself so the gate holds, and builds one ticket at a time unless you ask for parallel (`docs/agents/issue-tracker.md` says why).
 
 ## Merging
 

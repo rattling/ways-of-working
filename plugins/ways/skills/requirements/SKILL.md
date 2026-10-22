@@ -1,24 +1,22 @@
 ---
 name: requirements
-description: Part 2 of 4 of big work, the what and why. Grills the requirements with Pocock's grilling and domain-modeling, offers a mock when the result is visual, then writes the PRD with /to-spec in the same session, so nothing decided is lost between them.
+description: The first half of /ways:plan, on its own, for when different people do requirements and design. Grills the what and why with Pocock's grilling and domain-modeling (or takes written requirements as they are), offers a mock when the result is visual, then writes the PRD with /to-spec in the same session. Sizes an untriaged issue first.
 disable-model-invocation: true
 ---
 
 # Requirements
 
-Part 2 of 4 of big work: what to build and why, written as a PRD. It runs what `/grill-with-docs` then `/to-spec` would, in one session, so the grill's decisions can't be lost in between.
+What to build and why, written as a PRD. `/ways:plan` runs this and then `/ways:design` in one sitting, and is what most people use. Run this on its own when someone else will do the design: the PRD file is the hand-off.
 
-Input: the issue, `#<n>`, usually the intake that `/triage` labelled big work. Without one, use the issue the conversation is about, or ask for it once. New and unsorted work starts with `/triage`; work already known to be big starts here, and an unsized issue is sized here first (step 1).
+Input: the issue, `#<n>`. Without one, use the issue the conversation is about, or ask for it once.
 
-Follow `${CLAUDE_PLUGIN_ROOT}/reference/PARTS.md`: check state first, open with where you are, and end with the merge sentence.
+Follow `${CLAUDE_PLUGIN_ROOT}/reference/PARTS.md`: look for the output first, open with where you are, and end with the merge sentence.
 
-## 1. Check state
+## 1. Look first
 
-As PARTS.md says. Then:
-
-- **Nobody has sized it** (the issue has no triage labels): size it first, as `/triage` would, by the sizing rules in `docs/agents/issue-tracker.md`. Big work: label it as triage would and carry on. One ticket: say so and offer `/ways:work #<n>` instead. The problem isn't understood: offer `/ways:discover`. Don't carry on with requirements for work that isn't big.
 - **The PRD exists already** (a `Spec:` line, or `specs/prd/<feature-slug>.md`): say so, with its status, and offer to revise it: grill only what's open or changed, then update the file on its branch. Don't grill from scratch.
-- **The problem isn't understood** (the issue is labelled `needs-info` for discovery, or nobody can say who it's for): say `/ways:discover` comes first.
+- **Nobody has sized it** (no state label, or only `needs-triage`): size it first, as `/triage` would, by the sizing rules in `docs/agents/issue-tracker.md`. Big work: label it as triage would and carry on. One ticket: say so and offer `/ways:work #<n>` instead. The problem isn't understood: offer `/ways:discover`. Don't carry on for work that isn't big.
+- **The problem isn't understood** (labelled `needs-info` for discovery, or nobody can say who it's for): say `/ways:discover` comes first.
 
 ## 2. Grill
 
@@ -38,7 +36,7 @@ When the result is something people look at (a page, a screen, a printout, a cha
 
 ## 4. Write the PRD
 
-Call the Skill tool for Pocock's `to-spec`, in this session, so it synthesises the grill above (or the written requirements, read in full, when the grill was skipped). `docs/agents/issue-tracker.md` says how this repo publishes it: a file in `specs/prd/` on a `spec/<feature-slug>` branch, the request issue becoming the parent with a `Spec:` line, and a spec PR.
+Call the Skill tool for Pocock's `to-spec`, in this session, so it synthesises the grill above (or the written requirements, read in full, when the grill was skipped). `docs/agents/issue-tracker.md` says how this repo publishes it: a file in `specs/prd/` on a `spec/<feature-slug>` branch, the request issue becoming the parent with a `Spec:` line, and a draft spec PR.
 
 Two checks after it:
 
@@ -47,6 +45,4 @@ Two checks after it:
 
 ## 5. Hand on
 
-Say in a few lines what the PRD settles and what's still open. Then end, since this part has no merge of its own:
-
-> The spec PR (#<m>) stays open: `/ways:design` adds to it, and you merge it after. Next: `/ways:design #<n>`. You can clear the session before it: each part starts fresh from what's in the repo and the issue.
+Say in a few lines what the PRD settles and what's still open. Delete `.claude/ways/part`. Then: "Nothing to merge yet: design goes into the same draft spec PR (#<m>). Next: `/ways:design #<n>`."

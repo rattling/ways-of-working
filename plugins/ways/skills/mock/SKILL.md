@@ -1,6 +1,6 @@
 ---
 name: mock
-description: A clickable HTML mock of a visual result (a page, a screen, a flow, a printout, a chart), with real sample data, iterated with a person until it's agreed, then kept with the PRD as the picture the build must match. For big work inside /ways:requirements (after the grill, before the PRD), and for /ways:discover's to-be screens. Throwaway, never the build.
+description: A clickable HTML mock of a visual result (a page, a screen, a flow, a printout, a chart), with real sample data, iterated with a person until it's agreed, then kept with the PRD as the picture the build must match. For big work inside /ways:plan (after the grill, before the PRD), and for /ways:discover's to-be screens. Throwaway, never the build.
 disable-model-invocation: true
 ---
 
@@ -45,4 +45,4 @@ When the person says it's right:
 - **Tickets check against it.** A ticket's **Human verification** becomes "matches the mock" plus what to compare: "open `specs/prd/<slug>-mock.html` beside the built page; same columns, same empty and unknown states, print preview at A3 in mono".
 - **It's never the build.** The build matches it. It doesn't copy its code.
 
-Say what was agreed in a few lines and what comes next: back to `/ways:requirements`, which writes the PRD with `/to-spec`, or back to `/ways:discover`'s next step.
+Say what was agreed in a few lines and what comes next: back to `/ways:plan` (or `/ways:requirements`), which writes the PRD with `/to-spec`, or back to `/ways:discover`'s next step.

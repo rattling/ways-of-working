@@ -1,16 +1,16 @@
 ---
 name: design
-description: Part 3 of 4 of big work, after /ways:requirements and before /ways:build. Grills the system-level how (shape, parts, contracts, data, seams, NFRs), updates docs/ARCHITECTURE.md and the ADRs, and fills the PRD's design sections on the spec branch.
+description: The second half of /ways:plan, on its own, for when an engineer designs from a PRD someone else wrote. Grills the system-level how (shape, parts, contracts, data, seams, NFRs), updates docs/ARCHITECTURE.md and the ADRs, and fills the PRD's design sections on the spec branch.
 disable-model-invocation: true
 ---
 
 # Design
 
-Part 3 of 4 of big work: how the system takes the PRD, at system level, before anything is sliced. Requirements (part 2, `/ways:requirements`) wrote the what and why; build (part 4, `/ways:build`) cuts tickets along the seams decided here.
+How the system takes the PRD, at system level, before anything is sliced. `/ways:plan` runs requirements and then this in one sitting, and is what most people use. Run this on its own when the requirements were written by someone else with `/ways:requirements`: the PRD file is the hand-off. `/ways:build` then cuts tickets along the seams decided here.
 
-Input: the parent issue, `#<n>`, or the PRD's path. Without one, use the PRD written in this conversation; with none, stop and say `/ways:requirements` comes first.
+Input: the parent issue, `#<n>`, or the PRD's path. Without one, use the PRD written in this conversation; with none, stop and say `/ways:plan` (or `/ways:requirements`) comes first.
 
-Follow `${CLAUDE_PLUGIN_ROOT}/reference/PARTS.md`: check state first, open with where you are, and end with the merge sentence. If the PRD's design sections are already filled, say so and offer to revise them, not to start again.
+Follow `${CLAUDE_PLUGIN_ROOT}/reference/PARTS.md`: look for the output first, open with where you are, and end with the merge sentence. If the PRD's design sections are already filled, say so and offer to revise them, not to start again.
 
 If the work stays inside one part and touches no contract, schema or data store, there's no design to do: say so, add "Design: no change of shape" to the PRD, commit it to the spec branch, and hand on (step 4).
 
@@ -49,4 +49,4 @@ Commit to the spec's branch, so the spec PR carries requirements and design toge
 
 ## 4. Hand on
 
-Say what changed in a few lines (the PRD sections, the diagram, the ADRs) and what's still open. Then the merge sentence: "To agree the spec, merge PR #<m>: that's the requirements and the design together." Next: `/ways:build #<n>`, which cuts slices along the seams decided here.
+Mark the spec PR ready. Say what changed in a few lines (the PRD sections, the diagram, the ADRs) and what's still open. Delete `.claude/ways/part`. Then the merge sentence: "To agree the spec, merge PR #<m>: that's what it should do and how the system changes." Next: `/ways:build #<n>`, which cuts slices along the seams decided here.

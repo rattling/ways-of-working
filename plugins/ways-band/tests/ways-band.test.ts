@@ -68,10 +68,10 @@ test('the band shows mode, issue, gate, dial, branch and context', async ($, on)
 })
 
 test('the band shows the part of big work under way', async ($, on) => {
-  stubRepo(on, { ...REPO, '.claude/ways/part': 'allergen chart · part 3 of 4 · design\n' })
+  stubRepo(on, { ...REPO, '.claude/ways/part': 'allergen chart · plan\n' })
   await $.session.start({ cwd: '/repo' })
   const ui = await $.ui.mount(BAND as any)
-  expect(await ui.find({ type: 'Text', text: 'allergen chart · part 3 of 4 · design' })).toBeDefined()
+  expect(await ui.find({ type: 'Text', text: 'allergen chart · plan' })).toBeDefined()
   await ui.unmount()
 })
 
@@ -79,7 +79,7 @@ test('without a part file, no part is shown', async ($, on) => {
   stubRepo(on, REPO)
   await $.session.start({ cwd: '/repo' })
   const ui = await $.ui.mount(BAND as any)
-  expect(await ui.find({ type: 'Text', text: /part \d of 4/ })).toBeUndefined()
+  expect(await ui.find({ type: 'Text', text: / · (plan|build|discover|requirements|design)$/ })).toBeUndefined()
   await ui.unmount()
 })
 

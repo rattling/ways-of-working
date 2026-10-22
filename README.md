@@ -19,20 +19,24 @@ A repo set up this way declares both marketplaces and plugins in `.claude/settin
 ## The flow
 
 ```
-1. Discovery     /ways:discover       → the brief                  person merges the discovery PR
-                                        only when the problem isn't understood; documents in specs/brief/inbox/
-   Sizing        /triage              → typo, one ticket, or big work
-2. Requirements  /ways:requirements   → the PRD's what             grill, mock if visual, then the PRD
-3. Design        /ways:design         → the PRD's how              person merges the spec PR
-4. Build         /ways:build          → tickets, then code         person merges the integration PR
+New and unsorted, or a pile of them   →  /triage            (optional: the commands below size an issue themselves)
+Problem not understood                →  /ways:discover, then /ways:plan
+Known to be big                       →  /ways:plan #n, then /ways:build #n
+Known to be small                     →  /ways:work #n      (one issue or several)
 
-One ticket       /ways:work #n        → one reviewed PR            start to finish
+/ways:discover   → the brief                person merges the discovery PR    documents in specs/brief/inbox/
+/ways:plan #n    → the PRD, what and how    person merges the spec PR          requirements, a mock if visual, then design
+/ways:build #n   → tickets, then code       person merges the integration PR   resumes a build under way
+/ways:work #n    → one reviewed PR          sizes, reproduces and briefs a raw issue, then waits for go
+
 Any time         prototype (explore options) · /ways:explain (learn a repo) · /ways:arch-review (health check)
 ```
 
-One command per part, each typed by a person: Claude doesn't start them itself, because each is a point where someone decides to move on. Each one opens by saying where you are ("Part 3 of 4, design, for the allergen chart (#12)"), checks what's already done so it never suggests a step twice, and ends with the one PR to merge, what merging it means, and the next command.
+Each command is typed by a person: Claude doesn't start them itself, because each is a point where someone decides to move on. Each one looks for its own output before starting, so it never redoes a step, opens by saying where you are ("Planning the allergen chart (#12)"), and ends with the one PR to merge, what merging it means, and the next command.
 
-Pocock's skills run underneath and can still be typed on their own: `/ways:requirements` runs `grilling`, `domain-modeling` and `/to-spec`; `/ways:build` runs `/to-tickets`, `/implement-spec` and `code-review`. The part commands call them and add this repo's conventions; they don't copy them.
+A plan is one sitting: requirements then design, with one merge at the end. When different people do the halves (a product person grills, an engineer designs), `/ways:requirements` and `/ways:design` run them separately, with the PRD file as the hand-off.
+
+Pocock's skills run underneath and can still be typed on their own: `/ways:plan` runs `grilling`, `domain-modeling` and `/to-spec`; `/ways:build` runs `/to-tickets`, `/implement-spec` and `code-review`. These commands call them and add this repo's conventions; they don't copy them.
 
 The full table, with what counts as big work and the only two skips, is [How work goes](plugins/ways/templates/AGENTS.md#how-work-goes). It's written once: `/ways:setup` copies it into every repo's `AGENTS.md`, the SessionStart hook reads it from there, and `/triage` sizes against it.
 
@@ -49,13 +53,13 @@ The full table, with what counts as big work and the only two skips, is [How wor
 ## What `ways` adds to Pocock's skills
 
 - **`/ways:setup`:** the files above, including the standards, labels, a `pr-hygiene` CI check, settings, and this repo's conventions appended to Pocock's tracker config: PRDs as files, closing work through PRs.
-- **`/ways:work`:** one issue in interactive or autonomous mode: branch, plan comment, early draft PR, `tdd`, Pocock's `code-review` with every finding answered, risk tier, PR body, merge policy.
-- **The four part commands** (`/ways:discover`, `/ways:requirements`, `/ways:design`, `/ways:build`): one per part of big work, with the same three rules in `plugins/ways/reference/PARTS.md`: check state first, open with where you are, end with the one merge and the next command.
-- **`/ways:requirements`:** part 2. Pocock's grill (`grilling` and `domain-modeling`), starting from the issue and its discovery brief, a mock when the result is visual, then `/to-spec` in the same session, so the grill's decisions can't be lost between them. Offers to revise a PRD that already exists rather than grilling again.
-- **`/ways:build`:** part 4. With no tickets yet, asks once whether to go straight from cutting them into the build, then `/to-tickets` (every ticket gets a Human verification line) and `/implement-spec` on `integration/<feature>`, with the autonomous marker set for you. With tickets, it starts; with a build under way, it resumes.
-- **`/ways:discover`:** part 1, for the work that arrives as a list of solutions or a half-built app. It works from interviews, notes, data and whatever's been built (your documents in `specs/brief/inbox/`) to a one-page brief and an intake issue. Sources that name people go to a git-ignored `private/` folder; the rest are committed with the brief. Quick mode stops three times; deep mode stops after every step and checks every quote. Built on Ofer Regev's [discovery-to-mvp](https://github.com/oferregev81pt/discovery-to-mvp) (MIT), with ways adding the workflows, cost and benefit, the order of work and the hand-off. [`examples/discovery/`](examples/discovery/) is a sample case to practise on, with an answer key.
+- **`/ways:work`:** one small issue (or several) in interactive or autonomous mode: branch, plan comment, early draft PR, `tdd`, Pocock's `code-review` with every finding answered, risk tier, PR body, merge policy. From a raw issue it sizes it first (big work goes to `/ways:plan`), reproduces a bug before anything else, and posts the brief it will work to before you say go.
+- **The flow commands** (`/ways:discover`, `/ways:plan`, `/ways:build`, and `/ways:requirements` and `/ways:design` for split planning) share three rules in `plugins/ways/reference/PARTS.md`: look for the output before starting, open with where you are, end with the one merge and the next command.
+- **`/ways:plan`:** requirements and design in one sitting. Sizes an untriaged issue first, asks whether written requirements should go in as they are or be grilled, runs Pocock's grill (`grilling` and `domain-modeling`) from the issue and its discovery brief, offers a mock when the result is visual, writes the PRD's what to disk before designing (so a compaction loses nothing), then designs: C4 context and containers, parts, contracts, data, seams, NFRs, into the PRD, `docs/ARCHITECTURE.md` and ADRs. One spec PR, merged once.
+- **`/ways:requirements` and `/ways:design`:** the two halves of a plan, for when different people do them.
+- **`/ways:build`:** with no tickets yet, asks once whether to go straight from cutting them into the build, then `/to-tickets` (every ticket gets a Human verification line) and `/implement-spec` on `integration/<feature>`, with the autonomous marker set for you. With tickets, it starts; with a build under way, it resumes.
+- **`/ways:discover`:** before a plan, for the work that arrives as a list of solutions or a half-built app. It works from interviews, notes, data and whatever's been built (your documents in `specs/brief/inbox/`) to a one-page brief and an intake issue. Sources that name people go to a git-ignored `private/` folder; the rest are committed with the brief. Quick mode stops three times; deep mode stops after every step and checks every quote. Built on Ofer Regev's [discovery-to-mvp](https://github.com/oferregev81pt/discovery-to-mvp) (MIT), with ways adding the workflows, cost and benefit, the order of work and the hand-off. [`examples/discovery/`](examples/discovery/) is a sample case to practise on, with an answer key.
 - **`/ways:mock`:** for work whose result people look at (a page, a flow, a printout, a chart): one clickable HTML page with the repo's real data, iterated with a person two or three times, then kept beside the PRD as the picture the build must match. A ticket's human check becomes "matches the mock". `/ways:discover`'s test prototype is built the same way but used the other way round: run with users against a kill signal, not iterated until someone likes it. If it passes, it's the mock's first draft.
-- **`/ways:design`:** part 3, which Pocock's flow goes from requirements to slicing without: the system-level how, grilled outside in (C4 context and containers, parts, contracts, data, seams, NFRs), written into the PRD, `docs/ARCHITECTURE.md` and ADRs.
 - **`/ways:arch-review`:** a guided architecture walkthrough, pillar by pillar in the shape of a Well-Architected Review (reliability, security, cost, operational excellence, performance), at the start of a repo, before a big change or at intervals. It ends in a critique for people to turn into tickets: what holds, the one that would sink it, the gaps by pillar, smaller questions.
 - **Hooks:** a SessionStart hook that orients Claude in an opted-in repo, a Stop hook that won't let an autonomous run end on a red gate, and a nudge when the agent grows a file past about 500 lines.
 - **Reference:** risk tiers, branching and merge policy, in `plugins/ways/reference/`.

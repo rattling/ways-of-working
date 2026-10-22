@@ -1,20 +1,20 @@
 ---
 name: build
-description: Part 4 of 4 of big work. Cuts the agreed spec into tickets with /to-tickets (asking once whether to go straight on), then builds them with /implement-spec on one integration branch, ending in one reviewed integration PR. Resumes a build under way.
+description: The second command of big work, after /ways:plan. Cuts the agreed spec into tickets with /to-tickets (asking once whether to go straight on), then builds them with /implement-spec on one integration branch, ending in one reviewed integration PR. Resumes a build under way.
 disable-model-invocation: true
 ---
 
 # Build
 
-Part 4 of 4 of big work: from an agreed spec to one reviewed integration PR. It runs what `/to-tickets` then `/implement-spec` would, with this repo's conventions, and manages the autonomous marker itself.
+After `/ways:plan`: from an agreed spec to one reviewed integration PR. It runs what `/to-tickets` then `/implement-spec` would, with this repo's conventions, and manages the autonomous marker itself.
 
 Input: the parent issue, `#<n>`, the one with the `Spec:` line. Without one, use the issue the conversation is about, or ask once.
 
-Follow `${CLAUDE_PLUGIN_ROOT}/reference/PARTS.md`: check state first, open with where you are, and end with the merge sentence.
+Follow `${CLAUDE_PLUGIN_ROOT}/reference/PARTS.md`: look for the output first, open with where you are, and end with the merge sentence. This is the one command that resumes work part-done: its state lives in GitHub.
 
-## 1. Check state, and pick the case
+## 1. Find where the build is
 
-As PARTS.md says. If the spec PR isn't merged yet, stop: say that merging it agrees the spec, and that the build starts after.
+Read the parent issue, its `Spec:` line, its sub-issues, the `integration/<feature-slug>` branch and the PRs that refer to it. If the spec PR isn't merged yet, stop: say that merging it agrees the spec, and that the build starts after.
 
 - **A build is under way** (an `integration/<feature-slug>` branch or a draft integration PR for this parent): resume it. Read the draft PR's checklist and the branch's commits, say "N of M done", and carry on from step 3. Don't recut tickets.
 - **Tickets exist under the parent** (open sub-issues): go to step 3. Nothing to ask.
@@ -38,4 +38,4 @@ Every ticket gets a **Human verification** line, which `to-tickets`' template la
 
 Delete `.claude/ways/autonomous`, `.claude/ways/progress` and `.claude/ways/part`. Mark the integration PR ready. Say what was built and what's left in a few lines, with anything labelled `needs-human` and why.
 
-Then the merge sentence: "To ship it, merge PR #<m>: that's every ticket and the review, and merging closes them." Next: nothing in this feature; follow-ups are issues for `/triage`.
+Then the merge sentence: "To ship it, merge PR #<m>: that's every ticket and the review, and merging closes them." Next: nothing in this feature; follow-ups are new issues: `/ways:work` for small ones, `/triage` for a pile.

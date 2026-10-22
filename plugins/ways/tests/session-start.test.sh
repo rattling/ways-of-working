@@ -33,18 +33,18 @@ start "" 0.5.0
 check "a repo that hasn't opted in hears nothing" '[[ -z $out ]]'
 
 start 0.5.0 0.5.0
-check "orients Claude: the gate and the part commands" '[[ $out == *"Gate: make check"* && $out == */ways:requirements* && $out == */ways:design* && $out == */ways:build* && $out == *PARTS.md* ]]'
+check "orients Claude: the gate and the routing rule" '[[ $out == *"Gate: make check"* && $out == */ways:plan* && $out == */ways:build* && $out == */ways:work* && $out == *PARTS.md* ]]'
 check "no part file: no work in progress line" '[[ $out != *"Big work in progress"* ]]'
 check "the flow comes from AGENTS.md, skips included" '[[ $out == *"/ways:discover"* && $out == *"Skips, and only these"* ]]'
 check "and stops at the next section" '[[ $out != *"## Working an issue"* ]]'
 check "without the template's ownership comment" '[[ $out != *"<!--"* ]]'
 check "same version: no setup nudge" '[[ $out != *"/ways:setup"* ]]'
 
-start 0.5.0 0.5.0 agents "allergen chart · part 3 of 4 · design"
-check "a part under way is named, with where to check its state" '[[ $out == *"Big work in progress: allergen chart · part 3 of 4 · design"* && $out == *PARTS.md* ]]'
+start 0.5.0 0.5.0 agents "allergen chart · plan"
+check "a part under way is named, with where to check its state" '[[ $out == *"Big work in progress: allergen chart · plan"* && $out == *PARTS.md* ]]'
 
 start 0.5.0 0.5.0 no-agents
-check "no flow section: a short fallback and a setup nudge" '[[ $out == *"has no \"How work goes\" section"* && $out == *"/ways:discover"* && $out == *"/ways:setup"* ]]'
+check "no flow section: a short fallback and a setup nudge" '[[ $out == *"has no \"How work goes\" section"* && $out == *"/ways:discover"* && $out == *"/ways:plan #n"* && $out == *"/ways:setup"* ]]'
 
 start 0.5.0 0.5.1
 check "a patch release doesn't nudge setup" '[[ $out != *"/ways:setup"* ]]'

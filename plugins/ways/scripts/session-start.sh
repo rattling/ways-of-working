@@ -29,12 +29,12 @@ if [[ -n "$flow" ]]; then
   echo "$flow"
   echo
 else
-  echo "- Flow: AGENTS.md has no \"How work goes\" section. Pick the path by size: /ways:discover when the problem isn't understood, /triage when it's unsized, /ways:work <issue> for one ticket, and for big work /ways:requirements, /ways:design, /ways:build. Say which command comes next when a step finishes. Suggest running /ways:setup to restore the section."
+  echo "- Flow: AGENTS.md has no \"How work goes\" section. New and unsorted, or a pile: /triage (optional). Problem not understood: /ways:discover, then /ways:plan. Known to be big: /ways:plan #n, then /ways:build #n. Known to be small: /ways:work #n. Say which command comes next when a step finishes. Suggest running /ways:setup to restore the section."
 fi
-echo "- The part commands' rules (check state first, open with where you are, end with the one merge): ${root}/reference/PARTS.md"
+echo "- The flow commands' rules (look for the output first, open with where you are, end with the one merge): ${root}/reference/PARTS.md"
 part="$project/.claude/ways/part"
 if [[ -f "$part" ]]; then
-  echo "- Big work in progress: $(head -1 "$part"). If you don't remember it, check its state as PARTS.md says before suggesting anything."
+  echo "- Big work in progress: $(head -1 "$part"). If you don't remember it, look for its output as PARTS.md says before suggesting anything."
 fi
 echo "- Merge policy and risk tiers: ${root}/reference/REVIEW-AND-MERGE.md"
 echo "- Gate: ${gate:-not set in .claude/ways.json}"

@@ -1,54 +1,53 @@
-# The four part commands
+# The flow commands
 
-Big work goes in four parts, one command each. One ticket stays `/ways:work`.
+Where work goes:
 
-| Part | Command | Ends in | The person merges |
-|---|---|---|---|
-| 1 of 4, discovery (only when the problem isn't understood) | `/ways:discover` | A brief in `specs/brief/<slug>/` and an intake issue | The discovery PR: that's the brief agreed |
-| 2 of 4, requirements | `/ways:requirements [#issue]` | The PRD's what, on the spec branch | Nothing yet: the spec PR stays open for design |
-| 3 of 4, design | `/ways:design [#parent]` | The PRD's how, on the same branch | The spec PR: requirements and design agreed together |
-| 4 of 4, build | `/ways:build [#parent]` | Tickets, then the code on one integration branch | The integration PR: that's the feature shipped |
-
-Pocock's skills run underneath (`grilling`, `domain-modeling`, `to-spec`, `to-tickets`, `implement-spec`, `code-review`) and can still be typed on their own. The part commands call them; they don't copy them.
-
-Every part command follows the three rules below.
-
-## 1. Check state before suggesting anything
-
-Before the first message, find where this piece of work is, so you never suggest a step that's already done. Read:
-
-- **The issue** (the argument, or the one the conversation is about): its labels, comments, sub-issues, and its `Brief:` and `Spec:` lines.
-- **The files:** `specs/brief/<slug>/README.md`, `specs/prd/<feature-slug>.md` and its Status line.
-- **Git and GitHub:** `gh pr list --state all --search "<n> in:body"`, and the `discovery/`, `spec/` and `integration/` branches for this work, local and remote.
-
-From those, the part this work is in:
-
-| What's there | Where it is |
+| The work | Command |
 |---|---|
-| An open `discovery/` PR | Discovery done, waiting for its merge |
-| A `Brief:` line, no `Spec:` line | Ready for requirements |
-| A `Spec:` line, the PRD has no Implementation Decisions yet | Requirements done, design next |
-| The PRD's design sections filled (or "Design: no change of shape"), spec PR open | Waiting for the spec PR to be merged |
-| Spec PR merged, no sub-issues | Ready for build: tickets first |
-| Sub-issues, no `integration/` branch | Ready for build: tickets cut |
-| An `integration/` branch or draft integration PR | Build under way: resume it |
+| New and unsorted, or a pile of it | `/triage` (optional: the commands below size an untriaged issue themselves) |
+| Problem not understood | `/ways:discover`, then `/ways:plan` |
+| Known to be big | `/ways:plan #n`, then `/ways:build #n` |
+| Known to be small | `/ways:work #n` (one issue, or several) |
 
-If the command typed is for a part that's already done, say so and say what's next instead. If it's for a part whose earlier one isn't done, say which comes first and offer to run it. Don't run it unasked.
+Big work is two commands, with discovery before them when it's needed:
+
+| Command | What it does | Ends in | The person merges |
+|---|---|---|---|
+| `/ways:discover` (optional, separate: its input can take days) | Works out what the problem is | A brief in `specs/brief/<slug>/` and an intake issue | The discovery PR: the brief agreed |
+| `/ways:plan #n` | Requirements, a mock if the result is visual, then design, in one sitting | The PRD, what and how, and one spec PR | The spec PR: what it should do and how the system changes, agreed together |
+| `/ways:build #n` | Tickets, then the code | One integration PR | The integration PR: the feature shipped |
+
+`/ways:plan` is `/ways:requirements` then `/ways:design` in one session. Those two stay as commands of their own for when different people do the halves (a product person grills, an engineer designs): the PRD file between them is the hand-off.
+
+Pocock's skills run underneath (`grilling`, `domain-modeling`, `to-spec`, `to-tickets`, `implement-spec`, `code-review`, `triage`) and can still be typed on their own. These commands call them; they don't copy them.
+
+Every flow command follows the three rules below.
+
+## 1. Look for the output before starting
+
+Before doing anything, check whether this command's output is already there, and say so rather than redo it:
+
+| Command | Its output |
+|---|---|
+| `/ways:discover` | `specs/brief/<slug>/README.md`, or an open `discovery/` PR |
+| `/ways:plan`, `/ways:requirements` | A `Spec:` line on the issue, or `specs/prd/<feature-slug>.md` |
+| `/ways:design` | The PRD's Implementation Decisions filled, or "Design: no change of shape" |
+| `/ways:build` | Sub-issues under the parent, an `integration/<feature-slug>` branch, or a draft integration PR |
+
+If it's there, say what's there and offer to revise it, or say what's next. Only `/ways:build` resumes work part-done, because its state lives in GitHub (the tickets, the integration branch, the draft PR's checklist). The others run in one sitting: don't clear the session during a plan.
 
 ## 2. Open with where you are
 
-The first line says the part, the feature and its issue, and what's done:
+The first line says the command, the feature and its issue, and what's done:
 
-> Part 3 of 4, design, for the allergen chart (#12). Requirements are done: `specs/prd/allergen-chart.md`.
+> Planning the allergen chart (#12). Discovery is done: `specs/brief/allergen-chart/README.md`.
 
-Then write the same to `.claude/ways/part` as one line, `<feature> · part <n> of 4 · <part>` (for example `allergen chart · part 3 of 4 · design`), so the `ways-band` mod can show it. Delete the file when the build hands over.
+Then write the same to `.claude/ways/part` as one line, `<feature> · <command>` (for example `allergen chart · plan`, or `allergen chart · build`), so the `ways-band` mod can show it and the SessionStart hook can name it after a compaction. Delete the file when the command hands over.
 
 ## 3. End with one merge sentence, then the next command
 
 The last thing said is one plain sentence about what to merge and what merging means, then the next command:
 
-> To agree the spec, merge PR #14: that's the requirements and the design together. Next: `/ways:build #12`.
+> To agree the spec, merge PR #14: that's what it should do and how the system changes. Next: `/ways:build #12`.
 
-When nothing is to be merged yet, say so: "The spec PR (#14) stays open: `/ways:design` adds to it, and you merge it after. Next: `/ways:design #12`." Ask for no other merges: the part's own PR is the only one a person merges, and tickets merge into the integration branch without anyone being asked.
-
-Each part can start in a fresh session, because everything it needs is in the repo and the issue. Clear the session between parts, never within one: a part's decisions live in the conversation until its file is written.
+Ask for no other merges: the command's own PR is the only one a person merges, and tickets merge into the integration branch without anyone being asked. When a command ends with nothing to merge (`/ways:requirements` alone), say so in the same sentence and name the next command.

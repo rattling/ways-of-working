@@ -3,7 +3,7 @@
 //
 // It reads: .claude/ways.json (version, gate), .claude/ways/autonomous (the issue or
 // issues an autonomous run is on), .claude/ways/progress (a spec run's tickets done, of total),
-// .claude/ways/part (the part of big work under way, written by the part commands),
+// .claude/ways/part (the big work under way and its command, written by the flow commands),
 // .claude/ways/last-gate (written by the ways Stop hook and by /gate),
 // the Dial line in AGENTS.md, and the current git branch. In a repo without .claude/ways.json
 // it draws nothing.
@@ -52,7 +52,7 @@ async function refresh($) {
   // `<done> <total>`, written by the lead of a spec run after each ticket merges.
   const [done, total] = ((await readText($, '.claude/ways/progress')) || '').match(/\d+/g) || []
   const agents = await readText($, 'AGENTS.md')
-  // `<feature> · part <n> of 4 · <part>`, written by /ways:discover, requirements, design and build.
+  // `<feature> · <command>`, written by /ways:discover, plan, requirements, design and build.
   const part = ((await readText($, '.claude/ways/part')) || '').split('\n')[0].trim() || null
 
   let branch = null
