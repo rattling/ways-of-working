@@ -32,8 +32,8 @@ Come out with a brief someone could build from:
 
 ## Running it
 
-1. Copy this folder into an empty repo, so the brief you write lands in that repo's `specs/brief/`.
-2. Run `/ways:discover` and answer as the people in the notes would. Where the notes don't say, make a sensible call and write it down as an assumption.
+1. In a repo set up with `/ways:setup`, copy everything here except `FACILITATOR.md` into `specs/brief/inbox/`: `brief.md`, `notes/`, `evidence/` and `app/`. Keep `FACILITATOR.md` somewhere discovery won't read it.
+2. Run `/ways:discover` and tell it the documents are in the inbox. It sorts them as it goes: the interview notes, which name people, into the brief's git-ignored `private/`, and the rest into `raw/`. Then answer as the people in the notes would. Where the notes don't say, make a sensible call and write it down as an assumption.
 3. Compare your brief with `FACILITATOR.md`.
 
 About 90 minutes in a group: 15 to read, 60 to run discovery, 15 to compare.

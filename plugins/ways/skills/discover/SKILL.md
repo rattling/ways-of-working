@@ -28,6 +28,8 @@ Both modes produce the same front page, from the same steps, with the same decis
 | Fresh-eyes check at hand-off | Do it yourself | A subagent |
 | Prototype | Offered at checkpoint 2; built only if the person says yes | Brief, build and an independent critique |
 
+With no sources given, ask for the mode first, then point at the inbox (Where things go, below).
+
 If the person didn't say, recommend one and ask once. **Deep** when there are recordings, more than two personas, a contested problem with real money at stake, or a reader senior enough to pick holes. **Quick** otherwise, and for a first pass that a deep run can follow.
 
 ### Quick mode
@@ -37,7 +39,7 @@ Read the step files for what each part means and how to judge it, then write the
 - **`out/q1-heard.md`** (steps 1–3), in this order: the data's numbers with how each was worked out (`[DAT-nn]`); what's already built, one line per part (`[BLT-nn]`); for each persona: who, their top pains (three at most, each with a quote, severity and whether it was prompted), their workarounds, their numbers set against the data, what must not change, and their silences; then where they collide (four rows at most), what neither mentioned, the as-is diagram, and the top three tensions.
 - **`out/q2-decide.md`** (steps 4, 5 and 5b): the premise audit (contradicted premises only), the problem statement, the framing rejected in a line each, what solved looks like (a line per persona), the business case (outcome today and target, chain, weakest link, why now); candidate zero, v1 in a sentence, in scope (five rows at most), the centrality check in a line, v1 does not, the to-be diagram and the gap, the cut list (eight rows at most), keep or delete for what's built, the adoption plan (entry point and what happens if people ignore it), assumptions (six at most), "Argue with me" (two items); then benefit with its working, cost, sizes, the riskiest assumption, risks (four rows at most), order of work and the recommendation.
 
-**Citing in quick mode.** List each source in `context.md` with a short code (`ASK`, `PRI`, `DAT`); a code can name a person, so two people in one file get a code each, pointing at the same file. Cite a line by its code and line number in `raw/` (`[PRI:12]`), and data and what's built by their `DAT` and `BLT` IDs. Every rule about IDs in the step files is met by these.
+**Citing in quick mode.** List each source in `context.md` with a short code (`ASK`, `PRI`, `DAT`); a code can name a person, so two people in one file get a code each, pointing at the same file. Cite a line by its code and line number in `raw/` or `private/` (`[PRI:12]`), and data and what's built by their `DAT` and `BLT` IDs. Every rule about IDs in the step files is met by these.
 
 **Checkpoints.** Run the steps in order without stopping, then stop at:
 
@@ -50,19 +52,27 @@ At a checkpoint, ask its decisions above, plus any step decision whose answer wo
 ## Where things go
 
 ```
+specs/brief/inbox/   where the person drops documents. Git-ignored except its README; empty once sorted
 specs/brief/<slug>/
   README.md        the front page, written last by the hand-off
   context.md       what we're exploring, who we heard from, the sources, glossary, constraints
-  raw/             the sources as given. Read-only: never edit, rename or delete
+  raw/             shareable sources as given (committed). Read-only: never edit, rename or delete
+  private/         personal sources as given (git-ignored), and deep mode's merged copies of them. Read-only too
   out/             the working: one file per step in deep mode, two in quick
   out/decisions.md who decided what, and why
   prototype/       only if step 7 runs
 ```
 
-`<slug>` names the problem area in a few words, not a feature. Before step 1:
+`<slug>` names the problem area in a few words, not a feature, and is never `inbox`. Wherever a step file says `raw/`, it means `raw/` or `private/`, whichever the source is in. Before step 1:
 
-- **Find the sources.** Ask where they are if the person didn't say: interview notes or transcripts, the ask (an email, a brief, a wish list), data (exports, reports), and anything already built. Copy them into `raw/`. Material that shouldn't be committed (personal data, another company's documents) can stay where it is: list where in `context.md`, and the hand-off keeps `raw/` out of git.
-- **Write `context.md`** if it's missing. Ask for what the sources don't say: the problem space in two or three sentences; why it matters to the business and which number it should move (or "none named yet"); who was heard from (name, role, which side); whether each conversation was real or roleplayed; what the team currently believes about the people involved; why now (or "none named yet"); terms and product names (the glossary); constraints (team, time, budget, data you do or don't have); what's already built and where. Half a page is enough. Read the sources first, so you only ask what they can't answer.
+- **Find the sources.** If the person didn't give them, say: "Put your documents in `specs/brief/inbox/` and tell me when they're there, or give me a folder and I'll try to read it from there." Sources are interview notes or transcripts, the ask (an email, a brief, a wish list), data (exports, reports), and anything already built. If a folder outside the repo can't be read (a permission prompt refused, or blocked by settings), give the inbox instruction once and wait; don't retry in a loop.
+- **Sort each source as it leaves the inbox**, once the slug is known. Move it, so the inbox ends empty apart from its README:
+  - **Shareable** (data exports, a written-up ask, notes with no names, code): to `raw/`, which is committed.
+  - **Personal** (interview notes or transcripts with names, customer data): to `private/`, which is git-ignored.
+
+  When it isn't obvious, ask once per file: "This one has names in it. Keep it private?" Before moving anything to `private/`, check that `.gitignore` has `specs/brief/*/private/` and `specs/brief/inbox/*` (a repo set up before ways 0.12 won't); add what's missing and say so. A source given as a folder elsewhere is copied in and sorted the same way. Material too sensitive to copy at all (another company's documents, say) can stay where it is: list where in `context.md`.
+- **Deep mode's merged copy of a private source is private too**: write `01-merged-<CODE>.md` for it in `private/`, not `out/`. Later steps quote it as usual; the hand-off checks those quotes.
+- **Write `context.md`** if it's missing. Ask for what the sources don't say: the problem space in two or three sentences; why it matters to the business and which number it should move (or "none named yet"); who was heard from (name, role, which side); whether each conversation was real or roleplayed; what the team currently believes about the people involved; why now (or "none named yet"); terms and product names (the glossary); constraints (team, time, budget, data you do or don't have); what's already built and where. List every source with its code and where it is (`raw/`, `private/`, or outside the repo), so a reader knows why they can't open the private ones. Half a page is enough. Read the sources first, so you only ask what they can't answer.
 
 ## The steps
 
@@ -106,7 +116,8 @@ There's no unattended mode. If nobody is there to answer, finish the current ste
 
 - **Finding facts is your job**, never the person's. Read every source, work out the data's numbers, read what's been built. Ask only for what no source holds.
 - **Traceability.** Every claim about what a person said or did carries an ID from step 1, like `[PRI-006]` (or `[PRI:12]` in quick mode); every number from data carries a `DAT` ID. A claim with neither is labelled `Interpretation:`, or deleted.
-- **Raw stays raw.** Never edit `raw/`. Quotes are checked against `out/01-*` (deep) or `raw/` (quick).
+- **Raw stays raw.** Never edit `raw/` or `private/`. Quotes are checked against the merged files (deep) or the sources (quick).
+- **Private stays private.** Nothing from `private/` or the inbox is committed. Quotes in `out/` are the person's words, so the hand-off checks them for names and details that shouldn't go in git.
 - **Verbatim means verbatim.** Quote marks are for a person's words or the ask's, copied exactly. Hedges ("maybe half, maybe less") are data: keep them.
 - **No solutions before step 5.** Park them in a `Parked ideas` line; step 5 picks them up.
 - **Challenge the starting point.** The ask's premises are checked against the evidence in step 4, and whenever a later step contradicts one. Say so as soon as you see it, before anyone has to push.
