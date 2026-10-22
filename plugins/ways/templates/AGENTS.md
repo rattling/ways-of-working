@@ -27,6 +27,8 @@ This file is the only one read every time. Open the rest when the work needs the
 
 ## How work goes
 
+<!-- Owned by the ways plugin: /ways:setup replaces this section on every run. Change the flow in the plugin, not here; put repo-specific rules under "Rules for this repo". -->
+
 Pick the path by the size of the work. A person types each command; when a step finishes, say which command comes next.
 
 | The work | Path |

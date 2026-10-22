@@ -15,7 +15,7 @@ The files in `steps/` started as that plugin's step skills, copied unchanged in 
 - **Candidate zero** (step 5): what would change without building anything, first in the order of work.
 - **Keep, rework or delete** for what's already been built (step 5).
 - **Cost, benefit, size, risks and order of work**: a new step, 5b, `cost-and-order.md`.
-- **Prototype built as a mock**: step 7 builds with `/ways:mock`'s method (one clickable HTML file with the brief's data, opens from disk, no deploy), so ways has one way to mock.
+- **Prototype built the mock way, as a test**: step 7 builds as `/ways:mock` does (one clickable HTML file with the brief's data, opens from disk, no deploy), so ways has one way to build, but skips the mock's agree-it rounds, checks the test can fail, and hands a passed prototype on as the mock's first draft.
 - **The hand-off**: a new last step, `hand-off.md`, writing the front page from `brief-template.md` and opening an intake issue for `/triage`.
 
 ## Left out

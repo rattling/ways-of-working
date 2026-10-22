@@ -54,7 +54,7 @@ Observable in a 15-minute session, with thresholds, e.g.:
 And one **kill signal**: the observation that would mean the assumption is wrong.
 
 ### 7. Test script
-3 tasks phrased as goals, not instructions ("Batch 32 just arrived. Do whatever you'd normally do with it."), then 3 follow-up questions, including "What would you do if this link didn't exist?"
+3 tasks phrased as goals, not instructions ("Batch 32 just arrived. Do whatever you'd normally do with it."), then 3 follow-up questions, including "What would you do if this link didn't exist?" The tasks never give away the answer the test depends on (say "you've just finished the job", not "it was the diverter valve"), and the facilitator only plays the other people in the scene, never does the user's own steps.
 
 ### 8. Build prompt
 A paste-ready prompt for the builder containing: the flow, screens, mock data spec, real-vs-faked, stack constraints (single app, no backend unless the flow needs persistence, mock data in one JSON file, works on a phone, no login), visual direction in two lines, and "build only this flow; anything else is out of scope".

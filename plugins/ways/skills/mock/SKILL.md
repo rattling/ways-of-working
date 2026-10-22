@@ -8,7 +8,9 @@ disable-model-invocation: true
 
 Spec text is bad at saying what something looks like. A ten-minute mock with real data settles questions a page of prose leaves open: what an empty or unknown value looks like, whether the layout survives the real number of rows, whether the thing is even the right shape. Make one whenever the result of the work is something people look at, before the spec is written, so the spec can point at it.
 
-Input: what the work is (the issue, or the requirements just grilled), and where the real data is. Called from `/ways:discover` (its step 7, or the to-be screens at quick mode's checkpoint 2): the to-be workflow, the prototype brief if there is one, and the brief so far, from `out/`.
+Input: what the work is (the issue, or the requirements just grilled), and where the real data is. Called from `/ways:discover` (its step 7, or the to-be screens at quick mode's checkpoint 2): the to-be workflow, the prototype brief if there is one, and the brief so far, from `out/`. Discover's step 7 uses only section 2 below: its test prototype is run with users, not iterated with one person.
+
+In requirements, if discovery left a test prototype that passed (`specs/brief/<slug>/prototype/index.html`), start from it: it's the first draft, so the rounds begin from what users already tried.
 
 This isn't Pocock's `prototype`. That one answers a design question by exploring options (several UI variations, or a state machine you can drive) and stays off main. A mock is the one agreed picture, kept with the spec. If the person doesn't yet know which of several directions they want, run `prototype` first and mock the one they pick.
 

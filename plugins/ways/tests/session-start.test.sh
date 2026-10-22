@@ -4,10 +4,12 @@
 # and checks what the hook tells Claude.
 
 set -u
-script="$(cd "$(dirname "$0")/.." && pwd)/scripts/session-start.sh"
+root="$(cd "$(dirname "$0")/.." && pwd)"
+script="$root/scripts/session-start.sh"
 failures=0
 
-# Run the hook for a repo stamped $1 (empty: not opted in) under a plugin at $2. Sets out.
+# Run the hook for a repo stamped $1 (empty: not opted in) under a plugin at $2.
+# The repo gets the AGENTS.md template unless $3 is "no-agents". Sets out.
 start() {
   local repo plugin
   repo="$(mktemp -d)"; plugin="$(mktemp -d)"
@@ -16,6 +18,7 @@ start() {
   if [[ -n $1 ]]; then
     mkdir -p "$repo/.claude"
     echo "{\"version\": \"$1\", \"gate\": \"make check\"}" > "$repo/.claude/ways.json"
+    [[ ${3:-} == no-agents ]] || cp "$root/templates/AGENTS.md" "$repo/AGENTS.md"
   fi
   out="$(CLAUDE_PROJECT_DIR="$repo" CLAUDE_PLUGIN_ROOT="$plugin" bash "$script")"
   rm -rf "$repo" "$plugin"
@@ -29,8 +32,14 @@ start "" 0.5.0
 check "a repo that hasn't opted in hears nothing" '[[ -z $out ]]'
 
 start 0.5.0 0.5.0
-check "orients Claude: the gate and the three parts" '[[ $out == *"Gate: make check"* && $out == *requirements* && $out == */ways:design* ]]'
+check "orients Claude: the gate and the three parts" '[[ $out == *"Gate: make check"* && $out == *Requirements* && $out == */ways:design* ]]'
+check "the flow comes from AGENTS.md, skips included" '[[ $out == *"/ways:discover"* && $out == *"Skips, and only these"* ]]'
+check "and stops at the next section" '[[ $out != *"## Working an issue"* ]]'
+check "without the template's ownership comment" '[[ $out != *"<!--"* ]]'
 check "same version: no setup nudge" '[[ $out != *"/ways:setup"* ]]'
+
+start 0.5.0 0.5.0 no-agents
+check "no flow section: a short fallback and a setup nudge" '[[ $out == *"has no \"How work goes\" section"* && $out == *"/ways:discover"* && $out == *"/ways:setup"* ]]'
 
 start 0.5.0 0.5.1
 check "a patch release doesn't nudge setup" '[[ $out != *"/ways:setup"* ]]'
