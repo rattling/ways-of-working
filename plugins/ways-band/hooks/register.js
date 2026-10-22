@@ -3,6 +3,7 @@
 //
 // It reads: .claude/ways.json (version, gate), .claude/ways/autonomous (the issue or
 // issues an autonomous run is on), .claude/ways/progress (a spec run's tickets done, of total),
+// .claude/ways/part (the big work under way and its command, written by the flow commands),
 // .claude/ways/last-gate (written by the ways Stop hook and by /gate),
 // the Dial line in AGENTS.md, and the current git branch. In a repo without .claude/ways.json
 // it draws nothing.
@@ -51,6 +52,8 @@ async function refresh($) {
   // `<done> <total>`, written by the lead of a spec run after each ticket merges.
   const [done, total] = ((await readText($, '.claude/ways/progress')) || '').match(/\d+/g) || []
   const agents = await readText($, 'AGENTS.md')
+  // `<feature> · <command>`, written by /ways:discover, plan, requirements, design and build.
+  const part = ((await readText($, '.claude/ways/part')) || '').split('\n')[0].trim() || null
 
   let branch = null
   try {
@@ -82,6 +85,7 @@ async function refresh($) {
     // One number for a single run; several, space-separated, for a batch the lead is running.
     issues: marker ? marker.match(/\d+/g) || [] : [],
     progress: marker && total ? done + ' of ' + total : null,
+    part,
     gateResult: result === 'pass' || result === 'fail' ? result : null,
     gateAt: at ? Number(at) : null,
     dial: agents ? (agents.match(/\*\*Dial:\*\*\s*([a-z]+)/i) || [])[1] || null : null,
@@ -173,6 +177,7 @@ export function register(on) {
     else gate = Text({ dimColor: true, children: ['gate not run (/gate)'] })
 
     const parts = [Text({ bold: true, children: ['ways' + (view.version ? ' ' + view.version : '')] }), sep(), mode, sep(), gate]
+    if (view.part) parts.splice(1, 0, sep(), Text({ color: 'magenta', children: [view.part] }))
     if (view.dial) parts.push(sep(), Text({ children: ['dial ' + view.dial] }))
     if (view.branch) parts.push(sep(), Text({ dimColor: true, children: [view.branch] }))
     if (typeof view.context === 'number') {

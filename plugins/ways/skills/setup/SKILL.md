@@ -54,13 +54,21 @@ Append `${CLAUDE_PLUGIN_ROOT}/templates/overlays/issue-tracker.md` to the end of
 
 ## 5. Labels
 
-Create the labels in `${CLAUDE_PLUGIN_ROOT}/templates/labels.txt` with `gh label create <name> --color <hex> --description "<text>" --force`. Leave other labels alone.
+Create the labels in `${CLAUDE_PLUGIN_ROOT}/templates/labels.txt` with `gh label create <name> --color <hex> --description "<text>" --force`, except `bug` and `enhancement`: create those only if they're missing, without `--force`, so a repo's own colours stay. `/triage` needs one of the two, and they exist only where GitHub's defaults came with the repo. Leave other labels alone.
 
 ## 6. Settings and stamp
 
 - `.claude/settings.json`: merge in the template's `extraKnownMarketplaces`, `enabledPlugins` and `permissions.deny` entries. Keep everything already there.
 - `.claude/ways.json`: write the plugin version and the gate command, for example `{"version": "0.2.0", "gate": "make check"}`. The Stop hook runs this command in autonomous mode, so it must be the same command CI runs. It must also run as it is in PowerShell and bash (no `&&`), and on its own fresh state, not the running app's database (`docs/standards/delivery.md`). Where tests use the app's database today, list that as a gap in the report and suggest the fix as an issue: tests build a throwaway database from the schema each run. In a repo with no code yet, use a gate that passes trivially and list it as `needs-human`.
-- `.gitignore`: add `.claude/ways/` (the autonomous-mode marker lives there) and `.claude/settings.local.json`.
+- `.gitignore`: add each of these lines that's missing, and nothing twice:
+  ```
+  .claude/ways/
+  .claude/settings.local.json
+  specs/brief/inbox/*
+  !specs/brief/inbox/README.md
+  specs/brief/*/private/
+  ```
+  The first is where the autonomous-mode marker lives. The last three keep `/ways:discover`'s sources out of git: the inbox is ignored except its README (seeded from the template, so the folder exists in every clone), and each brief's `private/` holds the personal ones.
 
 ## 7. Open the PR and report
 

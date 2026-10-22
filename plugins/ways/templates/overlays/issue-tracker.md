@@ -11,7 +11,12 @@ A spec is a PRD, and it lives in the repo, not in an issue.
 2. Put a line at the top: `**Tracking:** #<n> · **Status:** draft · **Owner:** <person>`.
 3. Add two sections if the template lacks them: **Must not exist yet** (things a builder might reasonably add that we don't want now) and **Human verification** (how someone who didn't build it confirms it).
 4. The parent issue. **If an issue already asks for this work** (the request that was triaged or grilled, or one the person names), it becomes the parent: add a short summary and `Spec: specs/prd/<feature-slug>.md` at the top of its body, keeping the original request below. Don't create a second issue. Only when no issue asks for it, create the parent with the summary and the `Spec:` line. Either way, fill in its number on the Tracking line.
-5. Open a PR titled `spec: <feature>` with `Refs #<n>`. A person merges it; that is the spec being agreed.
+5. **The parent keeps one state label.** Don't apply `ready-for-agent` to it (where `/to-spec` says to): it keeps triage's `ready-for-human` until it's built. The tickets cut from it are what's `ready-for-agent`.
+6. Open a **draft** PR titled `spec: <feature>` with `Refs #<n>`. The design goes onto the same branch, and whoever finishes the design (`/ways:plan` or `/ways:design`) marks it ready. A person merges it once, and that is the spec, what and how, being agreed.
+
+### When a skill says "publish the tickets" (`/to-tickets`)
+
+Each ticket is a sub-issue of the parent, labelled `ready-for-agent`, as `/to-tickets` says. Add a **Human verification** section to each, after its acceptance criteria: how someone who didn't build it confirms it, from the PRD's Human verification, or "matches the mock" with what to compare. `/ways:work` won't build a ticket autonomously without it.
 
 A feature needs a PRD only if it needs more than one ticket or changes an invariant or a contract between systems. Otherwise the issue is the spec.
 
@@ -20,6 +25,8 @@ A feature needs a PRD only if it needs more than one ticket or changes an invari
 Read the parent issue, follow its `Spec:` line, and read the file.
 
 ### When implementing a whole spec (`/implement-spec`)
+
+`/ways:build` runs this, and writes the marker first. The integration branch is `integration/<feature-slug>`, so a re-run can find it and resume. The code review is Pocock's `code-review`: call it as `mattpocock-skills:code-review`, not Claude Code's built-in skill of the same name.
 
 **One ticket at a time**, in the order the blocking edges allow: one implementer at a time, merged to the integration branch before the next starts. Go parallel only when the person asks for it in this session. Parallel implementers each run the gate, so each brings up its own containers and database, and the run is harder to follow and costs more.
 
@@ -53,12 +60,12 @@ An agent brief also has a **Human verification** line: how someone who didn't bu
 
 ### Sizing, when triaging
 
-Say which path an issue takes, using the table in `AGENTS.md` under **How work goes**:
+Triage is optional: `/ways:plan`, `/ways:requirements` and `/ways:work` size an untriaged issue themselves, by these same rules. `/triage` is for new and unsorted work, or a pile of it. Say which path an issue takes, using the table in `AGENTS.md` under **How work goes**:
 
-- **The problem isn't understood yet** (the ask is a list of solutions, or nobody can say who it's for or how we'd know it worked): don't size it. Label it `needs-info`, and say in the comment that it needs `/ways:discover` first.
-- **One ticket** (fits one PR, changes no invariant or contract): brief it as usual. It's worked with `/ways:work`.
+- **The problem isn't understood yet** (the ask is a list of solutions, or nobody can say who it's for or how we'd know it worked): don't size it. Label it `needs-info`, and say in the comment that it needs `/ways:discover` first, then `/ways:plan`.
+- **One ticket** (fits one PR, changes no invariant or contract): brief it as usual. It's worked with `/ways:work #<n>`.
 - **One ticket in disguise:** if every part of big work except the build would be skipped (no real requirements question, nothing to design), it's one ticket. Brief it as one, or say what's missing; often it's the real-world problem the work is meant to fix.
-- **Big work** (more than one ticket, or it changes an invariant or a contract): don't brief it as a ticket. Label it `ready-for-human`, and say in the comment that it needs the three parts, starting with `/grill-with-docs`. An intake from `/ways:discover` has a `Brief:` line: read the brief and size from it, and the grill starts from it.
+- **Big work** (more than one ticket, or it changes an invariant or a contract): don't brief it as a ticket. Label it `ready-for-human`, and say in the comment that it's big work and next is `/ways:plan #<n>`, then `/ways:build #<n>`. An intake from `/ways:discover` has a `Brief:` line: read the brief and size from it, and the plan starts from it.
 
 ### Labels beyond the triage roles
 

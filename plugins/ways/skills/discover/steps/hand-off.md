@@ -26,10 +26,10 @@ Rules for the page:
 In deep mode, give a subagent only the front page and this question: "What would you decide from this, and what's missing for you to decide it?" Fix what it finds that the evidence supports, and when you show the page, say what it found and what you changed. In quick mode, ask yourself the same question of the page as a stranger would read it, and fix what you find.
 
 ### 3. Agree it
-Show the page in the chat, or its path and its opening paragraph if it's long, and ask the person to approve it or say what to change. This stop holds in every mode, including a delegated run: the page goes into the tracker next, where other people see it. Ask about `raw/` (below) in the same message. One approval covers the page, the commit, the issue and the PR.
+Show the page in the chat, or its path and its opening paragraph if it's long, and ask the person to approve it or say what to change. This stop holds in every mode, including a delegated run: the page goes into the tracker next, where other people see it. Ask about what's committed (below) in the same message. One approval covers the page, the commit, the issue and the PR.
 
 ### 4. Commit and open the intake issue
-1. **Check what's in `raw/` before committing.** Interview notes and exports can hold personal data or another company's material. Ask whether `raw/` belongs in this repo. If it doesn't, leave it out (add it to `.gitignore`), and say in `context.md` where the sources are kept instead.
+1. **Check what's committed** (changed by ways). Personal sources are already in `private/`, which is git-ignored: confirm with `git status` that nothing from `private/` or `specs/brief/inbox/` is staged. Then check two things: `raw/` holds nothing personal (move anything that is to `private/`), and quotes in `out/` and on the front page carry no names or details that shouldn't be in git (use the person's role or code instead, and say so in `decisions.md`). Ask about anything you're unsure of.
 2. On a branch `discovery/<slug>`, commit `specs/brief/<slug>/`.
 3. Open the intake issue, labelled `needs-triage`, titled with the problem (not a feature). The body is short:
    ```
@@ -44,7 +44,7 @@ Show the page in the chat, or its path and its opening paragraph if it's long, a
 5. With no GitHub remote, skip the issue and the PR, write `not filed yet` on the **Intake** line, and give the person the issue text to file.
 
 ### 5. Say what's next
-`/triage #<n>`. Triage sizes it from the brief. Big work goes on to `/grill-with-docs`, which starts from this brief instead of from scratch, then `/to-spec`, `/ways:design` and the build. If the first step in the order of work needs no code (candidate zero), say so: it's a change for the team to try, not a ticket.
+End with the merge sentence (`${CLAUDE_PLUGIN_ROOT}/reference/PARTS.md`): "To agree the brief, merge PR #<m>: that's the discovery." Next: `/ways:plan #<n>`, which sizes it from the brief first and starts from it instead of from scratch, then `/ways:build #<n>`. If the brief shows it's small, `/ways:work #<n>` instead. If the first step in the order of work needs no code (candidate zero), say so: it's a change for the team to try, not a ticket.
 
 ## Output
 

@@ -67,6 +67,22 @@ test('the band shows mode, issue, gate, dial, branch and context', async ($, on)
   await ui.unmount()
 })
 
+test('the band shows the part of big work under way', async ($, on) => {
+  stubRepo(on, { ...REPO, '.claude/ways/part': 'allergen chart · plan\n' })
+  await $.session.start({ cwd: '/repo' })
+  const ui = await $.ui.mount(BAND as any)
+  expect(await ui.find({ type: 'Text', text: 'allergen chart · plan' })).toBeDefined()
+  await ui.unmount()
+})
+
+test('without a part file, no part is shown', async ($, on) => {
+  stubRepo(on, REPO)
+  await $.session.start({ cwd: '/repo' })
+  const ui = await $.ui.mount(BAND as any)
+  expect(await ui.find({ type: 'Text', text: / · (plan|build|discover|requirements|design)$/ })).toBeUndefined()
+  await ui.unmount()
+})
+
 test('a batch shows every issue the lead is running, in merge order', async ($, on) => {
   stubRepo(on, { ...REPO, '.claude/ways/autonomous': '12 14 17\n' })
   await $.session.start({ cwd: '/repo' })
