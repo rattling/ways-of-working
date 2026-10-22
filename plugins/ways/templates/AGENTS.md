@@ -37,19 +37,21 @@ Pick the path by the size of the work. A person types each command; when a step 
 | New and not sized yet: a report, a request, an idea | `/triage`. It briefs it as one ticket, or says it's big work |
 | Typo-sized | Just do it: a PR labelled `no-issue` |
 | One ticket: a bug, a small enhancement | `/ways:work <issue>` |
-| **Big work:** more than one ticket, or it changes an invariant or a contract | **1 Requirements:** `/grill-with-docs` → `/to-spec` (the PRD; the grill starts from the discovery brief if there is one). Visual result: `/ways:mock` before `/to-spec`<br>**2 Design:** `/ways:design` (parts, contracts, data, seams, NFRs)<br>**3 Build:** `/to-tickets` → `/implement-spec` |
+| **Big work:** more than one ticket, or it changes an invariant or a contract | One command per part, each typed by a person:<br>**2 Requirements:** `/ways:requirements #<n>`: the PRD's what and why, from the discovery brief if there is one, with a mock if the result is visual<br>**3 Design:** `/ways:design #<n>`: the PRD's how. The person merges the spec PR: requirements and design agreed together<br>**4 Build:** `/ways:build #<n>`: tickets, then the code on one integration branch. The person merges the integration PR |
+
+Discovery is part 1 when it runs. Each part command says where you are when it starts, and ends with the one PR to merge, what merging means, and the next command. Pocock's skills run underneath (`grilling`, `domain-modeling`, `to-spec`, `to-tickets`, `implement-spec`, `code-review`) and can still be typed on their own.
 
 Skips, and only these:
 
-- **Requirements already written and agreed** (a brief someone wrote): skip the grill. Share the brief, then `/to-spec`.
-- **Big work that stays inside one part and touches no contract, schema or data store:** skip `/ways:design`. `/to-spec`'s seam sketch is enough; the PRD says "Design: no change of shape".
+- **Requirements already written and agreed** (a brief someone wrote): `/ways:requirements` skips the grill and writes the PRD from them.
+- **Big work that stays inside one part and touches no contract, schema or data store:** `/ways:design` says so and writes "Design: no change of shape" into the PRD.
 - Nothing else is skipped. If a step feels unnecessary, the work is probably one ticket, not big work.
 
 Also: `/ways:explain` before working in code you don't know; `/ways:arch-review` at the start of a repo, before a big change, and every so often.
 
 ## Working an issue
 
-Use `/ways:work <issue>`. It runs interactively for `ready-for-human` and autonomously for `ready-for-agent`. For a whole spec at once, `/implement-spec`, with `.claude/ways/autonomous` created first so the gate holds. It builds one ticket at a time unless you ask for parallel (`docs/agents/issue-tracker.md` says why).
+Use `/ways:work <issue>`. It runs interactively for `ready-for-human` and autonomously for `ready-for-agent`. For a whole spec at once, `/ways:build #<parent>`: it sets the autonomous marker itself so the gate holds, and builds one ticket at a time unless you ask for parallel (`docs/agents/issue-tracker.md` says why).
 
 ## Merging
 

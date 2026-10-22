@@ -2,3 +2,6 @@
 # The triage roles (needs-triage, needs-info, ready-for-agent, ready-for-human, wontfix) come from /setup-matt-pocock-skills.
 needs-human | E99695 | Needs a decision, an acceptance, or information only a person has
 no-issue | EEEEEE | PR deliberately has no issue behind it (skips pr-hygiene)
+# /triage needs one of these two. GitHub's defaults, so creating them changes nothing where they exist.
+bug | d73a4a | Something isn't working
+enhancement | a2eeef | New feature or request

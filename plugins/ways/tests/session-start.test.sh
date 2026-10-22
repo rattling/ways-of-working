@@ -9,7 +9,7 @@ script="$root/scripts/session-start.sh"
 failures=0
 
 # Run the hook for a repo stamped $1 (empty: not opted in) under a plugin at $2.
-# The repo gets the AGENTS.md template unless $3 is "no-agents". Sets out.
+# The repo gets the AGENTS.md template unless $3 is "no-agents", and $4, if given, as .claude/ways/part. Sets out.
 start() {
   local repo plugin
   repo="$(mktemp -d)"; plugin="$(mktemp -d)"
@@ -19,6 +19,7 @@ start() {
     mkdir -p "$repo/.claude"
     echo "{\"version\": \"$1\", \"gate\": \"make check\"}" > "$repo/.claude/ways.json"
     [[ ${3:-} == no-agents ]] || cp "$root/templates/AGENTS.md" "$repo/AGENTS.md"
+    [[ -z ${4:-} ]] || { mkdir -p "$repo/.claude/ways"; echo "$4" > "$repo/.claude/ways/part"; }
   fi
   out="$(CLAUDE_PROJECT_DIR="$repo" CLAUDE_PLUGIN_ROOT="$plugin" bash "$script")"
   rm -rf "$repo" "$plugin"
@@ -32,11 +33,15 @@ start "" 0.5.0
 check "a repo that hasn't opted in hears nothing" '[[ -z $out ]]'
 
 start 0.5.0 0.5.0
-check "orients Claude: the gate and the three parts" '[[ $out == *"Gate: make check"* && $out == *Requirements* && $out == */ways:design* ]]'
+check "orients Claude: the gate and the part commands" '[[ $out == *"Gate: make check"* && $out == */ways:requirements* && $out == */ways:design* && $out == */ways:build* && $out == *PARTS.md* ]]'
+check "no part file: no work in progress line" '[[ $out != *"Big work in progress"* ]]'
 check "the flow comes from AGENTS.md, skips included" '[[ $out == *"/ways:discover"* && $out == *"Skips, and only these"* ]]'
 check "and stops at the next section" '[[ $out != *"## Working an issue"* ]]'
 check "without the template's ownership comment" '[[ $out != *"<!--"* ]]'
 check "same version: no setup nudge" '[[ $out != *"/ways:setup"* ]]'
+
+start 0.5.0 0.5.0 agents "allergen chart · part 3 of 4 · design"
+check "a part under way is named, with where to check its state" '[[ $out == *"Big work in progress: allergen chart · part 3 of 4 · design"* && $out == *PARTS.md* ]]'
 
 start 0.5.0 0.5.0 no-agents
 check "no flow section: a short fallback and a setup nudge" '[[ $out == *"has no \"How work goes\" section"* && $out == *"/ways:discover"* && $out == *"/ways:setup"* ]]'

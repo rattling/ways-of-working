@@ -1,16 +1,18 @@
 ---
 name: design
-description: The design part of a feature, after /to-spec and before /to-tickets. Grills the system-level how (shape, parts, contracts, data, seams, NFRs), updates docs/ARCHITECTURE.md and the ADRs, and fills the PRD's design sections.
+description: Part 3 of 4 of big work, after /ways:requirements and before /ways:build. Grills the system-level how (shape, parts, contracts, data, seams, NFRs), updates docs/ARCHITECTURE.md and the ADRs, and fills the PRD's design sections on the spec branch.
 disable-model-invocation: true
 ---
 
 # Design
 
-Big work goes in three parts: **requirements** (`/grill-with-docs`, then `/to-spec`: what and why, the PRD), **design** (this: how, at system level), and **build** (`/to-tickets`, then `/implement-spec` or `/ways:work`). This is the middle part: take an agreed-in-principle PRD and decide how the system takes it, before anything is sliced.
+Part 3 of 4 of big work: how the system takes the PRD, at system level, before anything is sliced. Requirements (part 2, `/ways:requirements`) wrote the what and why; build (part 4, `/ways:build`) cuts tickets along the seams decided here.
 
-Input: the PRD, by path or parent issue. Without one, use the PRD written in this conversation; with none, stop and say to run `/to-spec` first.
+Input: the parent issue, `#<n>`, or the PRD's path. Without one, use the PRD written in this conversation; with none, stop and say `/ways:requirements` comes first.
 
-If the work stays inside one part and touches no contract, schema or data store, there's no design to do: say so, add "Design: no change of shape" to the PRD, and hand on to `/to-tickets`.
+Follow `${CLAUDE_PLUGIN_ROOT}/reference/PARTS.md`: check state first, open with where you are, and end with the merge sentence. If the PRD's design sections are already filled, say so and offer to revise them, not to start again.
+
+If the work stays inside one part and touches no contract, schema or data store, there's no design to do: say so, add "Design: no change of shape" to the PRD, commit it to the spec branch, and hand on (step 4).
 
 ## 1. Read first
 
@@ -47,4 +49,4 @@ Commit to the spec's branch, so the spec PR carries requirements and design toge
 
 ## 4. Hand on
 
-Say what changed in a few lines (the PRD sections, the diagram, the ADRs) and what's still open. Next is `/to-tickets`, which should cut slices along the seams decided here.
+Say what changed in a few lines (the PRD sections, the diagram, the ADRs) and what's still open. Then the merge sentence: "To agree the spec, merge PR #<m>: that's the requirements and the design together." Next: `/ways:build #<n>`, which cuts slices along the seams decided here.

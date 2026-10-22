@@ -44,7 +44,7 @@ Show the page in the chat, or its path and its opening paragraph if it's long, a
 5. With no GitHub remote, skip the issue and the PR, write `not filed yet` on the **Intake** line, and give the person the issue text to file.
 
 ### 5. Say what's next
-`/triage #<n>`. Triage sizes it from the brief. Big work goes on to `/grill-with-docs`, which starts from this brief instead of from scratch, then `/to-spec`, `/ways:design` and the build. If the first step in the order of work needs no code (candidate zero), say so: it's a change for the team to try, not a ticket.
+End with the merge sentence (`${CLAUDE_PLUGIN_ROOT}/reference/PARTS.md`): "To agree the brief, merge PR #<m>: that's the discovery." Next: `/triage #<n>`, which sizes it from the brief. Big work goes on to `/ways:requirements #<n>`, which starts from this brief instead of from scratch, then `/ways:design` and `/ways:build`. If the first step in the order of work needs no code (candidate zero), say so: it's a change for the team to try, not a ticket.
 
 ## Output
 

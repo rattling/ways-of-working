@@ -1,16 +1,18 @@
 ---
 name: discover
-description: Part 0 of big work, before requirements, for when the problem isn't understood yet (a wish list, an idea, interview notes, a half-built app). Works out who hurts and how we'd know it's fixed, the as-is and to-be workflows, personas, the MVP and what to cut or throw away, risks, cost and benefit, a T-shirt size and an order of work. Quick or deep. Ends in a brief in specs/brief/ and an intake issue for /triage.
+description: Part 1 of 4 of big work, before requirements, for when the problem isn't understood yet (a wish list, an idea, interview notes, a half-built app). Works out who hurts and how we'd know it's fixed, the as-is and to-be workflows, personas, the MVP and what to cut or throw away, risks, cost and benefit, a T-shirt size and an order of work. Quick or deep. Ends in a brief in specs/brief/ and an intake issue for /triage.
 disable-model-invocation: true
 ---
 
 # Discover
 
-Big work goes in three parts: requirements, design and build. This is the part before them, for when nobody can yet say what the problem is. The usual sign is that the ask is a list of solutions ("a portal, a dashboard, an app like the big firms have"), or that something has been built and nobody is sure it's the right thing. Requirements written from that are a guess written down carefully.
+Big work goes in four parts: discovery, requirements, design and build. This is the first, and the only one that's optional: for when nobody can yet say what the problem is. The usual sign is that the ask is a list of solutions ("a portal, a dashboard, an app like the big firms have"), or that something has been built and nobody is sure it's the right thing. Requirements written from that are a guess written down carefully.
 
-Discovery works from evidence: what people said, what the data shows, what's already been built. It ends in a one-page brief in `specs/brief/<slug>/` and an intake issue labelled `needs-triage`, and the usual flow takes over: `/triage`, then `/grill-with-docs`, `/to-spec`, `/ways:design` and the build.
+Discovery works from evidence: what people said, what the data shows, what's already been built. It ends in a one-page brief in `specs/brief/<slug>/` and an intake issue labelled `needs-triage`, and the usual flow takes over: `/triage`, then `/ways:requirements`, `/ways:design` and `/ways:build`.
 
 The steps are adapted from [discovery-to-mvp](https://github.com/oferregev81pt/discovery-to-mvp) 1.2.0 by Ofer Regev (MIT; licence in `LICENSE-discovery-to-mvp`, changes in `NOTICE.md`). Its hard parts are unchanged: separating what people said from what their stories show, finding where people collide, framing the problem without a solution in it, and a cut list you can defend. ways adds a quick mode, sources beyond transcripts, as-is and to-be workflows, a keep-or-delete pass over what's already built, cost and benefit with an order of work, and the hand-off.
+
+Discovery is part 1 of 4 of big work: follow `${CLAUDE_PLUGIN_ROOT}/reference/PARTS.md`. Check state first (a brief or an open `discovery/` PR for this problem means carry on, not start again), open with where you are, and end, at the hand-off, with the merge sentence.
 
 ## Pick a mode
 

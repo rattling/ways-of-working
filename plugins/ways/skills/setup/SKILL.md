@@ -54,7 +54,7 @@ Append `${CLAUDE_PLUGIN_ROOT}/templates/overlays/issue-tracker.md` to the end of
 
 ## 5. Labels
 
-Create the labels in `${CLAUDE_PLUGIN_ROOT}/templates/labels.txt` with `gh label create <name> --color <hex> --description "<text>" --force`. Leave other labels alone.
+Create the labels in `${CLAUDE_PLUGIN_ROOT}/templates/labels.txt` with `gh label create <name> --color <hex> --description "<text>" --force`, except `bug` and `enhancement`: create those only if they're missing, without `--force`, so a repo's own colours stay. `/triage` needs one of the two, and they exist only where GitHub's defaults came with the repo. Leave other labels alone.
 
 ## 6. Settings and stamp
 

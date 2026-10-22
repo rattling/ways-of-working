@@ -10,7 +10,7 @@ Input: an issue number, and optionally a mode (`interactive` or `autonomous`). W
 
 Read first: `docs/agents/issue-tracker.md` (how this repo publishes, links and closes work) and `${CLAUDE_PLUGIN_ROOT}/reference/REVIEW-AND-MERGE.md`. The gate command is in `.claude/ways.json`.
 
-For a whole spec with several tickets, this isn't the skill: use `/implement-spec`, with `.claude/ways/autonomous` created first. For several **unrelated** issues at once (a batch of bugs after triage), see **Batch** at the end.
+For a whole spec with several tickets, this isn't the skill: use `/ways:build #<parent>`. For several **unrelated** issues at once (a batch of bugs after triage), see **Batch** at the end.
 
 ## 1. Start
 
@@ -35,7 +35,7 @@ Work with the person turn by turn, and keep the gate green as you go. Then go to
 ## 4. Before the PR is ready
 
 1. Run the gate. It must be green.
-2. Run `code-review` against `main`. Answer every finding: **fixed**, or **not a problem because…**, verifying each before acting. At most three rounds; whatever is still disputed goes in the PR body.
+2. Run Pocock's `code-review` (call it as `mattpocock-skills:code-review`, not Claude Code's built-in skill of the same name) against `main`. Answer every finding: **fixed**, or **not a problem because…**, verifying each before acting. At most three rounds; whatever is still disputed goes in the PR body.
 3. Decide the risk tier from `${CLAUDE_PLUGIN_ROOT}/reference/REVIEW-AND-MERGE.md`, `REVIEW.md` and `.github/CODEOWNERS`. If the review argued for a higher tier, take it. High risk: also run `/security-review`.
 4. Write the PR body with the `pr` skill, plus `Closes #<n>`, a `## How to check` section and the risk tier. Evidence is output you actually ran. For a visual change, that includes headless-browser screenshots of what changed (and the print preview, if it's printed), attached to the PR.
 5. Delete `.claude/ways/autonomous` if it exists.
