@@ -22,7 +22,7 @@ A repo set up this way declares both marketplaces and plugins in `.claude/settin
 New and unsorted, or a pile of them   →  /triage            (optional: the commands below size an issue themselves)
 Problem not understood                →  /ways:discover, then /ways:plan
 Known to be big                       →  /ways:plan #n, then /ways:build #n
-Known to be small                     →  /ways:work #n      (one issue or several)
+Known to be small                     →  /ways:work #n      (one or several, one at a time by default)
 
 /ways:discover   → the brief                person merges the discovery PR    documents in specs/brief/inbox/
 /ways:plan #n    → the PRD, what and how    person merges the spec PR          requirements, a mock if visual, then design
@@ -53,7 +53,7 @@ The full table, with what counts as big work and the only two skips, is [How wor
 ## What `ways` adds to Pocock's skills
 
 - **`/ways:setup`:** the files above, including the standards, labels, a `pr-hygiene` CI check, settings, and this repo's conventions appended to Pocock's tracker config: PRDs as files, closing work through PRs.
-- **`/ways:work`:** one small issue (or several) in interactive or autonomous mode: branch, plan comment, early draft PR, `tdd`, Pocock's `code-review` with every finding answered, risk tier, PR body, merge policy. From a raw issue it sizes it first (big work goes to `/ways:plan`), reproduces a bug before anything else, and posts the brief it will work to before you say go.
+- **`/ways:work`:** one small issue (or several, one at a time by default) in interactive or autonomous mode: branch, plan comment, early draft PR, `tdd`, Pocock's `code-review` with every finding answered, risk tier, PR body, merge policy. From a raw issue it sizes it first (big work goes to `/ways:plan`), reproduces a bug before anything else, and posts the brief it will work to before you say go.
 - **The flow commands** (`/ways:discover`, `/ways:plan`, `/ways:build`, and `/ways:requirements` and `/ways:design` for split planning) share three rules in `plugins/ways/reference/PARTS.md`: look for the output before starting, open with where you are, end with the one merge and the next command.
 - **`/ways:plan`:** requirements and design in one sitting. Sizes an untriaged issue first, asks whether written requirements should go in as they are or be grilled, runs Pocock's grill (`grilling` and `domain-modeling`) from the issue and its discovery brief, offers a mock when the result is visual, writes the PRD's what to disk before designing (so a compaction loses nothing), then designs: C4 context and containers, parts, contracts, data, seams, NFRs, into the PRD, `docs/ARCHITECTURE.md` and ADRs. One spec PR, merged once.
 - **`/ways:requirements` and `/ways:design`:** the two halves of a plan, for when different people do them.
