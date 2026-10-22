@@ -39,11 +39,11 @@ Pick the path by the size of the work. A person types each command; when a step 
 | One ticket: a bug, a small enhancement | `/ways:work <issue>` |
 | **Big work:** more than one ticket, or it changes an invariant or a contract | One command per part, each typed by a person:<br>**2 Requirements:** `/ways:requirements #<n>`: the PRD's what and why, from the discovery brief if there is one, with a mock if the result is visual<br>**3 Design:** `/ways:design #<n>`: the PRD's how. The person merges the spec PR: requirements and design agreed together<br>**4 Build:** `/ways:build #<n>`: tickets, then the code on one integration branch. The person merges the integration PR |
 
-Discovery is part 1 when it runs. Each part command says where you are when it starts, and ends with the one PR to merge, what merging means, and the next command. Pocock's skills run underneath (`grilling`, `domain-modeling`, `to-spec`, `to-tickets`, `implement-spec`, `code-review`) and can still be typed on their own.
+Discovery is part 1 when it runs. New and unsorted work starts with `/triage`; work already known to be big starts with `/ways:requirements`, which sizes an unsized issue first. Each part command says where you are when it starts, and ends with the one PR to merge, what merging means, and the next command. Pocock's skills run underneath (`grilling`, `domain-modeling`, `to-spec`, `to-tickets`, `implement-spec`, `code-review`) and can still be typed on their own.
 
 Skips, and only these:
 
-- **Requirements already written and agreed** (a brief someone wrote): `/ways:requirements` skips the grill and writes the PRD from them.
+- **No grill when the requirements are already written and agreed:** put them in the issue, or in a file it links to, and `/ways:requirements` will ask.
 - **Big work that stays inside one part and touches no contract, schema or data store:** `/ways:design` says so and writes "Design: no change of shape" into the PRD.
 - Nothing else is skipped. If a step feels unnecessary, the work is probably one ticket, not big work.
 

@@ -5,7 +5,7 @@ Big work goes in four parts, one command each. One ticket stays `/ways:work`.
 | Part | Command | Ends in | The person merges |
 |---|---|---|---|
 | 1 of 4, discovery (only when the problem isn't understood) | `/ways:discover` | A brief in `specs/brief/<slug>/` and an intake issue | The discovery PR: that's the brief agreed |
-| 2 of 4, requirements | `/ways:requirements [#issue]` | The PRD's what, on the spec branch | Nothing yet: design adds to the same PR |
+| 2 of 4, requirements | `/ways:requirements [#issue]` | The PRD's what, on the spec branch | Nothing yet: the spec PR stays open for design |
 | 3 of 4, design | `/ways:design [#parent]` | The PRD's how, on the same branch | The spec PR: requirements and design agreed together |
 | 4 of 4, build | `/ways:build [#parent]` | Tickets, then the code on one integration branch | The integration PR: that's the feature shipped |
 
@@ -49,4 +49,6 @@ The last thing said is one plain sentence about what to merge and what merging m
 
 > To agree the spec, merge PR #14: that's the requirements and the design together. Next: `/ways:build #12`.
 
-When nothing is to be merged yet, say so: "Nothing to merge yet: design adds to spec PR #14. Next: `/ways:design #12`." Ask for no other merges: the part's own PR is the only one a person merges, and tickets merge into the integration branch without anyone being asked.
+When nothing is to be merged yet, say so: "The spec PR (#14) stays open: `/ways:design` adds to it, and you merge it after. Next: `/ways:design #12`." Ask for no other merges: the part's own PR is the only one a person merges, and tickets merge into the integration branch without anyone being asked.
+
+Each part can start in a fresh session, because everything it needs is in the repo and the issue. Clear the session between parts, never within one: a part's decisions live in the conversation until its file is written.
