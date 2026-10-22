@@ -36,7 +36,7 @@ Pick the path by what's known about the work. A person types each command; when 
 | New and unsorted, or a pile of it | `/triage`. Optional: the commands below size an untriaged issue themselves |
 | Problem not understood: a wish list of solutions, an idea, a half-built app nobody's sure about | `/ways:discover`, quick or deep, then `/ways:plan`. Documents go in `specs/brief/inbox/` |
 | Known to be big: more than one ticket, or it changes an invariant or a contract | `/ways:plan #<n>`, then `/ways:build #<n>` |
-| Known to be small: a bug, a small enhancement | `/ways:work #<n>`, for one issue or several |
+| Known to be small: a bug, a small enhancement | `/ways:work #<n>`, for one issue or several (one at a time by default) |
 | Typo-sized | Just do it: a PR labelled `no-issue` |
 
 Big work is two commands, each ending in one PR a person merges:
