@@ -35,6 +35,7 @@ start 0.5.0 0.5.0
 check "orients Claude: the gate and the three parts" '[[ $out == *"Gate: make check"* && $out == *Requirements* && $out == */ways:design* ]]'
 check "the flow comes from AGENTS.md, skips included" '[[ $out == *"/ways:discover"* && $out == *"Skips, and only these"* ]]'
 check "and stops at the next section" '[[ $out != *"## Working an issue"* ]]'
+check "without the template's ownership comment" '[[ $out != *"<!--"* ]]'
 check "same version: no setup nudge" '[[ $out != *"/ways:setup"* ]]'
 
 start 0.5.0 0.5.0 no-agents

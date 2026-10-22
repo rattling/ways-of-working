@@ -22,7 +22,7 @@ echo
 echo "- Read AGENTS.md first. Specs: specs/ (charter, roadmap, operating-context, brief/, prd/). Language: GLOSSARY.md. Decisions: docs/adr/. Status lives in GitHub issues, not in files."
 # The flow is written once, in the repo's AGENTS.md ("How work goes"): print that section, not a copy of it.
 flow=""
-[[ -f "$project/AGENTS.md" ]] && flow="$(awk '/^## How work goes/{f=1; next} /^## /{f=0} f' "$project/AGENTS.md" | sed '/./,$!d')"
+[[ -f "$project/AGENTS.md" ]] && flow="$(awk '/^## How work goes/{f=1; next} /^## /{f=0} f && !/^<!--.*-->$/' "$project/AGENTS.md" | sed '/./,$!d')"
 if [[ -n "$flow" ]]; then
   echo "- How work goes, from AGENTS.md. docs/agents/issue-tracker.md says how this repo publishes specs and closes work."
   echo

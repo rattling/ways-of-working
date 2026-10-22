@@ -42,6 +42,8 @@ Templates live in `${CLAUDE_PLUGIN_ROOT}/templates/`. For each one, except `over
 
 `AGENTS.md`: Pocock's setup may already have created it with only the `## Agent skills` section. Add the template's sections around that section; never remove or rewrite it. Fill in the gate command, the read order and the merge policy from what the repo shows. Leave genuine judgement calls as placeholders and list them.
 
+The one exception to "never overwrite": `## How work goes` belongs to the plugin. On every run, replace that section, from its heading to the next `## `, with the template's current one, so the SessionStart hook (which prints it) shows the flow this plugin version has. If the repo's copy had changes of its own, say so in the report and point them to `## Rules for this repo`; the setup PR's diff shows what was replaced.
+
 `CLAUDE.md`: should contain `@AGENTS.md`. If it has other content, move that content into `AGENTS.md` and leave the import.
 
 `GLOSSARY.md` and `docs/adr/` are not seeded: Pocock's `domain-modeling` creates them when the first term or decision is settled.
