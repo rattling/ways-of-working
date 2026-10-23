@@ -38,7 +38,7 @@ Read the parent issue, follow its `Spec:` line, and read the file.
 
 **Screenshots of visual changes.** Each implementer attaches headless-browser screenshots of what it changed on screen to its PR's evidence, and the integration PR collects them. For printed work a headless PDF isn't enough: the human verification names the real browser's print dialog.
 
-**Containers.** Each implementer stops the containers it started (and any dev server or watcher) before reporting done. After each merge, check with `docker ps` that none of that worktree's are still running, and stop any that are: left running, they hold memory and their ports (8080, say) and block the next ticket.
+**Containers.** Each implementer runs the stack under its worktree's own Compose project and, if it publishes ports, on a port other than the default (`docs/standards/delivery.md`). It stops the containers it started (and any dev server or watcher) before reporting done. After each merge, check with `docker ps` that none of that worktree's are still running, and stop any that are: left running, they hold memory and their ports (8080, say) and block the next ticket.
 
 **Progress, without being asked.** The draft PR's body opens with a checklist of the tickets in build order, plus the code review, and you tick each one as it merges. Every update you post starts with "N of M done", saying what's building and what's next. After each merge, write `<done> <total>` to `.claude/ways/progress` (for example `2 9`), and the band shows it. Delete the file at handover, with the marker.
 
