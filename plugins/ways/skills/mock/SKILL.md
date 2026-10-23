@@ -26,7 +26,7 @@ One HTML file that opens from disk with a double-click.
 
 - **Clickable.** The buttons, links and tabs that matter move between the screens and states the work involves: the main path, the empty state, an error, the edge case the grill argued about. A picture that can't be clicked doesn't show a flow.
 - **Self-contained.** Inline CSS and JavaScript, the data embedded as a JSON block, no build step, no backend, nothing fetched. State lives in memory.
-- **Printed results get print CSS.** If the result is printed, add `@media print` and `@page` (the real paper size and orientation) and check the print preview, in mono if it will be printed in mono.
+- **Printed results get print CSS.** If the result is printed, add `@media print` and `@page` (the real paper size and orientation) and check it in the real browser's print dialog (Chrome, Ctrl+P), in mono if it will be printed in mono: a headless PDF can paginate differently.
 - **Marked as a mock.** A small fixed label: "Mock: not the build". At the top of the file, an HTML comment saying what it's for, where the data came from, and the decisions it settles.
 - **Skip the polish.** No framework, no tests, no handling beyond what keeps it clickable.
 
@@ -42,7 +42,7 @@ When the person says it's right:
 
 - **Save it with the spec.** Big work: `specs/prd/<feature-slug>-mock.html`, on the spec's branch, which `/to-spec` then creates or reuses. From `/ways:discover`: `specs/brief/<slug>/prototype/index.html`, and the brief's front page links it.
 - **Hand the decisions on.** `/to-spec` references the mock in the PRD (Pocock's PRD allows a prototype snippet where it says a decision better than prose) and copies the decisions it settled into the PRD's text, so they don't live only in the picture.
-- **Tickets check against it.** A ticket's **Human verification** becomes "matches the mock" plus what to compare: "open `specs/prd/<slug>-mock.html` beside the built page; same columns, same empty and unknown states, print preview at A3 in mono".
+- **Tickets check against it.** A ticket's **Human verification** becomes "matches the mock" plus what to compare: "open `specs/prd/<slug>-mock.html` beside the built page; same columns, same empty and unknown states; Chrome, Ctrl+P, A3, mono, 1 page".
 - **It's never the build.** The build matches it. It doesn't copy its code.
 
 Say what was agreed in a few lines and what comes next: back to `/ways:plan` (or `/ways:requirements`), which writes the PRD with `/to-spec`, or back to `/ways:discover`'s next step.
