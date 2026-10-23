@@ -12,6 +12,8 @@ Input: what the work is (the issue, or the requirements just grilled), and where
 
 In requirements, if discovery left a test prototype that passed (`specs/brief/<slug>/prototype/index.html`), start from it: it's the first draft, so the rounds begin from what users already tried.
 
+**Decisions first, mock second.** Build it once the thinking is done: in `/ways:plan`, after the grill's decisions are written down; in `/ways:discover`, after the scope (step 5). By then every screen shows a decision already made, so "mock it up" needs nothing more, and the mock becomes the easiest way for people to understand those decisions. Built before them, it's a nice-looking guess. If someone wants a mock before the decisions exist, say so and offer Pocock's `prototype` to explore options instead.
+
 This isn't Pocock's `prototype`. That one answers a design question by exploring options (several UI variations, or a state machine you can drive) and stays off main. A mock is the one agreed picture, kept with the spec. If the person doesn't yet know which of several directions they want, run `prototype` first and mock the one they pick.
 
 ## 1. Read first
@@ -28,7 +30,15 @@ One HTML file that opens from disk with a double-click.
 - **Self-contained.** Inline CSS and JavaScript, the data embedded as a JSON block, no build step, no backend, nothing fetched. State lives in memory.
 - **Printed results get print CSS.** If the result is printed, add `@media print` and `@page` (the real paper size and orientation) and check it in the real browser's print dialog (Chrome, Ctrl+P), in mono if it will be printed in mono: a headless PDF can paginate differently.
 - **Marked as a mock.** A small fixed label: "Mock: not the build". At the top of the file, an HTML comment saying what it's for, where the data came from, and the decisions it settles.
-- **Skip the polish.** No framework, no tests, no handling beyond what keeps it clickable.
+- **Make it look like the finished product.** People judge the decisions by what they see, and a wireframe makes good decisions look unfinished. Match the real platform or the app it sits beside (its header, navigation, controls and type), or, for something new, a clean, coherent look: one palette, one type scale, spacing that breathes, icons (inline SVG or unicode), status pills, proper forms and tables. Fill it with enough realistic data that it feels used: a dozen rows, not two, awkward ones included, plus the empty and error states. What it skips is the engineering, not the look: no framework, no tests, no backend, no handling beyond what keeps it clickable.
+- **A guided tour, so it works without you in the room.** Start from `${CLAUDE_PLUGIN_ROOT}/skills/mock/guided-tour.html`, which has all three parts:
+  - **A demo guide:** a step per decision, in plain English: what you're looking at and why it was decided that way, with a "where" line saying how that part is built. Each step opens its screen and highlights the element that matters, and people can still click around freely.
+  - **Show architecture:** labels each part as standard or custom (or by the component that builds it), from the design, with a key.
+  - **Reset demo:** the data and screens back to the start.
+
+  Discover's test prototype keeps the guide but starts with it closed, and the test script never opens it: a user being tested has to find the way alone, or the test can't fail. Open it afterwards to demo the prototype to others.
+
+  `examples/mocks/` in the ways-of-working repo has worked examples: a field worker's phone flow, a back-office approval workflow, and a printed poster.
 
 ## 3. Iterate with the person
 

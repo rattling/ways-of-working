@@ -1,0 +1,584 @@
+<!doctype html>
+<!--
+  Mock: Riverside Leisure Centre weekly pool timetable, from /ways:mock. Example of a printed output that has to fit the page.
+
+  What it's for:    Staff fix the week's pool sessions on screen, then print one A3 landscape poster for the
+                    noticeboard on the office printer, which prints in black and white. The question it settles:
+                    what goes on the poster, and how it still reads when printed in mono on one page.
+  Where the data is from: Made up for this example, shaped like a booking system's CSV export
+                    (one row per session: day, pool, start, end, type, name, instructor, note, new). Fictional centre,
+                    fictional phone number (Ofcom drama range). Awkward rows on purpose: a very long session name
+                    (Sat, learner pool), instructors not known yet (blank or "TBC"), a clash in the main pool (Thu),
+                    late changes marked new (Sat, Sun), two bank holidays with shorter hours (Mon 28 Dec, Fri 1 Jan),
+                    a pool with no sessions all day (Fri, learner pool), and a week that crosses the year end.
+  Decisions it settles:
+    1. One page, always, at A3 landscape. Time runs left to right, 06:30 to 21:30; one row per pool per day.
+    2. The key works in mono: types differ by pattern and symbol, not colour alone.
+    3. Unknowns print as "TBC", never blank. A pool with no sessions prints "closed all day", never an empty row.
+    4. Clashes (same day, same pool, overlapping times) block "Ready to print".
+    5. Late changes are marked NEW. Any edit made on screen is ticked NEW by default; untick it for a typo fix.
+    6. Bank holiday hours print beside the day; hours the pool is shut are grey.
+    7. The date printed is in the footer, with the phone number, so an old copy is easy to spot.
+    8. Long names wrap to two lines, then stop. The full name stays in the editor.
+    9. How to check it: Chrome, Ctrl+P, A3 landscape, black and white, 1 sheet. A headless PDF can paginate differently.
+  Rounds:           Round 1: first draft, not yet shown to the centre's staff.
+-->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pool timetable poster (mock)</title>
+<style>
+:root{--ink:#132331;--muted:#5b6b78;--faint:#8a98a3;--line:#dce3e8;--bg:#f2f5f7;--card:#fff;--brand:#0b5e7e;--brand-d:#08465e;--brand-l:#e3f1f6;
+  --danger:#c62828;--danger-bg:#fdeeee;--ok:#1b7f4b;--ok-bg:#e8f5ee;--accent:#0b5e7e;--std:#0969da;--custom:#8250df;--banner:#fff8c5;--r:8px}
+*{box-sizing:border-box}
+body{margin:0;font:14px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;color:var(--ink);background:var(--bg)}
+button{font:inherit;cursor:pointer;color:inherit}
+input,select{font:inherit;color:inherit}
+.btn{border:1px solid var(--line);background:var(--card);border-radius:6px;padding:7px 14px;font-weight:500;transition:background .15s,border-color .15s}
+.btn:hover:not(:disabled){border-color:#b8c4cc;background:#f7f9fa}
+.btn.primary{background:var(--brand);border-color:var(--brand);color:#fff}
+.btn.primary:hover:not(:disabled){background:var(--brand-d);border-color:var(--brand-d)}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.btn.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+.btn.on:hover{background:#22384a}
+.lnk{border:0;background:none;padding:0;color:inherit;text-decoration:underline;text-underline-offset:2px}
+
+/* The banner: says it's a mock, and holds the three demo controls. */
+.banner{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:6px 16px;background:var(--banner);border-bottom:1px solid #e7d87a;font-size:13px}
+.banner .sp{flex:1}
+.banner .btn{padding:4px 11px;font-size:13px}
+.banner .btn.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+.archkey{display:none;gap:12px}
+body.arch .archkey{display:flex}
+.archkey i{display:inline-block;width:11px;height:11px;border-radius:3px;margin-right:4px;vertical-align:-1px}
+
+/* App header */
+.apphd{display:flex;align-items:center;gap:16px;padding:12px 24px;background:var(--brand);color:#fff}
+.logo{display:flex;align-items:center;gap:10px;font-weight:700;font-size:16px;letter-spacing:.01em}
+.logo small{display:block;font-weight:400;font-size:12px;opacity:.8}
+.wk{display:flex;align-items:center;gap:4px;margin-left:24px;background:rgba(255,255,255,.12);border-radius:6px;padding:3px}
+.wk span{padding:0 10px;font-weight:600}
+.wk button{border:0;background:none;color:#fff;opacity:.5;padding:4px 8px;cursor:default}
+.pill{font-size:12px;font-weight:600;padding:2px 9px;border-radius:999px;background:rgba(255,255,255,.18)}
+.apphd .sp{flex:1}
+.apphd .btn{border-color:rgba(255,255,255,.35);background:rgba(255,255,255,.1);color:#fff}
+.apphd .btn.primary{background:#fff;color:var(--brand);border-color:#fff}
+.apphd .btn:disabled{opacity:.55}
+
+main{max-width:1480px;margin:0 auto;padding:20px 24px 120px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r)}
+.src{display:flex;align-items:center;gap:10px;padding:9px 14px;margin-bottom:14px;font-size:13px;color:var(--muted)}
+.src code{font:12.5px ui-monospace,Consolas,monospace;color:var(--ink);background:var(--bg);padding:1px 6px;border-radius:4px}
+
+/* Status bar: clash error, or all clear */
+.status{display:flex;align-items:center;gap:12px;padding:10px 16px;border-radius:var(--r);margin-bottom:14px;font-size:13.5px}
+.status.bad{background:var(--danger-bg);border:1px solid #f3c1c1;color:#8e1b1b}
+.status.good{background:var(--ok-bg);border:1px solid #bfe3cd;color:#145c37}
+.status .ico{width:22px;height:22px;border-radius:50%;display:grid;place-items:center;color:#fff;font-weight:700;font-size:13px;flex:none}
+.status.bad .ico{background:var(--danger)}
+.status.good .ico{background:var(--ok)}
+.status .sp{flex:1}
+
+/* Editor layout: grid plus side panel */
+.ed-wrap{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:16px;align-items:start}
+.gridcard{padding:4px 0 8px;overflow:hidden}
+.gridhd{display:flex;align-items:baseline;gap:10px;padding:12px 16px 8px}
+.gridhd h2{margin:0;font-size:16px}
+.gridhd span{color:var(--muted);font-size:13px}
+
+/* The timetable grid, shared by editor (.ed) and poster (.pt) */
+.tt{display:grid;grid-template-columns:var(--dlw) var(--pnw) minmax(0,1fr)}
+.ed{--dlw:118px;--pnw:62px;padding:0 16px 0 0}
+.axis{position:relative;height:22px}
+.ax{position:absolute;bottom:3px;transform:translateX(-50%);font-size:11px;color:var(--muted);font-variant-numeric:tabular-nums}
+.dl{padding:6px 10px 6px 16px;border-bottom:1px solid var(--line);display:flex;flex-direction:column;justify-content:center;gap:1px}
+.dl b{font-size:14px}
+.dl .dd{font-size:12px;color:var(--muted)}
+.dl .hrs{font-size:11.5px;color:var(--muted);font-variant-numeric:tabular-nums}
+.bh{align-self:flex-start;font-size:10px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;background:var(--ink);color:#fff;padding:1px 6px;border-radius:3px;margin-top:2px}
+.dl.hol .hrs{color:var(--ink);font-weight:600}
+.pn{display:flex;flex-direction:column;border-bottom:1px solid var(--line)}
+.pn span{flex:1;display:flex;align-items:center;font-size:11.5px;color:var(--muted)}
+.pn span+span{border-top:1px dashed var(--line)}
+.dlanes{display:flex;flex-direction:column;border-bottom:1px solid var(--line)}
+.lane{position:relative;flex:1;background:#fff}
+.lane+.lane{border-top:1px dashed var(--line)}
+.ed .lane{flex:none;height:50px}
+.tick{position:absolute;top:0;bottom:0;border-left:1px solid #eef2f4}
+.off{position:absolute;top:0;bottom:0;background:repeating-linear-gradient(135deg,#eceff1 0 4px,#e4e8eb 4px 8px)}
+.empty{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:12px;color:var(--faint);font-style:italic}
+
+/* Session blocks: pattern and symbol per type, so they still differ in mono */
+.blk{position:absolute;top:3px;bottom:3px;border:1px solid #2b3a46;border-radius:4px;overflow:hidden;padding:2px 3px;text-align:left;color:#0d1b26;line-height:1.15;background-color:#fff}
+.blk .tx{display:inline-block;max-width:100%;background:rgba(255,255,255,.9);padding:1px 3px;border-radius:2px}
+.blk .nm,.blk .mt{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden}
+.t-lane{background-color:#dcebfb;background-image:repeating-linear-gradient(0deg,rgba(13,40,70,.32) 0 1px,transparent 1px 6px)}
+.t-family{background-color:#fdf0c4;background-image:radial-gradient(rgba(60,35,0,.5) 1.3px,transparent 1.7px);background-size:7px 7px}
+.t-lessons{background-color:#fff;border:2.5px solid #0d1b26}
+.t-aqua{background-color:#d4f3e4;background-image:repeating-linear-gradient(135deg,rgba(0,50,30,.38) 0 1.2px,transparent 1.2px 6px)}
+.t-club{background-color:#1f2c37;color:#fff}
+.t-club .tx{background:transparent}
+.t-closed{background-color:#f1f1f1;background-image:repeating-linear-gradient(45deg,rgba(0,0,0,.45) 0 1px,transparent 1px 6px),repeating-linear-gradient(-45deg,rgba(0,0,0,.45) 0 1px,transparent 1px 6px)}
+.ed .blk{font-size:11.5px;transition:transform .1s,box-shadow .1s}
+.ed .blk:hover{box-shadow:0 2px 8px rgba(0,0,0,.18);z-index:3}
+.ed .blk .nm,.ed .blk .mt{display:block;white-space:nowrap;text-overflow:ellipsis}
+.ed .blk .who{display:none}
+.ed .blk .mt{font-size:10.5px;opacity:.85}
+.ed .blk.sel{outline:3px solid var(--brand);outline-offset:1px;z-index:4}
+.blk.clash{outline:3px solid var(--danger);outline-offset:0;z-index:2}
+.blk.top{bottom:50%}
+.blk.bot{top:50%}
+.tbc{font-style:normal;font-weight:800;font-size:.85em;letter-spacing:.03em;border:1.5px solid currentColor;padding:0 3px;border-radius:2px;margin-right:2px}
+.blk .nm.one{-webkit-line-clamp:1}
+.blk .who{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.new{font-style:normal;font-weight:800;font-size:.85em;letter-spacing:.03em;background:#000;color:#fff;padding:0 4px;border-radius:2px;margin-right:2px}
+
+/* Side panel */
+.panel{padding:18px;position:sticky;top:12px}
+.panel h3{margin:0 0 2px;font-size:16px}
+.panel .sub{color:var(--muted);font-size:13px;margin-bottom:14px}
+.pempty{text-align:center;padding:28px 10px 18px;color:var(--muted)}
+.pempty .big{width:52px;height:52px;margin:0 auto 12px;border-radius:12px;background:var(--brand-l);display:grid;place-items:center;color:var(--brand);font-size:24px}
+.pempty b{display:block;color:var(--ink);font-size:15px;margin-bottom:4px}
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:18px;text-align:left}
+.stats div{background:var(--bg);border-radius:6px;padding:8px 10px;font-size:12px;color:var(--muted)}
+.stats strong{display:block;font-size:18px;color:var(--ink)}
+.fg{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.fg label{display:flex;flex-direction:column;gap:4px;font-size:12px;font-weight:600;color:var(--muted)}
+.fg label.w{grid-column:1/-1}
+.fg input,.fg select{border:1px solid var(--line);border-radius:6px;padding:7px 9px;background:#fff;font-weight:400;font-size:14px}
+.fg input:focus,.fg select:focus{outline:2px solid var(--brand-l);border-color:var(--brand)}
+.fg .hint{font-weight:400;color:var(--faint);font-size:11.5px}
+.ck{display:flex;gap:8px;align-items:flex-start;margin:14px 0 4px;padding:10px;border-radius:6px;background:var(--bg);font-size:13px}
+.ck input{margin-top:3px}
+.err{margin:12px 0 0;padding:8px 10px;border-radius:6px;background:var(--danger-bg);color:#8e1b1b;font-size:13px}
+.pact{display:flex;gap:8px;margin-top:16px}
+.toast{margin-top:12px;padding:8px 10px;border-radius:6px;background:var(--ok-bg);color:#145c37;font-size:13px}
+
+/* Preview toolbar */
+.pvbar{display:flex;align-items:center;gap:10px;padding:12px 16px;margin-bottom:14px}
+.pvbar .sp{flex:1}
+.pvbar .note{font-size:12.5px;color:var(--muted)}
+.paper{background:#cfd6db;border-radius:var(--r);padding:24px}
+.clip{overflow:hidden;box-shadow:0 6px 24px rgba(0,0,0,.25);background:#fff}
+
+/* The poster, at real A3 landscape size; scaled to fit on screen */
+.poster{width:404mm;height:279mm;padding:7mm 8mm 6mm;background:#fff;color:#000;transform-origin:0 0;display:flex;flex-direction:column;gap:3mm;
+  font-family:"Helvetica Neue",Arial,sans-serif;overflow:hidden}
+.poster.mono{filter:grayscale(1)}
+.ph{display:flex;align-items:flex-end;gap:10mm;padding-bottom:3mm;border-bottom:2.2mm solid #000}
+.ph-org{font-size:15pt;font-weight:700;letter-spacing:.02em;text-transform:uppercase}
+.ph-title{font-size:38pt;font-weight:800;line-height:1;letter-spacing:-.01em}
+.ph .sp{flex:1}
+.ph-r{text-align:right}
+.ph-wk{font-size:12pt;font-weight:700;text-transform:uppercase;letter-spacing:.06em}
+.ph-dates{font-size:22pt;font-weight:800;line-height:1.1}
+.ph-sub{font-size:10pt;margin-top:1mm}
+.pt{--dlw:30mm;--pnw:17mm;flex:1;min-height:0;grid-template-rows:auto repeat(7,minmax(0,1fr));border-top:0}
+.pt .axis{height:6mm}
+.pt .ax{font-size:9pt;font-weight:700;color:#000}
+.pt .dl{padding:1mm 2mm 1mm 0;border-bottom:.5mm solid #000}
+.pt .dl b{font-size:14pt;line-height:1}
+.pt .dl .dd{font-size:10pt;color:#000}
+.pt .dl .hrs{font-size:9pt;color:#000}
+.pt .bh{font-size:7pt;background:#000}
+.pt .pn{border-bottom:.5mm solid #000}
+.pt .pn span{font-size:8.5pt;color:#000;font-weight:700}
+.pt .pn span+span,.pt .lane+.lane{border-top:.2mm solid #999}
+.pt .dlanes{border-bottom:.5mm solid #000;border-left:.3mm solid #000;border-right:.3mm solid #000}
+.pt .lane{min-height:0}
+.pt .tick{border-left:.2mm solid #d4d4d4}
+.pt .off{background:#dedede}
+.pt .empty{font-size:10pt;color:#000;font-style:normal;font-weight:700;background:#dedede}
+.pt .blk{font-size:8.3pt;top:.6mm;bottom:.6mm;border-color:#000;border-radius:1mm}
+.pt .blk .nm{font-weight:700}
+.pt .t-lessons{border-width:.8mm}
+.key{display:flex;flex-wrap:wrap;align-items:center;gap:2mm 6mm;padding:2mm 0;border-top:.5mm solid #000;font-size:9.5pt}
+.key .kt{font-weight:800;text-transform:uppercase;letter-spacing:.06em;font-size:9pt}
+.ki{display:flex;align-items:center;gap:2mm}
+.sw{display:inline-grid;place-items:center;width:14mm;height:6mm;border:.3mm solid #000;border-radius:1mm;font-style:normal;font-size:10pt;font-weight:700}
+.sw.t-lessons{border-width:.8mm}
+.sw.offsw{background:#dedede}
+.foot{display:flex;justify-content:space-between;gap:8mm;font-size:9pt;padding-top:1.5mm;border-top:.3mm solid #000}
+
+/* Show architecture: outline and label each part by how it's built. */
+body.arch [data-arch]{position:relative;outline:2px dashed var(--std);outline-offset:3px}
+body.arch [data-arch="custom"]{outline-color:var(--custom)}
+body.arch [data-arch]::after{content:attr(data-arch-label);position:absolute;top:-11px;right:10px;font-size:11px;font-weight:600;padding:1px 7px;border-radius:4px;background:var(--std);color:#fff;white-space:nowrap;z-index:20}
+body.arch [data-arch="custom"]::after{background:var(--custom)}
+
+/* The guide: bottom right, minimisable. */
+.guide{position:fixed;right:20px;bottom:20px;width:min(380px,calc(100vw - 40px));background:var(--card);border-radius:12px;border-top:4px solid var(--brand);box-shadow:0 12px 36px rgba(10,30,45,.28);z-index:50}
+.guide .gh{display:flex;align-items:center;gap:8px;padding:10px 16px 2px;font-size:11.5px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
+.guide .gh span{flex:1}
+.guide .gt{padding:2px 16px;font-weight:700;font-size:17px}
+.guide .gb{padding:4px 16px;font-size:14px}
+.guide .where{margin-top:10px;padding:7px 10px;border-radius:6px;background:var(--bg);font-size:12.5px;color:var(--muted)}
+.guide .gf{display:flex;align-items:center;gap:8px;padding:12px 16px 14px}
+.guide .prog{flex:1;display:flex;gap:3px}
+.guide .prog i{flex:1;height:4px;border-radius:2px;background:var(--line)}
+.guide .prog i.on{background:var(--brand)}
+.guide.min .gt,.guide.min .gb,.guide.min .gf{display:none}
+.x{border:0;background:none;color:var(--muted);font-size:16px;padding:0 4px}
+.pulse{animation:pulse 1.4s ease-out 3}
+@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(11,94,126,.6)}100%{box-shadow:0 0 0 16px rgba(11,94,126,0)}}
+.print-only{display:none}
+
+@media (max-width:1100px){.ed-wrap{grid-template-columns:1fr}.panel{position:static}}
+
+/* Print: only the poster, one A3 landscape page. Page 420 x 297 mm, margins 8 mm, poster 404 x 279 mm. */
+@page{size:A3 landscape;margin:8mm}
+@media print{
+  *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  body{background:#fff}
+  .banner,.apphd,#guide{display:none!important}
+  main{max-width:none;margin:0;padding:0}
+  #main>:not(#poster-wrap):not(.print-only){display:none!important}
+  .print-only{display:block;font:16pt Arial,sans-serif;padding:20mm}
+  body.arch [data-arch]{outline:none}
+  body.arch [data-arch]::after{display:none}
+  #poster-wrap .paper{padding:0;background:none;border-radius:0}
+  #poster-wrap .clip{width:auto!important;height:auto!important;overflow:visible;box-shadow:none}
+  #poster{transform:none!important;break-inside:avoid;page-break-inside:avoid}
+  .pulse{animation:none}
+}
+</style>
+</head>
+<body>
+<div class="banner">
+  <b>Mock: not the build.</b><span>Made-up sessions for a fictional centre.</span>
+  <span class="archkey"><span><i style="background:var(--std)"></i>Standard</span><span><i style="background:var(--custom)"></i>Custom</span></span>
+  <span class="sp"></span>
+  <button class="btn" id="btn-arch" data-action="arch">Show architecture</button>
+  <button class="btn" data-action="guide-open">Demo guide</button>
+  <button class="btn" data-action="reset">Reset demo</button>
+</div>
+<div id="hd"></div>
+<main id="main"></main>
+<div id="guide"></div>
+
+<script type="application/json" id="data">
+{"centre": "Riverside Leisure Centre", "phone": "01632 960 418",
+ "export": {"file": "riverside_sessions_2026-W53.csv", "exported": "Mon 21 Dec 2026, 16:42"},
+ "week": {"label": "Week 53"},
+ "pools": {"main": "Main pool", "learner": "Learner pool"},
+ "types": {
+  "lane": {"label": "Lane swim", "sym": "≡"}, "family": {"label": "Family fun", "sym": "●"},
+  "lessons": {"label": "Lessons", "sym": "▲"}, "aqua": {"label": "Aqua fit", "sym": "≈"},
+  "club": {"label": "Club hire", "sym": "■"}, "closed": {"label": "Closed for maintenance", "sym": "✕"}},
+ "days": [
+  {"date": "2026-12-28", "open": "09:00", "close": "17:00", "holiday": "Bank holiday"},
+  {"date": "2026-12-29", "open": "06:30", "close": "21:30"},
+  {"date": "2026-12-30", "open": "06:30", "close": "21:30"},
+  {"date": "2026-12-31", "open": "06:30", "close": "18:00", "note": "New Year's Eve"},
+  {"date": "2027-01-01", "open": "10:00", "close": "16:00", "holiday": "Bank holiday"},
+  {"date": "2027-01-02", "open": "08:00", "close": "20:00"},
+  {"date": "2027-01-03", "open": "08:00", "close": "20:00"}],
+ "sessions": [
+  {"id": "S01", "day": 0, "pool": "main", "start": "09:00", "end": "11:00", "type": "lane", "name": "Lane swim", "instructor": "", "note": "", "new": false},
+  {"id": "S02", "day": 0, "pool": "main", "start": "11:00", "end": "13:00", "type": "family", "name": "Family fun with inflatables", "instructor": "", "note": "", "new": false},
+  {"id": "S03", "day": 0, "pool": "main", "start": "13:00", "end": "15:00", "type": "lane", "name": "Lane swim", "instructor": "", "note": "", "new": false},
+  {"id": "S04", "day": 0, "pool": "main", "start": "15:00", "end": "17:00", "type": "family", "name": "Family fun", "instructor": "", "note": "", "new": false},
+  {"id": "S05", "day": 0, "pool": "learner", "start": "09:00", "end": "12:00", "type": "family", "name": "Family splash", "instructor": "", "note": "", "new": false},
+  {"id": "S06", "day": 0, "pool": "learner", "start": "12:00", "end": "14:00", "type": "lessons", "name": "Holiday crash course, stages 1–3", "instructor": "Dan O.", "note": "", "new": false},
+  {"id": "S07", "day": 0, "pool": "learner", "start": "14:00", "end": "17:00", "type": "family", "name": "Family splash", "instructor": "", "note": "", "new": false},
+  {"id": "S08", "day": 1, "pool": "main", "start": "06:30", "end": "09:00", "type": "lane", "name": "Early lanes", "instructor": "", "note": "", "new": false},
+  {"id": "S09", "day": 1, "pool": "main", "start": "09:00", "end": "10:00", "type": "aqua", "name": "Aqua fit", "instructor": "Priya S.", "note": "", "new": false},
+  {"id": "S10", "day": 1, "pool": "main", "start": "10:00", "end": "12:00", "type": "lane", "name": "Lane swim", "instructor": "", "note": "", "new": false},
+  {"id": "S11", "day": 1, "pool": "main", "start": "12:00", "end": "16:00", "type": "family", "name": "Holiday family fun", "instructor": "", "note": "", "new": false},
+  {"id": "S12", "day": 1, "pool": "main", "start": "16:00", "end": "18:00", "type": "lane", "name": "Lane swim", "instructor": "", "note": "", "new": false},
+  {"id": "S13", "day": 1, "pool": "main", "start": "18:00", "end": "19:30", "type": "club", "name": "Riverside Otters SC", "instructor": "", "note": "", "new": false},
+  {"id": "S14", "day": 1, "pool": "main", "start": "19:30", "end": "21:30", "type": "lane", "name": "Evening lanes", "instructor": "", "note": "", "new": false},
+  {"id": "S15", "day": 1, "pool": "learner", "start": "09:30", "end": "11:00", "type": "lessons", "name": "Parent and baby", "instructor": "Gemma R.", "note": "", "new": false},
+  {"id": "S16", "day": 1, "pool": "learner", "start": "11:00", "end": "13:00", "type": "lessons", "name": "Holiday crash course, stages 1–3", "instructor": "Dan O.", "note": "", "new": false},
+  {"id": "S17", "day": 1, "pool": "learner", "start": "13:00", "end": "16:00", "type": "family", "name": "Family splash", "instructor": "", "note": "", "new": false},
+  {"id": "S18", "day": 1, "pool": "learner", "start": "18:30", "end": "19:30", "type": "aqua", "name": "Gentle aqua, warm water", "instructor": "", "note": "", "new": false},
+  {"id": "S19", "day": 2, "pool": "main", "start": "06:30", "end": "09:00", "type": "lane", "name": "Early lanes", "instructor": "", "note": "", "new": false},
+  {"id": "S20", "day": 2, "pool": "main", "start": "09:00", "end": "12:30", "type": "closed", "name": "Closed for maintenance", "instructor": "", "note": "Filter service", "new": false},
+  {"id": "S21", "day": 2, "pool": "main", "start": "12:30", "end": "16:00", "type": "lane", "name": "Lane swim", "instructor": "", "note": "", "new": false},
+  {"id": "S22", "day": 2, "pool": "main", "start": "16:00", "end": "18:00", "type": "family", "name": "Family fun", "instructor": "", "note": "", "new": false},
+  {"id": "S23", "day": 2, "pool": "main", "start": "18:00", "end": "20:00", "type": "club", "name": "Riverside Masters", "instructor": "", "note": "", "new": false},
+  {"id": "S24", "day": 2, "pool": "main", "start": "20:00", "end": "21:30", "type": "lane", "name": "Evening lanes", "instructor": "", "note": "", "new": false},
+  {"id": "S25", "day": 2, "pool": "learner", "start": "09:00", "end": "12:30", "type": "closed", "name": "Closed for maintenance", "instructor": "", "note": "Shared filter plant", "new": false},
+  {"id": "S26", "day": 2, "pool": "learner", "start": "13:00", "end": "15:00", "type": "lessons", "name": "Adult improvers", "instructor": "TBC", "note": "", "new": false},
+  {"id": "S27", "day": 2, "pool": "learner", "start": "15:00", "end": "17:00", "type": "family", "name": "Family splash", "instructor": "", "note": "", "new": false},
+  {"id": "S28", "day": 3, "pool": "main", "start": "06:30", "end": "09:00", "type": "lane", "name": "Early lanes", "instructor": "", "note": "", "new": false},
+  {"id": "S29", "day": 3, "pool": "main", "start": "09:30", "end": "10:30", "type": "aqua", "name": "Aqua fit", "instructor": "Priya S.", "note": "", "new": false},
+  {"id": "S30", "day": 3, "pool": "main", "start": "10:30", "end": "13:00", "type": "lane", "name": "Lane swim", "instructor": "", "note": "", "new": false},
+  {"id": "S31", "day": 3, "pool": "main", "start": "13:00", "end": "15:00", "type": "lane", "name": "Lane swim", "instructor": "", "note": "", "new": false},
+  {"id": "S32", "day": 3, "pool": "main", "start": "14:00", "end": "15:00", "type": "club", "name": "Swim club gala warm-up", "instructor": "", "note": "", "new": false},
+  {"id": "S33", "day": 3, "pool": "main", "start": "15:00", "end": "18:00", "type": "family", "name": "New Year's Eve family fun", "instructor": "", "note": "", "new": false},
+  {"id": "S34", "day": 3, "pool": "learner", "start": "10:00", "end": "12:00", "type": "lessons", "name": "Holiday crash course, stages 4–7", "instructor": "Dan O.", "note": "", "new": false},
+  {"id": "S35", "day": 3, "pool": "learner", "start": "13:00", "end": "16:00", "type": "family", "name": "Family splash", "instructor": "", "note": "", "new": false},
+  {"id": "S36", "day": 4, "pool": "main", "start": "10:00", "end": "12:00", "type": "lane", "name": "New Year's Day lanes", "instructor": "", "note": "", "new": false},
+  {"id": "S37", "day": 4, "pool": "main", "start": "12:00", "end": "16:00", "type": "family", "name": "New Year's Day family fun", "instructor": "", "note": "", "new": false},
+  {"id": "S38", "day": 5, "pool": "main", "start": "08:00", "end": "10:00", "type": "club", "name": "Riverside Otters SC", "instructor": "", "note": "", "new": false},
+  {"id": "S39", "day": 5, "pool": "main", "start": "10:00", "end": "13:00", "type": "family", "name": "Family fun", "instructor": "", "note": "", "new": false},
+  {"id": "S40", "day": 5, "pool": "main", "start": "13:00", "end": "15:00", "type": "lane", "name": "Lane swim", "instructor": "", "note": "", "new": false},
+  {"id": "S41", "day": 5, "pool": "main", "start": "15:00", "end": "17:00", "type": "family", "name": "Inflatable fun run", "instructor": "", "note": "Replaces lane swim", "new": true},
+  {"id": "S42", "day": 5, "pool": "main", "start": "17:00", "end": "20:00", "type": "lane", "name": "Lane swim", "instructor": "", "note": "", "new": false},
+  {"id": "S43", "day": 5, "pool": "learner", "start": "08:00", "end": "11:00", "type": "lessons", "name": "Saturday learn to swim, stages 1–7", "instructor": "Gemma R.", "note": "", "new": false},
+  {"id": "S44", "day": 5, "pool": "learner", "start": "11:30", "end": "14:00", "type": "family", "name": "Little Splashers: a quieter sensory session for under-5s and their grown-ups, lights dimmed and music off", "instructor": "", "note": "", "new": false},
+  {"id": "S45", "day": 5, "pool": "learner", "start": "14:00", "end": "17:00", "type": "family", "name": "Family splash", "instructor": "", "note": "", "new": false},
+  {"id": "S46", "day": 6, "pool": "main", "start": "08:00", "end": "10:00", "type": "lane", "name": "Lane swim", "instructor": "", "note": "", "new": false},
+  {"id": "S47", "day": 6, "pool": "main", "start": "10:00", "end": "14:00", "type": "family", "name": "Family fun", "instructor": "", "note": "", "new": false},
+  {"id": "S48", "day": 6, "pool": "main", "start": "14:00", "end": "16:00", "type": "club", "name": "Sub-aqua club try-dive, age 12+", "instructor": "", "note": "", "new": true},
+  {"id": "S49", "day": 6, "pool": "main", "start": "16:00", "end": "20:00", "type": "lane", "name": "Lane swim", "instructor": "", "note": "", "new": false},
+  {"id": "S50", "day": 6, "pool": "learner", "start": "10:00", "end": "12:00", "type": "lessons", "name": "Parent and baby", "instructor": "Gemma R.", "note": "", "new": false},
+  {"id": "S51", "day": 6, "pool": "learner", "start": "12:00", "end": "16:00", "type": "family", "name": "Family splash", "instructor": "", "note": "", "new": false},
+  {"id": "S52", "day": 6, "pool": "learner", "start": "16:00", "end": "17:00", "type": "aqua", "name": "Aqua natal", "instructor": "", "note": "", "new": false}]}
+</script>
+<script>
+const $ = (s) => document.querySelector(s)
+const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c])
+const DATA = JSON.parse($('#data').textContent)
+const T = DATA.types, POOLS = DATA.pools
+const DAY0 = 390, DAY1 = 1290 // 06:30 and 21:30, in minutes
+const m = (t) => { const [h, mi] = t.split(':').map(Number); return h * 60 + mi }
+const pct = (t) => (m(t) - DAY0) / 9 // 900 minutes = 100%
+const dt = (i) => new Date(DATA.days[i].date + 'T12:00:00')
+const dayShort = (i) => dt(i).toLocaleDateString('en-GB', { weekday: 'short' })
+const dayDate = (i) => dt(i).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })
+const longDate = (i) => dt(i).toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' })
+const nameOf = (s) => s.name.trim() || T[s.type].label
+const unknown = (v) => !v.trim() || /^tbc$/i.test(v.trim())
+const needsInstr = (s) => s.type === 'lessons' || s.type === 'aqua'
+
+// All state lives here, so Reset is one line.
+let S
+const initState = () => ({ view: 'editor', editing: null, err: '', toast: '', sessions: structuredClone(DATA.sessions), mono: false, arch: false, guide: 0, guideMin: false })
+
+// Clashes: same day, same pool, times overlap. Returns pairs, earlier start first.
+function clashes() {
+  const ss = [...S.sessions].sort((a, b) => a.day - b.day || m(a.start) - m(b.start))
+  const out = []
+  ss.forEach((a, i) => ss.slice(i + 1).forEach((b) => { if (a.day === b.day && a.pool === b.pool && m(b.start) < m(a.end)) out.push([a, b]) }))
+  return out
+}
+
+// One block. Editor blocks are buttons that open the side panel; poster blocks are plain.
+function block(s, kind, half) {
+  const pos = `left:${pct(s.start)}%;width:${(m(s.end) - m(s.start)) / 9}%`
+  // An unknown instructor gets a TBC tag at the start of the name line, so even a one-hour block can't cut it off.
+  const tbc = needsInstr(s) && unknown(s.instructor)
+  const who = needsInstr(s) ? `<span class="who">${tbc ? 'Instructor TBC' : 'with ' + esc(s.instructor)}</span>` : ''
+  const nm = `${s.new ? '<em class="new">NEW</em> ' : ''}${tbc ? '<em class="tbc">TBC</em> ' : ''}${T[s.type].sym} ${esc(nameOf(s))}`
+  const inner = `<span class="tx"><span class="nm ${who ? 'one' : ''}">${nm}</span><span class="mt">${s.start}–${s.end}${s.note ? ' · ' + esc(s.note) : ''}</span>${who}</span>`
+  if (kind === 'pt') return `<div class="blk t-${s.type}" style="${pos}">${inner}</div>`
+  const cls = `${half ? 'clash ' + half : ''}${S.editing === s.id ? ' sel' : ''}`
+  return `<button class="blk t-${s.type} ${cls}" style="${pos}" data-action="edit" data-id="${s.id}" title="${esc(nameOf(s))}, ${s.start}–${s.end}">${inner}</button>`
+}
+
+function lane(i, pool, kind, halves) {
+  const d = DATA.days[i]
+  const ss = S.sessions.filter((s) => s.day === i && s.pool === pool)
+  const ticks = Array.from({ length: 15 }, (_, h) => `<i class="tick" style="left:${(30 + h * 60) / 9}%"></i>`).join('')
+  const off = (m(d.open) > DAY0 ? `<i class="off" style="left:0;width:${pct(d.open)}%"></i>` : '') + (m(d.close) < DAY1 ? `<i class="off" style="left:${pct(d.close)}%;right:0"></i>` : '')
+  const empty = ss.length ? '' : `<span class="empty">${kind === 'pt' ? `${POOLS[pool]} closed all day` : 'No sessions. Prints as “closed all day”.'}</span>`
+  return `<div class="lane">${ticks}${off}${empty}${ss.map((s) => block(s, kind, halves[s.id])).join('')}</div>`
+}
+
+function grid(kind) {
+  const halves = {}
+  if (kind === 'ed') clashes().forEach(([a, b]) => { halves[a.id] = 'top'; halves[b.id] = 'bot' })
+  const axis = Array.from({ length: 15 }, (_, h) => `<span class="ax" style="left:${(30 + h * 60) / 9}%">${String(7 + h).padStart(2, '0')}:00</span>`).join('')
+  const rows = DATA.days.map((d, i) => `
+    <div class="dl ${d.holiday ? 'hol' : ''}"><b>${dayShort(i)}</b><span class="dd">${dayDate(i)}</span>
+      <span class="hrs">${d.open}–${d.close}</span>${d.holiday ? `<span class="bh">${esc(d.holiday)}</span>` : ''}${d.note ? `<span class="hrs">${esc(d.note)}</span>` : ''}</div>
+    <div class="pn"><span>Main</span><span>Learner</span></div>
+    <div class="dlanes">${lane(i, 'main', kind, halves)}${lane(i, 'learner', kind, halves)}</div>`).join('')
+  return `<div class="tt ${kind}" id="${kind === 'ed' ? 'grid' : 'ptgrid'}"><span></span><span></span><div class="axis">${axis}</div>${rows}</div>`
+}
+
+const weekRange = () => `${longDate(0)} – ${longDate(6)}`
+const srcCard = () => `<div class="card src" data-arch="std" data-arch-label="Standard booking system export (CSV)">
+  <span>Sessions from <code>${esc(DATA.export.file)}</code></span><span>· ${S.sessions.length} sessions · exported ${esc(DATA.export.exported)}</span>
+  <span>· Edits here stay in this mock</span></div>`
+
+function header() {
+  const cl = clashes().length
+  return `<div class="apphd"><div class="logo"><svg width="30" height="30" viewBox="0 0 30 30" aria-hidden="true"><rect width="30" height="30" rx="7" fill="#fff" fill-opacity=".16"/><path d="M5 12c3-3 5 3 8 0s5 3 8 0 4 2 4 2M5 18c3-3 5 3 8 0s5 3 8 0 4 2 4 2" stroke="#fff" stroke-width="2.2" fill="none" stroke-linecap="round"/></svg>
+    <div>Riverside Leisure Centre<small>Pool timetable</small></div></div>
+    <div class="wk"><button tabindex="-1">&#8249;</button><span>${DATA.week.label} · ${dayDate(0)} – ${dayDate(6)} ${dt(6).getFullYear()}</span><button tabindex="-1">&#8250;</button></div>
+    <span class="pill">${S.view === 'preview' ? 'Print preview' : cl ? 'Draft · ' + cl + ' clash' + (cl > 1 ? 'es' : '') : 'Draft · ready'}</span>
+    <span class="sp"></span>
+    ${S.view === 'editor' ? `<button class="btn primary" id="btn-ready" data-action="preview" ${cl ? 'disabled title="Fix the clash first"' : ''}>Ready to print</button>` : `<button class="btn" data-action="back">Back to editor</button>`}</div>`
+}
+
+function panel() {
+  const s = S.sessions.find((x) => x.id === S.editing)
+  if (!s) {
+    const n = (f) => S.sessions.filter(f).length
+    return `<div class="card panel" id="panel"><div class="pempty"><div class="big">&#9998;</div><b>Select a session</b>
+      Click any block in the week to change its time, type, pool or note. Changes print with a NEW tag.
+      <div class="stats"><div><strong>${S.sessions.length}</strong>sessions</div><div><strong>${n((x) => x.new)}</strong>marked new</div>
+      <div><strong>${n((x) => needsInstr(x) && unknown(x.instructor))}</strong>instructors TBC</div><div><strong>${clashes().length}</strong>clashes</div></div></div>
+      ${S.toast ? `<div class="toast">${esc(S.toast)}</div>` : ''}</div>`
+  }
+  const inClash = clashes().filter(([a, b]) => a.id === s.id || b.id === s.id)
+  const opt = (o, v) => Object.entries(o).map(([k, x]) => `<option value="${k}" ${k === v ? 'selected' : ''}>${esc(x.label || x)}</option>`).join('')
+  return `<div class="card panel" id="edit"><h3>${T[s.type].sym} ${esc(nameOf(s))}</h3>
+    <div class="sub">${longDate(s.day)} · ${POOLS[s.pool]} · ${s.id}</div>
+    ${inClash.length ? `<div class="err" style="margin:0 0 14px">Clashes with ${inClash.map(([a, b]) => { const o = a.id === s.id ? b : a; return `${esc(nameOf(o))} ${o.start}–${o.end}` }).join(', ')}.</div>` : ''}
+    <div class="fg">
+      <label>Start<input type="time" id="f-start" value="${s.start}" step="900" min="06:30" max="21:30"></label>
+      <label>End<input type="time" id="f-end" value="${s.end}" step="900" min="06:30" max="21:30"></label>
+      <label>Type<select id="f-type">${opt(T, s.type)}</select></label>
+      <label>Pool<select id="f-pool">${opt(POOLS, s.pool)}</select></label>
+      <label class="w">Name on poster<input id="f-name" value="${esc(s.name)}" placeholder="${esc(T[s.type].label)}"><span class="hint">Long names wrap to two lines on the poster, then stop.</span></label>
+      <label class="w">Instructor<input id="f-instr" value="${esc(s.instructor)}" placeholder="Not known yet"><span class="hint">Lessons and aqua fit only. Blank prints as “Instructor TBC”.</span></label>
+      <label class="w">Note<input id="f-note" value="${esc(s.note)}" placeholder="e.g. Warm water"></label>
+    </div>
+    <label class="ck"><input type="checkbox" id="f-new" checked><span><b>Mark NEW on the poster</b><br>On for any change. Untick it for a typo fix.</span></label>
+    ${S.err ? `<p class="err">${esc(S.err)}</p>` : ''}
+    <div class="pact"><button class="btn primary" data-action="save">Save</button><button class="btn" data-action="cancel">Cancel</button></div></div>`
+}
+
+const SCREENS = {
+  editor: () => {
+    const cl = clashes()
+    const status = cl.length
+      ? `<div class="status bad" id="ready"><span class="ico">!</span><span><b>${cl.length} clash${cl.length > 1 ? 'es' : ''}. Fix ${cl.length > 1 ? 'them' : 'it'} to print.</b> ${cl.map(([a, b]) => `<button class="lnk" data-action="edit" data-id="${a.id}">${dayShort(a.day)} ${dayDate(a.day)}, ${POOLS[a.pool]}: ${esc(nameOf(a))} ${a.start}–${a.end} overlaps ${esc(nameOf(b))} ${b.start}–${b.end}</button>`).join('; ')}</span></div>`
+      : `<div class="status good" id="ready"><span class="ico">&#10003;</span><span><b>No clashes.</b> The week is ready to print.</span><span class="sp"></span><button class="btn primary" data-action="preview">Open print preview</button></div>`
+    return `${srcCard()}<div data-arch="custom" data-arch-label="Custom screen">${status}
+      <div class="ed-wrap"><div class="card gridcard"><div class="gridhd"><h2>Week of ${longDate(0)}</h2><span>Click a session to edit it</span></div>${grid('ed')}</div>${panel()}</div></div>
+      <p class="print-only">To print the poster, open Print preview and use its Print button.</p>`
+  },
+  preview: () => {
+    const key = Object.entries(T).map(([k, t]) => `<span class="ki"><i class="sw t-${k}">${t.sym}</i>${t.label}</span>`).join('')
+    const printed = new Date().toLocaleString('en-GB', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })
+    return `${srcCard()}
+    <div class="card pvbar" data-arch="custom" data-arch-label="Custom screen">
+      <button class="btn" data-action="back">&#8249; Back to editor</button>
+      <button class="btn ${S.mono ? 'on' : ''}" id="btn-mono" data-action="mono">Mono preview: ${S.mono ? 'on' : 'off'}</button>
+      <span class="sp"></span><span class="note">One A3 landscape page. Check: Chrome, Ctrl+P, A3, landscape, black and white, 1 sheet.</span>
+      <button class="btn primary" id="btn-print" data-action="print">Print</button></div>
+    <div id="poster-wrap" data-arch="std" data-arch-label="Print stylesheet (standard browser printing)"><div class="paper"><div class="clip" id="clip">
+      <div class="poster ${S.mono ? 'mono' : ''}" id="poster">
+        <header class="ph"><div><div class="ph-org">${esc(DATA.centre)}</div><div class="ph-title">Swimming timetable</div></div><span class="sp"></span>
+          <div class="ph-r"><div class="ph-wk">${DATA.week.label}</div><div class="ph-dates">${weekRange()}</div><div class="ph-sub">Main pool 25 m, 6 lanes · Learner pool 0.9 m deep · Grey: pool shut</div></div></header>
+        ${grid('pt')}
+        <div class="key" id="key"><span class="kt">Key</span>${key}<span class="ki"><i class="sw offsw"></i>Pool shut</span>
+          <span class="ki"><em class="new">NEW</em>New or changed this week</span><span class="ki"><em class="tbc">TBC</em>Instructor to be confirmed</span></div>
+        <footer class="foot" id="foot"><span><b>Printed ${printed}.</b> Two copies on the board? The later printed date is right.</span>
+          <span>Times can change. Ask at reception or call <b>${esc(DATA.phone)}</b></span></footer>
+      </div></div></div></div>`
+  },
+}
+
+// Fit the real-size poster to the screen. Print CSS removes the scale.
+function fitPoster() {
+  const c = $('#clip'), p = $('#poster')
+  if (!p) return
+  p.style.transform = ''
+  const room = c.parentNode.clientWidth - 48 // .paper has 24px padding each side
+  const sc = room > 0 ? Math.min(1, room / p.offsetWidth) : 1
+  p.style.transform = `scale(${sc})`
+  c.style.width = Math.floor(p.offsetWidth * sc) + 'px'
+  c.style.height = Math.floor(p.offsetHeight * sc) + 'px'
+}
+
+// The guide: one step per decision the mock settles, in the order the story is told.
+const toPreview = () => { fixClashes(); S.editing = null; S.err = ''; nav('preview') }
+const GUIDE = [
+  { t: 'Welcome', b: 'This is the weekly pool timetable for Riverside Leisure Centre. Staff fix the week on screen, then print one A3 poster for the noticeboard on the office printer, which prints in black and white. Use <b>Next</b> to follow the story, or click any session.', where: 'Tip: <b>Show architecture</b> labels which parts are standard and which are custom.', go: () => { S.editing = null; nav('editor') }, hl: '#grid' },
+  { t: 'Clashes block printing', b: 'On Thursday the main pool has lane swim until 15:00 and the swim club warm-up from 14:00. Both show in red, and <b>Ready to print</b> stays off until it is fixed. A poster with a clash sends two groups to one pool.', where: 'A clash is the same day, the same pool and overlapping times. Closed for maintenance counts too.', go: () => { S.editing = null; nav('editor') }, hl: '#ready' },
+  { t: 'Late changes are marked', b: 'The side panel has the lane swim open. Change the end to <b>14:00</b> and <b>Save</b>. Any change made here is ticked <b>NEW</b>, so it prints with a black NEW tag; untick it for a typo fix.', where: 'Staff edit on screen first. Nobody writes on the paper.', go: () => { S.editing = S.sessions.some((x) => x.id === 'S31') ? 'S31' : null; S.err = ''; nav('editor') }, hl: '#edit' },
+  { t: 'One page, always, at A3 landscape', b: 'The poster is one A3 landscape page whatever the week holds. Time runs left to right, 06:30 to 21:30, one row per pool per day. The longest name (Saturday, Little Splashers) wraps to two lines and stops. A pool with no sessions says “closed all day”.', where: 'If the clash was still there, the guide fixed it for you.', go: () => { S.mono = false; toPreview() }, hl: '#poster-wrap' },
+  { t: 'The key works in mono', b: 'The office printer is black and white, so colour can’t tell sessions apart. Each type has a pattern and a symbol: lines for lane swim, dots for family fun, a thick outline for lessons, stripes for aqua fit, solid black for club hire, cross-hatching for closed. Mono preview is on, and they still differ.', go: () => { S.mono = true; toPreview() }, hl: '#key' },
+  { t: 'Unknowns print as TBC', b: 'Three sessions have no instructor yet. They print a <b>TBC</b> tag and “Instructor TBC”, never a blank, so nobody thinks a line went missing.', where: 'A blank in the export and “TBC” typed by staff both print as TBC.', go: () => toPreview(), hl: '#poster .tbc' },
+  { t: 'Bank holidays show their hours', b: 'Mon 28 Dec and Fri 1 Jan are bank holidays with shorter hours. The hours print beside the day under a black label, and the hours the pool is shut are grey.', go: () => toPreview(), hl: '#poster .bh' },
+  { t: 'The date printed is on the poster', b: 'The footer says when this copy was printed, beside the phone number. If two copies are on the board, the later date is the right one.', go: () => toPreview(), hl: '#foot' },
+  { t: 'How to check it', b: 'Press <b>Print</b>. Check it in Chrome: Ctrl+P, A3, landscape, black and white, and the preview says <b>1 sheet of paper</b>. Don’t trust a PDF made by a headless browser: it can split pages differently from the real print dialog.', where: 'If the patterns are missing, tick More settings, then Background graphics.', go: () => toPreview(), hl: '#btn-print' },
+  { t: 'Standard and custom', b: 'Only the editor is custom. The sessions come from the booking system’s standard CSV export, and the poster is the browser’s own printing with a print stylesheet. <b>Reset demo</b> starts again.', go: () => { S.arch = true; toPreview() } },
+]
+
+// Shorten the earlier of each clashing pair so it ends when the later one starts (the guide's shortcut).
+function fixClashes() {
+  for (let n = 0; n < 50; n++) {
+    const c = clashes()[0]
+    if (!c) return
+    const [a, b] = c
+    if (m(b.start) > m(a.start)) { a.end = b.start; a.new = true } else S.sessions = S.sessions.filter((x) => x !== a)
+  }
+}
+
+function nav(view) { S.view = view; render() }
+
+function render() {
+  $('#hd').innerHTML = header()
+  $('#main').innerHTML = SCREENS[S.view]()
+  document.body.classList.toggle('arch', S.arch)
+  $('#btn-arch').classList.toggle('on', S.arch)
+  fitPoster()
+  renderGuide()
+}
+
+function renderGuide() {
+  if (S.guide < 0) { $('#guide').innerHTML = ''; return }
+  const g = GUIDE[S.guide]
+  const last = S.guide === GUIDE.length - 1
+  $('#guide').innerHTML = `<div class="guide ${S.guideMin ? 'min' : ''}">
+    <div class="gh"><span>Demo guide · ${S.guide + 1} of ${GUIDE.length}</span>
+      <button class="x" data-action="guide-min" title="Minimise">${S.guideMin ? '&#9650;' : '&#9660;'}</button>
+      <button class="x" data-action="guide-close" title="Close">&times;</button></div>
+    <div class="gt">${g.t}</div>
+    <div class="gb">${g.b}${g.where ? `<div class="where">${g.where}</div>` : ''}</div>
+    <div class="gf"><button class="btn" data-action="guide-prev" ${S.guide ? '' : 'disabled'}>Back</button>
+      <span class="prog">${GUIDE.map((_, i) => `<i class="${i <= S.guide ? 'on' : ''}"></i>`).join('')}</span>
+      <button class="btn primary" data-action="guide-next">${last ? 'Finish' : 'Next'}</button></div>
+  </div>`
+}
+
+function guideGo(i) {
+  S.guide = i; S.guideMin = false
+  GUIDE[i].go()
+  render()
+  const sel = GUIDE[i].hl
+  if (sel) setTimeout(() => { const el = $(sel); if (el) { el.scrollIntoView({ block: 'nearest' }); el.classList.add('pulse'); setTimeout(() => el.classList.remove('pulse'), 4300) } }, 60)
+}
+
+function save() {
+  const s = S.sessions.find((x) => x.id === S.editing)
+  const v = { start: $('#f-start').value, end: $('#f-end').value, type: $('#f-type').value, pool: $('#f-pool').value, name: $('#f-name').value, instructor: $('#f-instr').value, note: $('#f-note').value }
+  const ok = /^\d\d:\d\d$/
+  if (!ok.test(v.start) || !ok.test(v.end)) { S.err = 'Enter a start and an end time.'; return render() }
+  if (m(v.end) <= m(v.start)) { S.err = 'The end must be after the start.'; return render() }
+  if (m(v.start) < DAY0 || m(v.end) > DAY1) { S.err = 'Sessions must sit between 06:30 and 21:30.'; return render() }
+  const changed = Object.keys(v).some((k) => v[k] !== s[k])
+  Object.assign(s, v)
+  if (changed) s.new = $('#f-new').checked
+  S.editing = null; S.err = ''
+  S.toast = changed ? `Saved ${nameOf(s)}${s.new ? ', marked NEW' : ''}.` : 'No changes.'
+  render()
+}
+
+// Every button says what it does with data-action; one listener handles them all.
+const ACTIONS = {
+  edit: (el) => { S.editing = el.dataset.id; S.err = ''; S.toast = ''; nav('editor') },
+  save: () => save(),
+  cancel: () => { S.editing = null; S.err = ''; render() },
+  preview: () => { if (!clashes().length) { S.editing = null; nav('preview') } },
+  back: () => nav('editor'),
+  mono: () => { S.mono = !S.mono; render() },
+  print: () => window.print(),
+  arch: () => { S.arch = !S.arch; render() },
+  'guide-open': () => guideGo(Math.max(0, S.guide)),
+  'guide-next': () => (S.guide === GUIDE.length - 1 ? ((S.guide = -1), render()) : guideGo(S.guide + 1)),
+  'guide-prev': () => guideGo(Math.max(0, S.guide - 1)),
+  'guide-min': () => { S.guideMin = !S.guideMin; renderGuide() },
+  'guide-close': () => { S.guide = -1; render() },
+  reset: () => { const g = S.guide; S = initState(); if (g < 0) { S.guide = -1; render() } else guideGo(0) },
+}
+document.addEventListener('click', (e) => {
+  const el = e.target.closest('[data-action]')
+  if (el && ACTIONS[el.dataset.action]) ACTIONS[el.dataset.action](el)
+})
+window.addEventListener('resize', fitPoster)
+
+S = initState()
+guideGo(0)
+</script>
+</body>
+</html>
