@@ -15,7 +15,8 @@ function stubRepo(
     env = {},
     runs = [],
     rateLimits = [],
-  }: { env?: Record<string, string>; runs?: string[][]; rateLimits?: unknown[] } = {},
+    tools = [],
+  }: { env?: Record<string, string>; runs?: string[][]; rateLimits?: unknown[]; tools?: string[] } = {},
 ) {
   on('fs.exists', ($: any, e: any) => ({ value: rel(e.path) in files }))
   on('fs.read', ($: any, e: any) => ({ value: files[rel(e.path)] }))
@@ -34,6 +35,10 @@ function stubRepo(
   on('command.register', () => ({ value: undefined }))
   mock.clock(on)
   mock.env(on, env)
+  on('tool.register', ($: any, e: any) => {
+    tools.push(e.name)
+    return { value: { tool: 'mcp__ways-band__' + e.name } }
+  })
   on('session.start', ($: any, e: any) => ({ cwd: e.cwd }))
 }
 
@@ -98,17 +103,35 @@ const WINDOWS = [
   { kind: 'seven_day', percentUsed: 8.5, resetsAt: '2026-10-24T09:00:00Z' },
 ]
 
-test('the band shows the usage windows and writes them for the agent', async ($, on) => {
+test('the band shows the usage windows, and writes no shared file', async ($, on) => {
   const written: Record<string, string> = {}
   stubRepo(on, REPO, written, { rateLimits: WINDOWS })
   await $.session.start({ cwd: '/repo' })
   const ui = await $.ui.mount(BAND as any)
   expect(await ui.find({ type: 'Text', text: 'usage 5h 34% · wk 9%' })).toBeDefined()
-  const usage = JSON.parse(written['.claude/ways/usage'])
+  expect(written['.claude/ways/usage']).toBeUndefined()
+  await ui.unmount()
+})
+
+// Every session open in a repo wrote the one .claude/ways/usage file, so an agent could read
+// another session's numbers (76% and 98% while its own was 30%). The tool answers for its own.
+test("the usage tool gives the agent this session's own windows", async ($, on) => {
+  const tools: string[] = []
+  stubRepo(on, REPO, {}, { rateLimits: WINDOWS, tools })
+  await $.session.start({ cwd: '/repo' })
+  expect(tools).toEqual(['usage'])
+  const answer: any = await $.tool.call({ tool: 'mcp__ways-band__usage' } as any)
+  const usage = JSON.parse(answer.result)
   expect(usage.five_hour).toEqual({ percentUsed: 34, resetsAt: '2026-10-19T19:00:00Z' })
   expect(usage.seven_day.percentUsed).toBe(8.5)
   expect(typeof usage.at).toBe('string')
-  await ui.unmount()
+})
+
+test('outside a ways repo, no usage tool is offered', async ($, on) => {
+  const tools: string[] = []
+  stubRepo(on, {}, {}, { tools })
+  await $.session.start({ cwd: '/repo' })
+  expect(tools).toEqual([])
 })
 
 test('with no usage reading, the band leaves usage out and writes nothing', async ($, on) => {

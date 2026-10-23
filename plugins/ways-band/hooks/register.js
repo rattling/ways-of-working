@@ -8,13 +8,15 @@
 // the Dial line in AGENTS.md, and the current git branch. In a repo without .claude/ways.json
 // it draws nothing.
 //
-// It writes .claude/ways/usage: the plan's usage windows (five-hour, weekly) as JSON, whenever
-// they move. The agent can't read them itself, and an autonomous run reports them in its
-// integration PR at the start and after each ticket.
+// It gives the agent a `usage` tool (mcp__ways-band__usage): this session's plan usage windows
+// (five-hour, weekly), which the agent can't read itself, so an autonomous run can report them
+// in its integration PR. Earlier versions wrote them to .claude/ways/usage, but every session
+// open in the repo wrote that one file, so it could hold another session's (or account's) numbers.
+
+const USAGE_TOOL = 'mcp__ways-band__usage'
 
 let view = null // what the band shows; null means "not a ways repo"
 let gateRunning = false
-let lastUsage = null // the windows last written, so the file only changes when they move
 
 async function readText($, path) {
   try {
@@ -41,6 +43,19 @@ function ago(epochSeconds) {
   return Math.round(s / 86400) + 'd ago'
 }
 
+// This session's reading: the context fill, and each rate-limit window by kind (Claude Code
+// reports each kind once). Windows are empty off a subscription, or before the first response.
+async function readUsage($) {
+  const windows = {}
+  let context = null
+  try {
+    const usage = await $.session.usage()
+    context = usage.context.percent
+    for (const w of usage.rateLimits || []) windows[w.kind] = { percentUsed: w.percentUsed, resetsAt: w.resetsAt }
+  } catch {}
+  return { context, windows }
+}
+
 async function refresh($) {
   const stamp = await readText($, '.claude/ways.json')
   if (!stamp) {
@@ -61,21 +76,7 @@ async function refresh($) {
     if (r.exitCode === 0) branch = r.stdout.trim() || null
   } catch {}
 
-  let context = null
-  const windows = {}
-  try {
-    const usage = await $.session.usage()
-    context = usage.context.percent
-    for (const w of usage.rateLimits || []) windows[w.kind] = { percentUsed: w.percentUsed, resetsAt: w.resetsAt }
-  } catch {}
-  // Empty off a subscription, or before the first response: then there's nothing to write.
-  const usage = JSON.stringify(windows)
-  if (usage !== '{}' && usage !== lastUsage) {
-    try {
-      await $.fs.write('.claude/ways/usage', JSON.stringify({ ...windows, at: new Date().toISOString() }, null, 2) + '\n')
-      lastUsage = usage
-    } catch {}
-  }
+  const { context, windows } = await readUsage($)
 
   const [result, at] = (lastGate || '').trim().split(/\s+/)
   view = {
@@ -143,6 +144,15 @@ export function register(on) {
       description: "Run this repo's gate now, without a Claude turn",
     })
     await refresh($)
+    if (view) {
+      await $.tool.register({
+        name: 'usage',
+        description:
+          "This session's plan usage windows: five_hour and seven_day, each with percentUsed (0 to 100) and resetsAt. " +
+          'Read them here, not from any file: they are for this session and its account only. Empty off a subscription or before the first response.',
+        isDeferred: false,
+      })
+    }
     // Files change outside any event (the Stop hook, git checkout), so look again now and then.
     $.clock.every(10_000, async () => {
       await refresh($)
@@ -155,6 +165,11 @@ export function register(on) {
     await refresh($)
     $.ui.invalidate('ui.render')
     return next(e)
+  })
+
+  on('tool.call', { tool: USAGE_TOOL }, async ($) => {
+    const { windows } = await readUsage($)
+    return { result: JSON.stringify({ ...windows, at: new Date().toISOString() }) }
   })
 
   on('command.run', { command: 'gate' }, async ($) => {
