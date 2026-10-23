@@ -1,0 +1,646 @@
+<!doctype html>
+<!--
+  Mock with a guided tour, from /ways:mock. An example for the ways-of-working repo.
+
+  What it's for:    Brightwater Heating & Plumbing's job record: the engineer's phone flow (from the
+                    morning WhatsApp list to a signed record) and the office screen that turns records into
+                    invoices. It settles what the record captures, how it reaches the office, and what the
+                    office needs before it invoices.
+  Where the data is from: examples/discovery/ (README, notes/engineer.md, notes/office.md,
+                    evidence/job-sheet.md, evidence/jobs-export.csv): the engineers, job types, job-ref style,
+                    the price ranges (service always £95), and the awkward cases (no sheet, coffee, missing part
+                    number, a pad that comes back late). Customer names, addresses, today's job refs, part numbers
+                    and the boiler plate are made up in the same style. All of it is fictional.
+                    Times are fixed demo times: arrive 10:15, done 11:40, signal back 11:52.
+  Decisions it settles:
+    1. The job link sits in the WhatsApp message they already get: no new app, no login.
+    2. The record is taps and photos, no typing (times, and the part from a short list).
+    3. The boiler plate is a photo, not copied by hand.
+    4. The customer signs on the phone.
+    5. It saves with no signal and sends itself when signal returns.
+    6. The office sees what's missing (no record, no signature, no photo) before ringing anyone.
+    7. Nothing is marked ready to invoice without a price, or without a signature.
+    8. The export is a CSV in the layout the accounts package already imports.
+  Rounds:
+    Round 1: first draft from the discovery notes, built to a finished-product look. Not yet shown to Priya or Tom.
+-->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Brightwater job record (mock)</title>
+<style>
+:root{
+  --brand:#0b4f6c;--brand-2:#1478a8;--brand-soft:#e7f2f8;
+  --ink:#14202b;--ink-2:#3d4b58;--muted:#6b7885;--line:#dfe5ea;--line-2:#eef2f5;--bg:#eef1f4;--card:#fff;
+  --ok:#16794c;--ok-soft:#e3f5ec;--bad:#c4321f;--bad-soft:#fdecea;--warn:#8a5a00;--warn-soft:#fff4dc;
+  --wa:#075e54;--wa-2:#128c7e;--wa-me:#dcf8c6;--wa-bg:#efe7de;--tick:#34b7f1;
+  --std:#1f6feb;--custom:#8250df;--banner:#fff8c5;
+  --r:12px;--sh:0 1px 2px rgba(20,32,43,.06),0 4px 14px rgba(20,32,43,.06);
+}
+*{box-sizing:border-box}
+body{margin:0;font:15px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;color:var(--ink);background:var(--bg);-webkit-font-smoothing:antialiased}
+button{font:inherit;color:inherit;cursor:pointer}
+button:disabled{cursor:default}
+.ic{display:inline-block;vertical-align:-3px;flex:none}
+.btn{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);background:var(--card);border-radius:8px;padding:7px 14px;font-weight:500}
+.btn:hover:not(:disabled){border-color:#c3ccd4}
+.btn.primary{background:var(--brand);border-color:var(--brand);color:#fff}
+.btn.primary:hover:not(:disabled){background:#093f57}
+.btn:disabled{opacity:.45}
+.muted{color:var(--muted)}
+.small{font-size:13px}
+
+/* The banner: says it's a mock, and holds the three demo controls. */
+.banner{position:sticky;top:0;z-index:40;display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:6px 16px;background:var(--banner);border-bottom:1px solid #e7d87a;font-size:13px}
+.banner .sp{flex:1}
+.banner .btn{padding:4px 10px;font-size:13px}
+.banner .btn.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+.archkey{display:none;gap:12px}
+body.arch .archkey{display:flex}
+.archkey i{display:inline-block;width:11px;height:11px;border-radius:3px;margin-right:4px;vertical-align:-1px}
+
+main{max-width:1180px;margin:0 auto;padding:20px 16px 300px}
+.modes{display:flex;justify-content:center;margin-bottom:20px}
+.seg{display:inline-flex;background:#dde3e8;border-radius:10px;padding:3px}
+.seg button{border:0;background:none;border-radius:8px;padding:7px 16px;font-weight:600;font-size:14px;color:var(--ink-2);display:flex;gap:6px;align-items:center}
+.seg button.on{background:#fff;color:var(--ink);box-shadow:0 1px 3px rgba(0,0,0,.12)}
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);z-index:60;background:var(--ink);color:#fff;padding:10px 16px;border-radius:10px;font-size:14px;box-shadow:var(--sh);max-width:calc(100vw - 32px)}
+
+/* ---------- The phone ---------- */
+.device{width:min(390px,100%);margin:0 auto;background:#16191d;border-radius:46px;padding:11px;box-shadow:0 20px 50px rgba(20,32,43,.25)}
+.screen{position:relative;border-radius:36px;overflow:hidden;background:#fff;height:min(800px,calc(100vh - 150px));min-height:620px;display:flex;flex-direction:column}
+.sb{display:flex;align-items:center;justify-content:space-between;padding:10px 22px 6px;font-size:14px;font-weight:600;background:inherit}
+.sb .notch{width:96px;height:24px;border-radius:14px;background:#16191d}
+.sb .sbr{display:flex;gap:5px;align-items:center;font-size:12px}
+.scroll{flex:1;overflow-y:auto;overscroll-behavior:contain}
+.democtl{width:min(390px,100%);margin:14px auto 0;display:flex;align-items:center;gap:10px;justify-content:center;font-size:13px;color:var(--muted)}
+.switch{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--line);background:#fff;border-radius:20px;padding:5px 12px 5px 6px;font-size:13px;font-weight:600}
+.switch i{width:30px;height:18px;border-radius:9px;background:#c7cfd6;position:relative;transition:.2s}
+.switch i::after{content:"";position:absolute;top:2px;left:2px;width:14px;height:14px;border-radius:50%;background:#fff;transition:.2s}
+.switch.on i{background:var(--ok)}.switch.on i::after{left:14px}
+@media (max-width:440px){.device{padding:0;background:none;box-shadow:none;border-radius:0}.screen{border-radius:18px;border:1px solid var(--line)}}
+
+/* WhatsApp-style chat */
+.wa .sb{background:var(--wa);color:#fff}
+.wa-head{display:flex;align-items:center;gap:10px;padding:8px 12px 10px;background:var(--wa);color:#fff}
+.av{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;font-weight:700;background:#cfe9e4;color:var(--wa);flex:none}
+.wa-head .who{flex:1;line-height:1.2}.wa-head .who small{display:block;opacity:.8;font-size:12px}
+.wa-body{background-color:var(--wa-bg);background-image:radial-gradient(rgba(0,0,0,.045) 1px,transparent 1px);background-size:14px 14px;padding:10px 10px 16px}
+.day{display:table;margin:4px auto 10px;background:#e1f2fb;color:#4a5a66;font-size:12px;padding:3px 10px;border-radius:7px}
+.bub{position:relative;max-width:86%;background:#fff;border-radius:0 9px 9px 9px;padding:6px 8px 4px;margin:0 0 8px 8px;font-size:14.5px;box-shadow:0 1px .5px rgba(0,0,0,.13)}
+.bub::before{content:"";position:absolute;left:-8px;top:0;border:8px solid transparent;border-top-color:#fff;border-right-color:#fff;border-width:0 8px 8px 0}
+.bub.cont{border-radius:9px}.bub.cont::before{display:none}
+.bub.me{margin:0 8px 8px auto;background:var(--wa-me);border-radius:9px 0 9px 9px}
+.bub.me::before{left:auto;right:-8px;border-color:transparent;border-top-color:var(--wa-me);border-left-color:var(--wa-me);border-width:0 0 8px 8px}
+.bub p{margin:0 0 2px}
+.meta{float:right;margin:6px 0 0 10px;font-size:11px;color:#667781;display:flex;gap:3px;align-items:center}
+.meta .ticks{color:var(--tick)}
+.preview{display:block;width:100%;text-align:left;border:0;padding:0;background:#f0f4f6;border-radius:7px;overflow:hidden;margin:2px 0 4px}
+.preview .pv{display:flex;gap:10px;padding:9px 10px;border-left:4px solid var(--brand-2)}
+.preview .logo{width:40px;height:40px;border-radius:8px;background:var(--brand);color:#fff;display:grid;place-items:center;flex:none}
+.preview b{display:block;font-size:14px}.preview span{display:block;font-size:12.5px;color:#54656f;line-height:1.35}
+.urltext{display:block;color:#027eb5;font-size:13.5px;word-break:break-all;margin:2px 0}
+.wa-input{display:flex;align-items:center;gap:8px;padding:8px;background:#f0f2f5}
+.wa-input .field{flex:1;display:flex;align-items:center;gap:8px;background:#fff;border-radius:22px;padding:9px 12px;color:#8696a0}
+.wa-input .mic{width:44px;height:44px;border-radius:50%;background:var(--wa-2);color:#fff;display:grid;place-items:center}
+
+/* The job record web page */
+.urlbar{display:flex;align-items:center;gap:8px;padding:6px 12px 8px;background:#f6f7f8;border-bottom:1px solid var(--line);font-size:13px}
+.urlbar .u{flex:1;display:flex;align-items:center;justify-content:center;gap:5px;background:#e9ecef;border-radius:8px;padding:5px;color:var(--ink-2)}
+.urlbar button{border:0;background:none;color:var(--brand-2);font-weight:600;padding:4px}
+.jh{background:linear-gradient(160deg,var(--brand),#0e6a8f);color:#fff;padding:14px 16px 16px}
+.jh .ref{font-size:12.5px;opacity:.85;letter-spacing:.03em;display:flex;gap:8px;align-items:center}
+.jh h2{margin:4px 0 2px;font-size:21px;line-height:1.25}
+.jh .addr{font-size:14px;opacity:.92}
+.chip{display:inline-flex;align-items:center;gap:4px;border-radius:20px;padding:2px 10px;font-size:12.5px;font-weight:600}
+.jh .chip{background:rgba(255,255,255,.16);margin-top:10px}
+.offline{display:flex;gap:10px;align-items:flex-start;padding:10px 16px;background:var(--warn-soft);color:var(--warn);font-size:13.5px;border-bottom:1px solid #f0dca8}
+.steps{display:flex;gap:6px;padding:12px 16px 4px;overflow-x:auto}
+.steps .chip{background:var(--line-2);color:var(--muted)}
+.steps .chip.done{background:var(--ok-soft);color:var(--ok)}
+.pc{margin:10px 12px;background:#fff;border:1px solid var(--line);border-radius:var(--r);padding:14px;box-shadow:var(--sh)}
+.pc h3{margin:0 0 10px;font-size:15px;display:flex;align-items:center;gap:8px}
+.pc h3 .n{margin-left:auto;font-size:12px;font-weight:600}
+.pc h3 .ic{color:var(--brand-2)}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.tile{min-height:84px;border:2px solid var(--line);border-radius:12px;background:#fff;padding:10px;text-align:left;display:flex;flex-direction:column;justify-content:center}
+.tile .l{font-size:13px;color:var(--muted);font-weight:600}
+.tile .v{font-size:22px;font-weight:700;letter-spacing:-.01em}
+.tile .v.ph{font-size:16px;color:var(--brand-2)}
+.tile.on{border-color:var(--ok);background:var(--ok-soft)}.tile.on .l{color:var(--ok)}
+.opts{display:flex;flex-direction:column;border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.opt{display:flex;align-items:center;gap:12px;min-height:54px;padding:8px 14px;border:0;border-bottom:1px solid var(--line);background:#fff;text-align:left}
+.opt:last-child{border-bottom:0}
+.opt .rd{width:22px;height:22px;border-radius:50%;border:2px solid #b9c3cc;display:grid;place-items:center;flex:none;color:#fff}
+.opt .nm{flex:1;font-weight:500}.opt .no{font-size:12.5px;color:var(--muted);font-variant-numeric:tabular-nums}
+.opt.on{background:var(--ok-soft)}.opt.on .rd{background:var(--ok);border-color:var(--ok)}
+.shoot{width:100%;min-height:120px;border:2px dashed #b9c3cc;border-radius:12px;background:#f8fafb;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;color:var(--brand-2);font-weight:600}
+.shoot small{color:var(--muted);font-weight:400}
+.plate{width:100%;display:block;border-radius:8px}
+.pad{position:relative;border:1px solid var(--line);border-radius:12px;background:#fdfdfd;overflow:hidden}
+.pad::after{content:"";position:absolute;left:28px;right:16px;bottom:28px;border-bottom:1.5px solid #c3ccd4;pointer-events:none}
+.pad .xm{position:absolute;left:10px;bottom:24px;color:#9aa6b1;font-size:18px;pointer-events:none}
+.pad .hint{position:absolute;left:0;right:0;bottom:6px;text-align:center;font-size:11.5px;color:#9aa6b1;pointer-events:none}
+canvas#sig{width:100%;height:auto;aspect-ratio:340/150;display:block;touch-action:none;cursor:crosshair}
+.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:10px}
+.foot{border-top:1px solid var(--line);background:#fff;padding:10px 14px 16px;box-shadow:0 -4px 14px rgba(20,32,43,.06)}
+.sync{display:flex;align-items:center;gap:8px;font-size:13.5px;font-weight:600;margin-bottom:8px;color:var(--muted)}
+.sync.saved{color:var(--warn)}.sync.sent{color:var(--ok)}
+.big{width:100%;min-height:54px;border:0;border-radius:12px;background:var(--brand);color:#fff;font-size:17px;font-weight:700;display:flex;align-items:center;justify-content:center;gap:8px}
+.big:disabled{background:#c7d3dc}
+.big.done{background:var(--ok)}
+.sentcard{margin:10px 12px;padding:14px;border-radius:var(--r);background:var(--ok-soft);color:var(--ok);display:flex;gap:10px;align-items:flex-start;font-size:14px}
+
+/* ---------- The office ---------- */
+.app{background:#fff;border:1px solid var(--line);border-radius:14px;box-shadow:var(--sh);overflow:hidden}
+.ohead{display:flex;align-items:center;gap:22px;padding:0 20px;height:58px;background:var(--brand);color:#fff;flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:9px;font-weight:700;font-size:16px}
+.brand .mark{width:30px;height:30px;border-radius:8px;background:#fff;color:var(--brand);display:grid;place-items:center}
+.brand small{font-weight:500;opacity:.7;font-size:13px}
+.onav{display:flex;gap:4px;flex:1;align-self:stretch}
+.onav button{border:0;background:none;color:rgba(255,255,255,.78);padding:0 14px;font-weight:600;font-size:14px;display:flex;align-items:center;gap:7px;border-bottom:3px solid transparent;white-space:nowrap}
+.onav button.on{color:#fff;border-bottom-color:#7fd3f7}
+.badge{display:inline-grid;place-items:center;min-width:20px;height:20px;padding:0 6px;border-radius:10px;background:rgba(255,255,255,.22);font-size:12px}
+.me{display:flex;align-items:center;gap:10px;font-size:13px;opacity:.95;white-space:nowrap}
+@media (max-width:900px){.me .dt{display:none}.ohead{gap:12px;padding:0 14px}}
+.me .av{width:32px;height:32px;background:#7fd3f7;color:var(--brand);font-size:13px}
+.obody{padding:22px 24px 28px;background:#f8fafb}
+.otitle{display:flex;align-items:flex-end;gap:12px;flex-wrap:wrap;margin-bottom:18px}
+.otitle h1{margin:0;font-size:24px;letter-spacing:-.01em}
+.otitle p{margin:2px 0 0;color:var(--muted);font-size:14px}
+.otitle .sp{flex:1}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px;margin-bottom:18px}
+.stat{background:#fff;border:1px solid var(--line);border-radius:12px;padding:14px 16px}
+.stat .l{font-size:13px;color:var(--muted);font-weight:600;display:flex;gap:6px;align-items:center}
+.stat .v{font-size:28px;font-weight:700;letter-spacing:-.02em;margin-top:2px}
+.stat .s{font-size:12.5px;color:var(--muted)}.stat .s.bad{color:var(--bad)}
+.filters{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px;align-items:center}
+.fchip{border:1px solid var(--line);background:#fff;border-radius:20px;padding:5px 12px;font-size:13px;font-weight:600;color:var(--ink-2)}
+.fchip.on{background:var(--ink);border-color:var(--ink);color:#fff}
+.tablewrap{background:#fff;border:1px solid var(--line);border-radius:12px;overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:14px}
+th{text-align:left;font-size:12px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);font-weight:600;padding:10px 12px;border-bottom:1px solid var(--line);background:#fbfcfd;white-space:nowrap}
+td{padding:9px 12px;border-bottom:1px solid var(--line-2);vertical-align:middle}
+tr.grp td{background:#f3f6f8;font-weight:700;font-size:13px;color:var(--ink-2);padding:8px 12px;border-bottom:1px solid var(--line)}
+tr.grp td span{font-weight:500;color:var(--muted)}
+tr.click{cursor:pointer}tr.click:hover td{background:var(--brand-soft)}
+tr.empty td{color:var(--muted);font-size:13px;text-align:center;padding:14px}
+td .sub{display:block;font-size:12.5px;color:var(--muted)}
+td.ref{font-weight:700;font-variant-numeric:tabular-nums;white-space:nowrap}
+.eng{display:flex;align-items:center;gap:8px;white-space:nowrap}
+.eng .av{width:26px;height:26px;font-size:11px}
+.cap{display:flex;gap:4px}
+.cap i{width:26px;height:26px;border-radius:7px;display:grid;place-items:center}
+.cap i.y{background:var(--ok-soft);color:var(--ok)}.cap i.n{background:var(--bad-soft);color:var(--bad)}
+.tag{display:inline-flex;align-items:center;gap:4px;padding:2px 9px;border-radius:20px;font-size:12.5px;font-weight:600;white-space:nowrap}
+.tag.bad{background:var(--bad-soft);color:var(--bad)}.tag.ok{background:var(--ok-soft);color:var(--ok)}.tag.warn{background:var(--warn-soft);color:var(--warn)}.tag.info{background:var(--brand-soft);color:var(--brand)}
+.crumb{font-size:13px;color:var(--muted);margin-bottom:8px}
+.crumb button{border:0;background:none;padding:0;color:var(--brand-2);font-weight:600}
+.alert{display:flex;gap:10px;align-items:flex-start;padding:12px 14px;border-radius:10px;font-size:14px;margin-bottom:14px}
+.alert.bad{background:var(--bad-soft);color:var(--bad)}.alert.warn{background:var(--warn-soft);color:var(--warn)}
+.rgrid{display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:16px;align-items:start}
+@media (max-width:860px){.rgrid{grid-template-columns:1fr}}
+.cols{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px}
+.oc{background:#fff;border:1px solid var(--line);border-radius:12px;padding:16px 18px}
+.oc h3{margin:0 0 12px;font-size:13px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);display:flex;gap:6px;align-items:center}
+.tl{list-style:none;margin:0;padding:0}
+.tl li{display:flex;gap:10px;align-items:center;padding:6px 0;border-bottom:1px dashed var(--line-2)}
+.tl li:last-child{border-bottom:0}
+.tl .t{font-weight:700;font-variant-numeric:tabular-nums;width:54px}
+.sigimg{width:100%;border:1px solid var(--line);border-radius:8px;background:#fdfdfd;display:block}
+.money{display:flex;align-items:center;border:1.5px solid var(--line);border-radius:10px;overflow:hidden;background:#fff}
+.money:focus-within{border-color:var(--brand-2);box-shadow:0 0 0 3px var(--brand-soft)}
+.money.err{border-color:var(--bad);box-shadow:0 0 0 3px var(--bad-soft)}
+.money span{padding:0 12px;font-size:20px;font-weight:700;color:var(--muted)}
+input#price{border:0;outline:0;font:inherit;font-size:22px;font-weight:700;width:100%;padding:10px 10px 10px 0}
+.why{font-size:13px;margin:8px 0 12px;min-height:18px;color:var(--muted)}.why.err{color:var(--bad)}
+.dl{display:grid;grid-template-columns:auto 1fr;gap:6px 14px;font-size:14px;margin:0}
+.dl dt{color:var(--muted)}.dl dd{margin:0;font-weight:500}
+pre{margin:0;background:#14202b;color:#d8e4ee;padding:14px 16px;border-radius:10px;overflow-x:auto;font-size:12.5px;line-height:1.6}
+.win{border:1px solid #c9d1d9;border-radius:10px;overflow:hidden;background:#fff;box-shadow:var(--sh)}
+.win .bar{display:flex;align-items:center;gap:6px;padding:8px 12px;background:#e9ecef;border-bottom:1px solid #c9d1d9;font-size:13px;color:#444}
+.win .bar i{width:11px;height:11px;border-radius:50%;background:#c9d1d9}
+.win .bar b{margin-left:8px}
+.win .wb{padding:14px 16px;font-family:Tahoma,Verdana,sans-serif;font-size:13px}
+.wsteps{display:flex;gap:18px;margin-bottom:12px;color:#888}.wsteps .on{color:#1b5e20;font-weight:700}
+.win table{font-size:12.5px}.win th{background:#f1f3f5;text-transform:none;letter-spacing:0;font-size:12.5px;color:#333}
+.win td{border:1px solid #e3e6e9}
+.emptyst{text-align:center;padding:36px 16px;color:var(--muted)}
+.emptyst .ic{color:#b9c3cc}
+.emptyst b{display:block;color:var(--ink);font-size:16px;margin:8px 0 2px}
+.tot td{font-weight:700;border-top:2px solid var(--line)}
+.num{text-align:right;font-variant-numeric:tabular-nums}
+
+/* Show architecture: outline and label each part by how it's built. */
+body.arch [data-arch]{position:relative;outline:2px dashed var(--std);outline-offset:2px}
+body.arch [data-arch="custom"]{outline-color:var(--custom)}
+body.arch [data-arch]::after{content:attr(data-arch-label);position:absolute;top:-10px;right:8px;font-size:11px;font-weight:600;padding:2px 7px;border-radius:5px;background:var(--std);color:#fff;white-space:nowrap;z-index:30;pointer-events:none}
+body.arch [data-arch="custom"]::after{background:var(--custom)}
+
+/* The guide: bottom right, minimisable. */
+.guide{position:fixed;right:18px;bottom:18px;width:min(370px,calc(100vw - 32px));background:var(--card);border-radius:14px;border-top:5px solid var(--brand);box-shadow:0 14px 40px rgba(20,32,43,.28);z-index:50}
+.guide .gh{display:flex;align-items:center;gap:8px;padding:12px 16px 2px;font-size:11.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;font-weight:600}
+.guide .gh span{flex:1}
+.guide .gt{padding:2px 16px;font-weight:700;font-size:17px;line-height:1.3}
+.guide .gb{padding:6px 16px;font-size:14px;color:var(--ink-2)}
+.guide .where{margin-top:10px;padding:8px 10px;border-radius:8px;background:var(--brand-soft);font-size:12.5px;color:var(--brand)}
+.guide .gf{display:flex;align-items:center;gap:8px;padding:10px 16px 14px}
+.guide .prog{flex:1;display:flex;gap:3px}
+.guide .prog i{flex:1;height:4px;border-radius:2px;background:var(--line)}
+.guide .prog i.on{background:var(--brand)}
+.guide.min .gt,.guide.min .gb,.guide.min .gf{display:none}
+.x{border:0;background:none;color:var(--muted);font-size:16px;padding:0 4px}
+.pulse{animation:pulse 1.4s ease-out 3}
+@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(20,120,168,.6)}100%{box-shadow:0 0 0 16px rgba(20,120,168,0)}}
+
+@media print{.banner,.guide{display:none}}
+</style>
+</head>
+<body>
+<div class="banner">
+  <b>Mock: not the build.</b><span>Brightwater is fictional. Sample jobs, not real customers.</span>
+  <span class="archkey"><span><i style="background:var(--std)"></i>Standard</span><span><i style="background:var(--custom)"></i>Custom</span></span>
+  <span class="sp"></span>
+  <button class="btn" id="btn-arch" data-action="arch">Show architecture</button>
+  <button class="btn" data-action="guide-open">Demo guide</button>
+  <button class="btn" data-action="reset">Reset demo</button>
+</div>
+<main id="main"></main>
+<div id="guide"></div>
+<div id="toast"></div>
+
+<script type="application/json" id="data">
+{"today": "2026-09-21", "todayLabel": "Monday 21 September", "current": "BW-4352",
+ "times": {"start": "10:15", "finish": "11:40", "saved": "11:41", "sent": "11:52", "morning": "07:02"},
+ "tomList": [{"time": "9:30", "ref": "BW-4352"}, {"time": "12:30", "ref": "BW-4355"}, {"time": "2pm", "ref": "BW-4359"}],
+ "parts": [{"name": "Diverter valve", "no": "DV-2418"}, {"name": "Pressure relief valve", "no": "PRV-15-3"},
+           {"name": "Pump head", "no": "PH-60-2"}, {"name": "Fan assembly", "no": "FA-24C"},
+           {"name": "Filling loop", "no": "FL-01"}, {"name": "No part fitted", "no": "Labour only"}],
+ "boiler": {"make": "CALORA", "model": "24C Combi", "serial": "CA24-7781-0932", "gc": "47-311-02", "extra": "Nat gas G20  20 mbar  24 kW  IPX4D"},
+ "usual": {"service": "Always £95", "breakdown": "Usually £165 to £240", "leak": "Usually £120 to £150", "install": "Usually £1,980 to £2,450"},
+ "office": [
+  {"ref": "BW-4352", "date": "2026-09-21", "engineer": "Tom", "type": "breakdown", "customer": "Mrs J. Wilson", "address": "14 Larch Rd", "issue": "No hot water", "record": "phone", "price": null, "ready": false},
+  {"ref": "BW-4353", "date": "2026-09-21", "engineer": "Aisha", "type": "service", "customer": "Mr D. Okonkwo-Harrington", "address": "Flat 3, Riverside Court, 112 Old Mill Lane", "issue": "Annual service", "record": {"start": "08:30", "finish": "09:20", "part": 5, "photo": true, "signed": true, "sentAt": "09:21"}, "price": null, "ready": false},
+  {"ref": "BW-4354", "date": "2026-09-21", "engineer": "Kev", "type": "breakdown", "customer": "Harbour Lettings (tenant)", "address": "9 Quay St", "issue": "Boiler losing pressure", "record": {"start": "09:05", "finish": "10:50", "part": 1, "photo": true, "signed": false, "sentAt": "11:03"}, "price": null, "ready": false, "note": "Tenant out, neighbour let Kev in"},
+  {"ref": "BW-4357", "date": "2026-09-21", "engineer": "Aisha", "type": "breakdown", "customer": "Mr & Mrs Adeyemi", "address": "58 Beacon Hill", "issue": "Heating not coming on", "record": {"start": "09:40", "finish": "11:05", "part": 2, "photo": true, "signed": true, "sentAt": "11:07"}, "price": null, "ready": false},
+  {"ref": "BW-4358", "date": "2026-09-21", "engineer": "Kev", "type": "leak", "customer": "Ms K. Lindqvist", "address": "2 Ferry Cottages", "issue": "Drip from boiler pipework", "record": {"start": "11:20", "finish": "12:05", "part": 5, "photo": false, "signed": true, "sentAt": "12:31"}, "price": null, "ready": false, "note": "Boiler in a cupboard Kev couldn't open fully"},
+  {"ref": "BW-4355", "date": "2026-09-21", "engineer": "Tom", "type": "service", "customer": "Mrs E. Brannigan", "address": "3 Holly Close", "issue": "Annual service", "record": null, "note": "Booked 12:30"},
+  {"ref": "BW-4356", "date": "2026-09-21", "engineer": "Marek", "type": "install", "customer": "Mr & Mrs Ferris", "address": "The Old Forge, Church Lane", "issue": "New combi, day 1 of 2", "record": null, "note": "Two-day install, finishes tomorrow"},
+  {"ref": "BW-4359", "date": "2026-09-21", "engineer": "Tom", "type": "leak", "customer": "Harbour Lettings (tenant)", "address": "Flat 11, Anchor House, Quay St", "issue": "Leak under kitchen sink, key from no. 9", "record": null, "note": "Moved to 3pm"},
+  {"ref": "BW-4361", "date": "2026-09-21", "engineer": "Aisha", "type": "service", "customer": "Greenacre Nursery", "address": "Unit 4, Greenacre Business Park", "issue": "Annual service, two boilers", "record": null, "note": "Booked 2pm"},
+  {"ref": "BW-4362", "date": "2026-09-21", "engineer": "Kev", "type": "breakdown", "customer": "Mr P. Szymański", "address": "41 Station Rd", "issue": "Boiler showing fault F28", "record": null, "note": "Booked 3:30pm"},
+  {"ref": "BW-4338", "date": "2026-09-18", "engineer": "Kev", "type": "leak", "customer": "Mrs A. Doherty", "address": "7 Weir Lane", "issue": "Leak at radiator valve", "record": null, "note": "Before the app: no sheet, customer says job done"},
+  {"ref": "BW-4247", "date": "2026-09-15", "engineer": "Tom", "type": "breakdown", "customer": "Mr R. Costa", "address": "27 Mill View", "issue": "Boiler not firing", "record": null, "note": "Before the app: sheet unreadable (coffee)"},
+  {"ref": "BW-4349", "date": "2026-09-18", "engineer": "Marek", "type": "service", "customer": "St Anne's Community Hall", "address": "Vicarage Rd", "issue": "Annual service", "record": {"start": "13:10", "finish": "14:25", "part": 5, "photo": true, "signed": true, "sentAt": "14:26"}, "price": 95, "ready": true},
+  {"ref": "BW-4346", "date": "2026-09-18", "engineer": "Aisha", "type": "breakdown", "customer": "Mr T. O'Riordan", "address": "19 Kingfisher Way", "issue": "No heating or hot water", "record": {"start": "10:00", "finish": "11:30", "part": 3, "photo": true, "signed": true, "sentAt": "11:31"}, "price": 195, "ready": true},
+  {"ref": "BW-4341", "date": "2026-09-18", "engineer": "Tom", "type": "leak", "customer": "Brook & Sons Bakery", "address": "1A High St", "issue": "Leak under staff sink", "record": {"start": "15:20", "finish": "16:10", "part": 5, "photo": true, "signed": true, "sentAt": "16:58"}, "price": 130, "ready": true}
+ ]}
+</script>
+<script>
+const $ = (s) => document.querySelector(s)
+const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c])
+const DATA = JSON.parse($('#data').textContent)
+const T = DATA.times
+const PHONE_VIEWS = ['msg', 'job']
+const ENGINEERS = ['Tom', 'Aisha', 'Kev', 'Marek']
+
+// All state lives here, so Reset is one line.
+let S
+const initState = () => ({
+  view: 'msg', phoneView: 'msg', officeView: 'inbox', rec: null, filter: 'All', toast: '',
+  start: null, finish: null, part: null, photo: false, sig: [], drawing: null, signal: false, sync: 'none', sentAt: null,
+  office: structuredClone(DATA.office), arch: false, guide: 0, guideMin: false,
+})
+
+// Icons, inline so the file opens from disk with nothing fetched.
+const I = {
+  clock: '<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
+  wrench: '<path d="M14.7 6.3a4 4 0 0 0-5.4 5.4L3 18l3 3 6.3-6.3a4 4 0 0 0 5.4-5.4l-2.5 2.5-2.4-.6-.6-2.4z"/>',
+  camera: '<path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/>',
+  pen: '<path d="M4 20l4-1 11-11-3-3L5 16z"/><path d="M14 6l3 3"/>',
+  check: '<path d="M5 12l4 4 10-10"/>',
+  x: '<path d="M6 6l12 12M18 6L6 18"/>',
+  back: '<path d="M15 5l-7 7 7 7"/>',
+  alert: '<path d="M12 3l10 18H2z"/><path d="M12 10v4M12 17.5v.5"/>',
+  cloudoff: '<path d="M7 18h10a4 4 0 0 0 1.6-7.7M15 6.6A6 6 0 0 0 6 11a3.5 3.5 0 0 0 1 7"/><path d="M3 3l18 18"/>',
+  send: '<path d="M4 12l16-8-6 16-2-6z"/>',
+  drop: '<path d="M12 3c4 5 6 8 6 11a6 6 0 0 1-12 0c0-3 2-6 6-11z"/>',
+  download: '<path d="M12 4v11M7 10l5 5 5-5M5 20h14"/>',
+  lock: '<rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/>',
+  pin: '<path d="M12 21s-6-5.5-6-11a6 6 0 0 1 12 0c0 5.5-6 11-6 11z"/><circle cx="12" cy="10" r="2"/>',
+  inbox: '<path d="M3 13l3-8h12l3 8v6H3z"/><path d="M3 13h5l1 2h6l1-2h5"/>',
+  file: '<path d="M6 3h8l4 4v14H6z"/><path d="M14 3v4h4"/>',
+  phone: '<rect x="7" y="3" width="10" height="18" rx="2"/><path d="M11 18h2"/>',
+  desk: '<rect x="3" y="4" width="18" height="12" rx="2"/><path d="M8 20h8M12 16v4"/>',
+  smile: '<circle cx="12" cy="12" r="9"/><path d="M8 14s1.5 2 4 2 4-2 4-2M9 9.5h.01M15 9.5h.01"/>',
+  clip: '<path d="M20 11l-8.5 8.5a5 5 0 0 1-7-7L13 4a3.5 3.5 0 0 1 5 5l-8.5 8.5a2 2 0 0 1-3-3L14 7"/>',
+  mic: '<rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/>',
+  dots: '<circle cx="12" cy="5" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="12" cy="19" r="1"/>',
+  video: '<rect x="3" y="6" width="13" height="12" rx="2"/><path d="M16 10l5-3v10l-5-3"/>',
+}
+const ic = (n, s = 18, w = 2) => `<svg class="ic" width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="${w}" stroke-linecap="round" stroke-linejoin="round">${I[n]}</svg>`
+const bars = () => `<svg width="18" height="12" viewBox="0 0 18 12">${[0, 1, 2, 3].map((i) => `<rect x="${i * 5}" y="${9 - i * 3}" width="3" height="${3 + i * 3}" rx="1" fill="currentColor" opacity="${S.signal ? 1 : 0.28}"/>`).join('')}</svg>`
+const battery = `<svg width="25" height="12" viewBox="0 0 25 12"><rect x=".5" y=".5" width="21" height="11" rx="3" fill="none" stroke="currentColor" opacity=".5"/><rect x="2" y="2" width="14" height="8" rx="1.5" fill="currentColor"/><rect x="23" y="4" width="1.5" height="4" rx=".75" fill="currentColor" opacity=".5"/></svg>`
+
+const job = (ref) => S.office.find((o) => o.ref === ref)
+const cur = () => job(S.rec)
+const sampleSig = () => [Array.from({ length: 40 }, (_, i) => [34 + i * 6, Math.round(78 - 26 * Math.sin(i / 2.2) * (i < 20 ? 1 : 0.6))]), [[70, 104], [258, 98]]]
+// The record the office sees. Tom's comes from the phone, and only once it has been sent.
+const rec = (o) => o.record !== 'phone' ? o.record
+  : S.sync === 'sent' ? { start: S.start, finish: S.finish, part: S.part, photo: S.photo, signed: S.sig.length > 0, sig: S.sig, sentAt: S.sentAt } : null
+const missing = (r) => [!(r.start && r.finish) && 'times', r.part == null && 'part', !r.photo && 'boiler photo', !r.signed && 'signature'].filter(Boolean)
+const group = (o) => !rec(o) ? 'none' : o.ready ? 'ready' : 'arrived'
+const days = (o) => Math.round((Date.parse(DATA.today) - Date.parse(o.date)) / 864e5)
+const fdate = (d) => { const [, m, dd] = d.split('-'); return `${+dd} ${['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'][m - 1]}` }
+const mins = (a, b) => { const m = (t) => +t.split(':')[0] * 60 + +t.split(':')[1]; const d = m(b) - m(a); return `${Math.floor(d / 60)}h ${String(d % 60).padStart(2, '0')}m` }
+const phoneTime = () => S.sentAt || (S.sync === 'saved' ? T.saved : S.finish || S.start || T.morning)
+const partName = (i) => i == null ? '' : DATA.parts[i].name + (i < 5 ? ` (${DATA.parts[i].no})` : '')
+const money = (n) => '£' + Number(n).toLocaleString('en-GB')
+const initials = (n) => n.slice(0, 2).toUpperCase()
+const engAv = (n) => `<span class="eng"><span class="av" style="background:${{ Tom: '#d7ecf7', Aisha: '#f4e3f7', Kev: '#fdebd2', Marek: '#dff3e6' }[n]}">${initials(n)}</span>${n}</span>`
+
+const plateSvg = (b) => `<svg class="plate" viewBox="0 0 300 160" font-family="ui-monospace,Consolas,monospace">
+  <defs><linearGradient id="pg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#4b5258"/><stop offset=".55" stop-color="#2f3539"/><stop offset="1" stop-color="#3d4448"/></linearGradient>
+  <linearGradient id="mg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#e4e8eb"/><stop offset=".5" stop-color="#c3cad0"/><stop offset="1" stop-color="#d6dbdf"/></linearGradient></defs>
+  <rect width="300" height="160" fill="url(#pg)"/><rect x="22" y="14" width="256" height="132" rx="6" fill="url(#mg)" stroke="#8c959f" transform="rotate(-1.5 150 80)"/>
+  <g transform="rotate(-1.5 150 80)" fill="#1f2328"><circle cx="32" cy="24" r="3" fill="#8c959f"/><circle cx="268" cy="24" r="3" fill="#8c959f"/><circle cx="32" cy="136" r="3" fill="#8c959f"/><circle cx="268" cy="136" r="3" fill="#8c959f"/>
+  <text x="42" y="42" font-size="17" font-weight="700" font-family="system-ui,sans-serif">${esc(b.make)}</text><text x="42" y="66" font-size="12.5">MODEL  ${esc(b.model)}</text>
+  <text x="42" y="86" font-size="12.5">SERIAL ${esc(b.serial)}</text><text x="42" y="106" font-size="12.5">GC NO  ${esc(b.gc)}</text>
+  <text x="42" y="128" font-size="10" fill="#57606a">${esc(b.extra)}</text></g>
+  <rect x="210" y="96" width="80" height="58" fill="#fff" opacity=".07" transform="rotate(20 250 125)"/></svg>`
+const sigSvg = (strokes) => `<svg class="sigimg" viewBox="0 0 340 150"><line x1="28" y1="122" x2="324" y2="122" stroke="#dfe5ea" stroke-width="1.5"/>${strokes.map((s) => `<polyline points="${s.map((p) => p.join(',')).join(' ')}" fill="none" stroke="#1b2b6b" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>`).join('')}</svg>`
+
+const modes = () => {
+  const phone = PHONE_VIEWS.includes(S.view)
+  return `<div class="modes"><div class="seg"><button class="${phone ? 'on' : ''}" data-action="mode" data-mode="phone">${ic('phone', 16)} Engineer's phone</button>
+    <button class="${phone ? '' : 'on'}" id="mode-office" data-action="mode" data-mode="office">${ic('desk', 16)} Office</button></div></div>`
+}
+const statusBar = () => `<div class="sb"><span>${phoneTime()}</span><span class="notch"></span><span class="sbr">${bars()}${S.signal ? '4G' : 'No service'} ${battery}</span></div>`
+const demoCtl = () => `<div class="democtl">Demo control:
+  <button class="switch ${S.signal ? 'on' : ''}" id="signal" data-action="signal"><i></i>${S.signal ? 'Signal on' : 'No signal (basement)'}</button></div>`
+const phone = (cls, inner) => `<div class="device"><div class="screen ${cls}">${statusBar()}${inner}</div></div>${demoCtl()}`
+
+const SCREENS = {
+  // The morning list, in the WhatsApp chat they already use. Each job now carries a link.
+  msg: () => phone('wa', `<div data-arch="std" data-arch-label="Existing tool (standard): WhatsApp" style="flex:1;display:flex;flex-direction:column;min-height:0">
+    <div class="wa-head">${ic('back', 22)}<span class="av">P</span><div class="who"><b>Priya · Brightwater office</b><small>last seen today at 08:15</small></div>${ic('video', 22)}${ic('dots', 22)}</div>
+    <div class="scroll wa-body">
+      <span class="day">Today</span>
+      <div class="bub"><p>Morning Tom. Your jobs for today, tap each link to open the job:</p><span class="meta">06:58</span><div style="clear:both"></div></div>
+      ${DATA.tomList.map((l) => { const o = job(l.ref); return `<div class="bub cont">
+        <span data-arch="custom" data-arch-label="New (custom): job link" style="display:block"><button class="preview" id="link-${o.ref}" data-action="open-job" data-ref="${o.ref}">
+          <span class="pv"><span class="logo">${ic('drop', 20)}</span><span><b>${esc(l.time)} · ${o.ref} · ${o.type[0].toUpperCase() + o.type.slice(1)}</b><span>${esc(o.customer)}, ${esc(o.address)}</span><span>${esc(o.issue)}</span></span></span></button></span>
+        <span class="urltext">https://jobs.brightwater.example/${o.ref}?k=7f3a</span><span class="meta">06:58</span><div style="clear:both"></div></div>` }).join('')}
+      <div class="bub"><p>Change: BW-4359 moved to 3pm, tenant at work till 2:30</p><span class="meta">08:12</span><div style="clear:both"></div></div>
+      <div class="bub me"><p>ok</p><span class="meta">08:15 <span class="ticks">${ic('check', 13, 2.5)}${ic('check', 13, 2.5)}</span></span><div style="clear:both"></div></div>
+    </div>
+    <div class="wa-input"><span class="field">${ic('smile', 20)}<span style="flex:1">Message</span>${ic('clip', 20)}${ic('camera', 20)}</span><span class="mic">${ic('mic', 20)}</span></div></div>`),
+
+  // The job record: a web page opened from the link. Taps and a photo, no typing.
+  job: () => {
+    const o = job(DATA.current), locked = S.sync !== 'none', dis = locked ? 'disabled' : ''
+    const have = { Times: !!(S.start && S.finish), Part: S.part != null, Photo: S.photo, Signature: S.sig.length > 0 }
+    const todo = Object.keys(have).filter((k) => !have[k])
+    const sync = { none: ['', ic('lock', 16), 'Kept on this phone as you tap'], saved: ['saved', ic('cloudoff', 16), 'Saved on phone. Sends itself when there\'s signal'], sent: ['sent', ic('check', 16, 2.5), `Sent to office ${S.sentAt}`] }[S.sync]
+    return phone('', `<div class="urlbar"><button data-action="nav" data-view="msg">${ic('x', 18)}</button><span class="u">${ic('lock', 13)} jobs.brightwater.example</span><span style="width:26px"></span></div>
+    <div class="scroll" data-arch="custom" data-arch-label="New (custom): job record">
+      <div class="jh"><div class="ref">${o.ref} · ${o.type.toUpperCase()} · TODAY 9:30</div><h2>${esc(o.customer)}</h2>
+        <div class="addr">${ic('pin', 15)} ${esc(o.address)}</div><span class="chip">${ic('alert', 14)} ${esc(o.issue)}</span></div>
+      ${S.signal ? '' : `<div class="offline" data-arch="std" data-arch-label="Offline storage on the phone (standard browser)">${ic('cloudoff', 18)}<span><b>No signal.</b> Everything you tap is saved on this phone and goes to the office when signal comes back.</span></div>`}
+      ${S.sync === 'sent' ? `<div class="sentcard">${ic('check', 20, 2.5)}<span><b>Sent to office at ${S.sentAt}.</b><br>Priya can see it now. Nothing else to do for this job.</span></div>` : ''}
+      <div class="steps" id="progress">${Object.keys(have).map((k) => `<span class="chip ${have[k] ? 'done' : ''}">${have[k] ? ic('check', 13, 3) : ''}${k}</span>`).join('')}</div>
+      <div class="pc" id="times"><h3>${ic('clock')} Times<span class="n muted">Tap as it happens</span></h3><div class="two">
+        <button class="tile ${S.start ? 'on' : ''}" data-action="start" ${dis}><span class="l">Arrived</span><span class="v ${S.start ? '' : 'ph'}">${S.start || 'Tap now'}</span></button>
+        <button class="tile ${S.finish ? 'on' : ''}" data-action="finish-time" ${dis}><span class="l">Done</span><span class="v ${S.finish ? '' : 'ph'}">${S.finish || 'Tap now'}</span></button></div></div>
+      <div class="pc" id="parts"><h3>${ic('wrench')} Part fitted</h3><div class="opts">
+        ${DATA.parts.map((p, i) => `<button class="opt ${S.part === i ? 'on' : ''}" data-action="part" data-i="${i}" ${dis}><span class="rd">${S.part === i ? ic('check', 14, 3) : ''}</span><span class="nm">${esc(p.name)}</span><span class="no">${esc(p.no)}</span></button>`).join('')}</div></div>
+      <div class="pc" id="photo"><h3>${ic('camera')} Boiler plate</h3>
+        ${S.photo ? `${plateSvg(DATA.boiler)}<div class="row"><span class="tag ok">${ic('check', 13, 3)} Photo saved</span><span class="sp" style="flex:1"></span><button class="btn" data-action="photo" ${dis}>Retake</button></div>`
+          : `<button class="shoot" data-action="photo" ${dis}>${ic('camera', 30, 1.6)}Take a photo of the plate<small>The model and serial number come from the photo. In the mock, a sample photo.</small></button>`}</div>
+      <div class="pc"><h3>${ic('pen')} Customer signature${S.sig.length ? `<span class="n tag ok">${ic('check', 13, 3)} Signed</span>` : ''}</h3>
+        <div class="pad"><canvas id="sig" width="340" height="150"></canvas><span class="xm">&times;</span><span class="hint">${esc(o.customer)} signs above the line with a finger</span></div>
+        <div class="row"><button class="btn" data-action="sig-clear" ${dis}>Clear</button><button class="btn" data-action="sig-sample" ${dis}>Sample signature</button></div></div>
+      <div style="height:8px"></div>
+    </div>
+    <div class="foot"><div class="sync ${sync[0]}" id="sync" data-arch="std" data-arch-label="Offline storage on the phone (standard browser)">${sync[1]} ${sync[2]}</div>
+      ${!locked && todo.length ? `<div class="small muted" style="margin:-2px 0 8px">Still to do: ${todo.join(', ').toLowerCase()}. You can finish without them; the office sees what's missing.</div>` : ''}
+      ${S.sync === 'sent' ? `<button class="big done" id="btn-finish" data-action="nav" data-view="msg">${ic('back', 18)} Back to my jobs</button>`
+        : `<button class="big ${locked ? 'done' : ''}" id="btn-finish" data-action="finish" ${dis}>${locked ? `${ic('check', 18, 3)} Job finished` : `${ic('send', 18)} Finish job`}</button>`}</div>`)
+  },
+
+  // The office: every job, grouped by what it needs next.
+  inbox: () => {
+    const all = S.office.filter((o) => S.filter === 'All' || o.engineer === S.filter)
+    const g = { arrived: [], none: [], ready: [] }
+    all.forEach((o) => g[group(o)].push(o))
+    const every = { arrived: 0, none: 0, ready: 0 }; S.office.forEach((o) => every[group(o)]++)
+    const late = S.office.filter((o) => group(o) === 'none' && days(o) > 2).length
+    const value = S.office.filter((o) => o.ready).reduce((a, o) => a + o.price, 0)
+    const capCell = (o) => { const r = rec(o); if (!r) return '<span class="muted small">Nothing yet</span>'
+      const m = missing(r); return `<span class="cap" id="missing-${o.ref}">${[['times', 'clock'], ['part', 'wrench'], ['boiler photo', 'camera'], ['signature', 'pen']].map(([k, n]) => `<i class="${m.includes(k) ? 'n' : 'y'}" title="${m.includes(k) ? 'No ' + k : k[0].toUpperCase() + k.slice(1)}">${ic(n, 14)}</i>`).join('')}</span>` }
+    const status = (o) => { const r = rec(o)
+      if (!r) return `<span class="tag ${days(o) > 2 ? 'bad' : 'warn'}">${days(o) > 2 ? ic('alert', 13) : ''}${esc(o.note || 'Not sent yet')}</span>`
+      if (o.ready) return `<span class="tag ok">${ic('check', 13, 3)} ${money(o.price)}</span>`
+      return !r.signed ? `<span class="tag bad">${ic('alert', 13)} No signature</span>` : `<span class="tag info">Needs a price</span>` }
+    const tr = (o) => { const r = rec(o); return `<tr class="${r ? 'click' : ''}" ${r ? `data-action="open-rec" data-ref="${o.ref}"` : ''}>
+      <td class="ref">${o.ref}</td><td>${fdate(o.date)}<span class="sub">${days(o) ? `${days(o)} days ago` : 'today'}</span></td><td>${engAv(o.engineer)}</td>
+      <td><b>${esc(o.customer)}</b><span class="sub">${esc(o.address)}</span></td><td>${o.type}<span class="sub">${esc(o.issue)}</span></td>
+      <td>${capCell(o)}${r ? `<span class="sub">sent ${r.sentAt}</span>` : ''}</td><td>${status(o)}</td></tr>` }
+    const section = (id, title, list, hint) => `<tbody id="grp-${id}"><tr class="grp"><td colspan="7">${title} (${list.length}) <span>· ${hint}</span></td></tr>
+      ${list.map(tr).join('') || `<tr class="empty"><td colspan="7">Nothing here${S.filter === 'All' ? '' : ` for ${S.filter}`}.</td></tr>`}</tbody>`
+    return office(`<div class="otitle"><div><h1>Jobs</h1><p>${DATA.todayLabel} · records arrive from the engineers' phones as they finish</p></div><span class="sp"></span>
+        <button class="btn primary" data-action="nav" data-view="export">${ic('download', 16)} Export for accounts (${every.ready})</button></div>
+      <div class="stats">
+        <div class="stat"><div class="l">${ic('inbox', 15)} Arrived</div><div class="v">${every.arrived}</div><div class="s">Need a price</div></div>
+        <div class="stat"><div class="l">${ic('clock', 15)} No record yet</div><div class="v">${every.none}</div><div class="s ${late ? 'bad' : ''}">${late} older than 2 days</div></div>
+        <div class="stat"><div class="l">${ic('check', 15)} Ready to invoice</div><div class="v">${every.ready}</div><div class="s">${money(value)} to invoice</div></div>
+        <div class="stat"><div class="l">${ic('alert', 15)} Can't invoice</div><div class="v">${S.office.filter((o) => rec(o) && !rec(o).signed).length}</div><div class="s">No customer signature</div></div></div>
+      <div class="filters"><span class="small muted" style="margin-right:4px">Engineer</span>${['All', ...ENGINEERS].map((e) => `<button class="fchip ${S.filter === e ? 'on' : ''}" data-action="filter" data-eng="${e}">${e}</button>`).join('')}</div>
+      <div class="tablewrap"><table><thead><tr><th>Ref</th><th>Date</th><th>Engineer</th><th>Customer</th><th>Job</th><th>Captured</th><th>Status</th></tr></thead>
+        ${section('arrived', 'Arrived', g.arrived, 'open one to check it and add a price')}${section('none', 'No record yet', g.none, 'not sent from a phone')}${section('ready', 'Ready to invoice', g.ready, 'goes in the next export')}</table></div>`)
+  },
+
+  // One record, as the engineer captured it, plus the price.
+  record: () => {
+    const o = cur(), r = o && rec(o)
+    if (!r) { S.view = S.officeView = 'inbox'; return SCREENS.inbox() }
+    const m = missing(r)
+    return office(`<div class="crumb"><button data-action="nav" data-view="inbox">Jobs</button> / ${o.ref}</div>
+      <div class="otitle"><div><h1>${o.ref} · ${esc(o.customer)}</h1><p>${esc(o.address)} · ${o.type} · ${esc(o.issue)}</p></div><span class="sp"></span>
+        ${o.ready ? `<span class="tag ok">${ic('check', 13, 3)} Ready to invoice</span>` : '<span class="tag info">Arrived</span>'}</div>
+      ${!r.signed ? `<div class="alert bad">${ic('alert', 20)}<span><b>No customer signature.</b> This can't be invoiced until it's signed. ${o.note ? esc(o.note) + '.' : ''} Ring ${o.engineer} to go back, or ask the customer to sign on the next visit.</span></div>` : ''}
+      ${m.includes('boiler photo') ? `<div class="alert warn">${ic('camera', 20)}<span><b>No boiler plate photo.</b> Fine to invoice; the model and serial will be missing from the customer's history.${o.note ? ' ' + esc(o.note) + '.' : ''}</span></div>` : ''}
+      <div class="rgrid"><div class="cols">
+        <div class="oc"><h3>${ic('clock', 15)} Times</h3><ul class="tl">
+          <li><span class="t">${r.start || '--:--'}</span>Arrived</li><li><span class="t">${r.finish || '--:--'}</span>Done${r.start && r.finish ? ` <span class="muted">· ${mins(r.start, r.finish)} on site</span>` : ''}</li>
+          <li><span class="t">${r.sentAt}</span>Sent from ${o.engineer}'s phone</li></ul>
+          <h3 style="margin-top:16px">${ic('wrench', 15)} Part fitted</h3><p style="margin:0;font-weight:600">${r.part == null ? '<span class="tag bad">Not tapped</span>' : esc(partName(r.part))}</p></div>
+        <div class="oc"><h3>${ic('camera', 15)} Boiler plate</h3>${r.photo ? plateSvg(DATA.boiler) : '<div class="emptyst" style="padding:20px">' + ic('camera', 32) + '<b>No photo</b></div>'}</div>
+        <div class="oc"><h3>${ic('pen', 15)} Customer signature</h3>${r.signed ? sigSvg(r.sig || sampleSig()) + `<p class="small muted" style="margin:8px 0 0">Signed by ${esc(o.customer)} at ${r.finish}</p>` : '<div class="emptyst" style="padding:20px">' + ic('pen', 32) + '<b>Not signed</b></div>'}</div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:16px">
+        <div class="oc" id="pricebox"><h3>Price</h3>${o.ready ? `<p style="font-size:28px;font-weight:700;margin:0 0 4px">${money(o.price)}</p><p class="small muted">Ready to invoice. Goes in the next export.</p><button class="btn" data-action="unready">Undo</button>`
+          : `<div class="money" id="moneybox"><span>£</span><input id="price" type="number" min="0" step="5" inputmode="decimal" value="${o.price ?? ''}" placeholder="0"></div>
+          <p class="why" id="ready-why"></p><button class="btn primary" id="btn-ready" data-action="ready" style="width:100%;justify-content:center;padding:10px">${ic('check', 16, 2.5)} Mark ready to invoice</button>
+          <p class="small muted" style="margin:10px 0 0">${DATA.usual[o.type]} for a ${o.type}, from the last two weeks.</p>`}</div>
+        <div class="oc"><h3>Job</h3><dl class="dl"><dt>Engineer</dt><dd>${o.engineer}</dd><dt>Date</dt><dd>${fdate(o.date)}</dd><dt>Type</dt><dd>${o.type}</dd><dt>Address</dt><dd>${esc(o.address)}</dd></dl></div>
+      </div></div>`)
+  },
+
+  // What goes to the accounts package: one CSV row per job that is ready.
+  export: () => {
+    const rows = S.office.filter((o) => o.ready)
+    const cell = (v) => (/[",\n]/.test(v) ? `"${v.replace(/"/g, '""')}"` : v)
+    const desc = (o) => `${o.type}: ${rec(o).part === 5 ? 'labour only' : partName(rec(o).part) || 'part not recorded'}`
+    const line = (o) => [DATA.today, o.ref, o.customer, o.address, desc(o), String(o.price), o.engineer].map(cell).join(',')
+    const csv = ['invoice_date,job_ref,customer,address,description,amount_gbp,engineer', ...rows.map(line)].join('\n')
+    const total = rows.reduce((a, o) => a + o.price, 0)
+    return office(`<div class="crumb"><button data-action="nav" data-view="inbox">Jobs</button> / Export for accounts</div>
+      <div class="otitle"><div><h1>Export for accounts</h1><p>Only jobs with a price and a customer signature are here.</p></div></div>
+      <div class="rgrid"><div class="oc" data-arch="custom" data-arch-label="New (custom): export">
+        ${rows.length ? `<div class="tablewrap" style="margin-bottom:14px"><table><thead><tr><th>Ref</th><th>Customer</th><th>Description</th><th>Engineer</th><th class="num">Amount</th></tr></thead><tbody>
+          ${rows.map((o) => `<tr><td class="ref">${o.ref}</td><td>${esc(o.customer)}<span class="sub">${esc(o.address)}</span></td><td>${esc(desc(o))}</td><td>${engAv(o.engineer)}</td><td class="num">${money(o.price)}</td></tr>`).join('')}
+          <tr class="tot"><td colspan="4">${rows.length} invoice${rows.length === 1 ? '' : 's'}</td><td class="num">${money(total)}</td></tr></tbody></table></div>`
+          : `<div class="emptyst">${ic('inbox', 40, 1.5)}<b>Nothing ready to invoice yet</b>Open an arrived job, add a price and mark it ready.</div>`}
+        <h3 style="text-transform:none;letter-spacing:0">${ic('file', 15)} brightwater-invoices-${DATA.today}.csv</h3><pre id="csv">${esc(csv)}</pre>
+        <div class="row"><button class="btn primary" data-action="download" ${rows.length ? '' : 'disabled'}>${ic('download', 16)} Download CSV</button></div></div>
+      <div class="win" data-arch="std" data-arch-label="Existing tool (standard): accounts package"><div class="bar"><i></i><i></i><i></i><b>Accounts · Import invoices from CSV</b></div>
+        <div class="wb"><div class="wsteps"><span>1. Choose file &#10003;</span><span class="on">2. Check rows</span><span>3. Import</span></div>
+          <table><tr><th>Date</th><th>Ref</th><th>Customer</th><th class="num">Net</th></tr>
+          ${rows.map((o) => `<tr><td>${DATA.today.split('-').reverse().join('/')}</td><td>${o.ref}</td><td>${esc(o.customer)}</td><td class="num">${o.price.toFixed(2)}</td></tr>`).join('') || '<tr><td colspan="4">No rows in file</td></tr>'}</table>
+          <div class="row" style="justify-content:flex-end"><button class="btn" data-action="import" ${rows.length ? '' : 'disabled'}>Import ${rows.length} invoice${rows.length === 1 ? '' : 's'}</button></div></div></div></div>`)
+  },
+}
+const office = (inner) => {
+  const n = { arrived: 0, ready: 0 }; S.office.forEach((o) => { const g = group(o); if (g in n) n[g]++ })
+  return `<div class="app" data-arch="custom" data-arch-label="New (custom): office inbox"><div class="ohead">
+    <span class="brand"><span class="mark">${ic('drop', 18)}</span>Brightwater <small>Office</small></span>
+    <nav class="onav"><button class="${S.view === 'export' ? '' : 'on'}" data-action="nav" data-view="inbox">Jobs <span class="badge">${n.arrived}</span></button>
+      <button class="${S.view === 'export' ? 'on' : ''}" data-action="nav" data-view="export">Export for accounts <span class="badge">${n.ready}</span></button></nav>
+    <span class="me"><span class="dt">${DATA.todayLabel}</span><span class="av">PR</span>Priya</span></div>
+    <div class="obody">${inner}</div></div>`
+}
+
+// Fill whatever Tom hasn't tapped yet, so a guide step can start from a complete record.
+function fillSample() { S.start ||= T.start; S.finish ||= T.finish; if (S.part == null) S.part = 0; S.photo = true; if (!S.sig.length) S.sig = sampleSig() }
+function sendNow() { fillSample(); S.signal = true; S.sync = 'sent'; S.sentAt ||= T.sent }
+
+const GUIDE = [
+  { t: 'Welcome', b: 'A mock of Brightwater\'s job record: Tom\'s phone on a Monday morning, and Priya\'s screen in the office. Use <b>Next</b> to follow the story, or click around.', where: 'Tip: <b>Show architecture</b> labels which parts Brightwater already has and which are new.', go: () => nav('msg') },
+  { t: 'The link is in the message they already get', b: 'Priya still sends the morning list on WhatsApp. Each job now comes with a link. Tom taps it: no new app to install, and no password to forget by Wednesday.', where: 'WhatsApp is the existing tool. The link carries its own key, so there is no login.', go: () => nav('msg'), hl: '#link-BW-4352' },
+  { t: 'Taps, not typing', b: 'Hands are dirty or in gloves. Tap <b>Arrived</b> and <b>Done</b> as they happen, and tap the part fitted from a short list. The times are real, not made up at the end of the day.', where: 'A web page made for this (custom). It opens in the phone\'s browser.', go: () => nav('job'), hl: '#times' },
+  { t: 'A photo of the boiler plate', b: 'Copying the model and serial number off the plate is the slowest part of the paper sheet. Here it is one photo. Try <b>Take a photo</b>.', go: () => nav('job'), hl: '#photo' },
+  { t: 'The customer signs on the phone', b: 'Priya won\'t invoice without a signature, and a lost pad means a lost signature. The customer signs with a finger. Draw in the box, or tap <b>Sample signature</b>.', go: () => nav('job'), hl: '#sig' },
+  { t: 'It works with no signal', b: 'This boiler is in a basement: no signal. Tap <b>Finish job</b> and it says <b>Saved on phone</b>. Then turn the signal on under the phone: it sends itself and says <b>Sent to office 11:52</b>.', where: 'Kept in the phone\'s own browser storage (standard), sent when signal returns.', go: () => { fillSample(); S.signal = false; S.sync = 'none'; S.sentAt = null; nav('job') }, hl: '#btn-finish' },
+  { t: 'The office sees what\'s missing', b: 'Every job is in one of three groups: <b>Arrived</b>, <b>No record yet</b>, <b>Ready to invoice</b>. Kev\'s BW-4354 came in with no signature (the red pen), and two jobs from last week have no record at all. Priya knows before she rings anyone.', where: 'A new office screen (custom). Switch with <b>Engineer\'s phone</b> / <b>Office</b> at the top.', go: () => { sendNow(); S.filter = 'All'; nav('inbox') }, hl: '#missing-BW-4354' },
+  { t: 'Nothing is invoiced without a price', b: 'Tom\'s record shows everything he tapped: times, part, plate photo, signature. Enter a price, then <b>Mark ready to invoice</b>. The button stays off until there is a price. Open BW-4354 and it stays off for good: no signature.', go: () => { sendNow(); job('BW-4352').ready = false; openRec('BW-4352') }, hl: '#price' },
+  { t: 'The export goes into the accounts package', b: 'Every job that is ready becomes one CSV row, in the layout the accounts package already imports. No more retyping on Monday and Tuesday.', where: 'The accounts package is the existing tool; its CSV import has never been used because nothing produced a clean file.', go: () => nav('export'), hl: '#csv' },
+  { t: 'Standard and custom', b: 'Blue: what Brightwater already has (WhatsApp, the accounts package) and the phone\'s standard browser storage. Purple: the new build, the job record and the office screen. <b>Reset demo</b> starts again.', go: () => { S.arch = true; nav('job') } },
+]
+
+function nav(view) { S.view = view; if (PHONE_VIEWS.includes(view)) S.phoneView = view; else S.officeView = view; S.toast = ''; render() }
+function openRec(ref) { S.rec = ref; nav('record') }
+function toast(msg) { S.toast = msg; renderToast(); clearTimeout(toast.t); toast.t = setTimeout(() => { S.toast = ''; renderToast() }, 4000) }
+function renderToast() { $('#toast').innerHTML = S.toast ? `<div class="toast">${esc(S.toast)}</div>` : '' }
+
+function drawSig() {
+  const c = $('#sig'), x = c.getContext('2d')
+  x.clearRect(0, 0, c.width, c.height); x.lineWidth = 2.6; x.lineCap = 'round'; x.lineJoin = 'round'; x.strokeStyle = '#1b2b6b'
+  S.sig.forEach((s) => { x.beginPath(); s.forEach((p, i) => (i ? x.lineTo(p[0], p[1]) : x.moveTo(p[0], p[1]))); if (s.length === 1) x.lineTo(s[0][0] + .1, s[0][1]); x.stroke() })
+}
+// The price box: no signature, no price, or a price that looks wrong all keep the button off.
+function updateReady() {
+  const o = cur(), p = o.price
+  const [why, err] = !rec(o).signed ? ['No customer signature, so this can\'t be invoiced.', false]
+    : p == null ? ['Enter a price to mark it ready.', false]
+    : !(p > 0 && p < 10000) ? ['That price doesn\'t look right. Check it.', true] : ['', false]
+  $('#btn-ready').disabled = !!why
+  $('#ready-why').textContent = why; $('#ready-why').classList.toggle('err', err); $('#moneybox').classList.toggle('err', err)
+}
+
+function render() {
+  $('#main').innerHTML = modes() + SCREENS[S.view]()
+  if ($('#sig')) drawSig()
+  if ($('#btn-ready')) updateReady()
+  document.body.classList.toggle('arch', S.arch)
+  $('#btn-arch').classList.toggle('on', S.arch)
+  renderToast()
+  renderGuide()
+}
+
+function renderGuide() {
+  if (S.guide < 0) { $('#guide').innerHTML = ''; return }
+  const g = GUIDE[S.guide]
+  const last = S.guide === GUIDE.length - 1
+  $('#guide').innerHTML = `<div class="guide ${S.guideMin ? 'min' : ''}">
+    <div class="gh"><span>Demo guide · ${S.guide + 1} of ${GUIDE.length}</span>
+      <button class="x" data-action="guide-min" title="Minimise">${S.guideMin ? '&#9650;' : '&#9660;'}</button>
+      <button class="x" data-action="guide-close" title="Close">&times;</button></div>
+    <div class="gt">${g.t}</div>
+    <div class="gb">${g.b}${g.where ? `<div class="where">${g.where}</div>` : ''}</div>
+    <div class="gf"><button class="btn" data-action="guide-prev" ${S.guide ? '' : 'disabled'}>Back</button>
+      <span class="prog">${GUIDE.map((_, i) => `<i class="${i <= S.guide ? 'on' : ''}"></i>`).join('')}</span>
+      <button class="btn primary" data-action="guide-next">${last ? 'Finish' : 'Next'}</button></div>
+  </div>`
+}
+
+function guideGo(i) {
+  S.guide = i; S.guideMin = false
+  GUIDE[i].go()
+  render()
+  const sel = GUIDE[i].hl
+  if (sel) setTimeout(() => { const el = $(sel); if (el) { el.scrollIntoView({ block: 'nearest' }); el.classList.add('pulse'); setTimeout(() => el.classList.remove('pulse'), 4300) } }, 60)
+}
+
+// Every button says what it does with data-action; one listener handles them all.
+const ACTIONS = {
+  mode: (el) => nav(el.dataset.mode === 'phone' ? S.phoneView : S.officeView),
+  nav: (el) => nav(el.dataset.view),
+  'open-job': (el) => (el.dataset.ref === DATA.current ? nav('job') : toast(`In the mock only ${DATA.current} opens. ${el.dataset.ref} works the same way.`)),
+  start: () => { S.start = S.start ? null : T.start; render() },
+  'finish-time': () => { S.finish = S.finish ? null : T.finish; render() },
+  part: (el) => { S.part = Number(el.dataset.i); render() },
+  photo: () => { S.photo = !S.photo; render() },
+  'sig-clear': () => { S.sig = []; render() },
+  'sig-sample': () => { S.sig = sampleSig(); render() },
+  finish: () => { S.finish ||= T.finish; S.sync = S.signal ? 'sent' : 'saved'; S.sentAt = S.signal ? T.saved : null; render() },
+  signal: () => { S.signal = !S.signal; if (S.signal && S.sync === 'saved') { S.sync = 'sent'; S.sentAt = T.sent } render() },
+  filter: (el) => { S.filter = el.dataset.eng; render() },
+  'open-rec': (el) => openRec(el.dataset.ref),
+  ready: () => { const o = cur(); if (o.price > 0 && o.price < 10000 && rec(o).signed) { o.ready = true; nav('inbox'); toast(`${o.ref} is ready to invoice at ${money(o.price)}.`) } },
+  unready: () => { cur().ready = false; render() },
+  download: () => toast('In the mock nothing downloads. The file is the CSV shown here.'),
+  import: () => toast('In the mock the import stops here. The accounts package does this step.'),
+  arch: () => { S.arch = !S.arch; render() },
+  'guide-open': () => guideGo(Math.max(0, S.guide)),
+  'guide-next': () => (S.guide === GUIDE.length - 1 ? ((S.guide = -1), render()) : guideGo(S.guide + 1)),
+  'guide-prev': () => guideGo(Math.max(0, S.guide - 1)),
+  'guide-min': () => { S.guideMin = !S.guideMin; renderGuide() },
+  'guide-close': () => { S.guide = -1; render() },
+  reset: () => { const g = S.guide; S = initState(); if (g < 0) { S.guide = -1; render() } else guideGo(0) },
+}
+document.addEventListener('click', (e) => {
+  const el = e.target.closest('[data-action]')
+  if (el && !el.disabled && ACTIONS[el.dataset.action]) ACTIONS[el.dataset.action](el)
+})
+// The price box updates its button without a re-render, so typing keeps focus.
+document.addEventListener('input', (e) => {
+  if (e.target.id !== 'price') return
+  cur().price = e.target.value === '' ? null : Number(e.target.value)
+  updateReady()
+})
+// The signature pad: strokes live in S.sig, so the office shows the same signature.
+const pt = (e) => { const c = $('#sig'), r = c.getBoundingClientRect(); return [Math.round((e.clientX - r.left) * c.width / r.width), Math.round((e.clientY - r.top) * c.height / r.height)] }
+document.addEventListener('pointerdown', (e) => {
+  if (e.target.id !== 'sig' || S.sync !== 'none') return
+  e.preventDefault(); e.target.setPointerCapture(e.pointerId); S.drawing = [pt(e)]; S.sig.push(S.drawing); drawSig()
+})
+document.addEventListener('pointermove', (e) => { if (S.drawing && $('#sig')) { S.drawing.push(pt(e)); drawSig() } })
+document.addEventListener('pointerup', () => { if (S.drawing) { S.drawing = null; render() } })
+
+S = initState()
+guideGo(0)
+</script>
+</body>
+</html>

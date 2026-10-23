@@ -1,0 +1,277 @@
+<!doctype html>
+<!--
+  Mock skeleton with a guided tour, from /ways:mock. Copy it, then replace everything marked REPLACE.
+  It starts as a credible business app (header, nav, a table, a record): restyle it to match the real
+  platform or the app this sits beside, and fill it with enough realistic data that it feels used.
+
+  What it's for:          REPLACE: the work, and the question this mock settles.
+  Where the data is from: REPLACE: the seed, fixture or export, or "made from the schema".
+  Decisions it settles:   REPLACE: one line each. The guide has a step per decision.
+  Rounds:                 REPLACE: round 1, what changed and why; round 2, ...
+
+  The three parts that make it a demo people can follow alone:
+  - The guide (GUIDE below): a step per decision, in plain English. Each step's go() opens its screen,
+    hl highlights the element that matters, and "where" says how that part is built.
+  - Show architecture: every element with data-arch="std" or "custom" gets a label from data-arch-label.
+  - Reset demo: the data and screens back to the start, the guide kept where it was.
+-->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>REPLACE: Product name (mock)</title>
+<style>
+:root{
+  --ink:#1b1f24;--muted:#5f6b7a;--faint:#8a95a3;--line:#e3e7ec;--bg:#f4f6f9;--card:#fff;
+  --brand:#2457d6;--brand-ink:#fff;--brand-soft:#e8eefc;--hdr:#14213d;
+  --ok:#137a3a;--ok-bg:#e3f5ea;--warn:#8a5a00;--warn-bg:#fdf1d6;--bad:#b42318;--bad-bg:#fde7e5;
+  --std:#2457d6;--custom:#7c3aed;--banner:#fff6d6;--r:10px;
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%}
+body{font:14px/1.5 "Segoe UI",system-ui,-apple-system,Roboto,sans-serif;color:var(--ink);background:var(--bg);display:flex;flex-direction:column}
+button{font:inherit;cursor:pointer}
+h1,h2,h3{margin:0;line-height:1.25}
+.btn{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:8px;padding:7px 14px;font-weight:500}
+.btn:hover{border-color:#c9d0d9}
+.btn.primary{background:var(--brand);border-color:var(--brand);color:var(--brand-ink)}
+.btn.primary:hover{filter:brightness(1.07)}
+.btn:disabled{opacity:.45;cursor:default}
+.ico{width:16px;height:16px;flex:none}
+
+/* The banner: says it's a mock, and holds the three demo controls. */
+.banner{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:6px 16px;background:var(--banner);border-bottom:1px solid #f0dc93;font-size:13px;color:#5c4400}
+.banner .sp{flex:1}
+.banner .btn{padding:4px 10px;font-size:12.5px}
+.banner .btn.on{background:#5c4400;color:#fff;border-color:#5c4400}
+.archkey{display:none;gap:14px}
+body.arch .archkey{display:flex}
+.archkey i{display:inline-block;width:11px;height:11px;border-radius:3px;margin-right:5px;vertical-align:-1px}
+
+/* App chrome: header and left nav. REPLACE with the real platform's look where there is one. */
+.apphdr{display:flex;align-items:center;gap:14px;height:52px;padding:0 18px;background:var(--hdr);color:#fff}
+.apphdr .logo{width:28px;height:28px;border-radius:7px;background:var(--brand);display:grid;place-items:center;font-weight:700}
+.apphdr .name{font-weight:600;font-size:15px}
+.apphdr .search{margin-left:auto;display:flex;align-items:center;gap:8px;width:280px;max-width:40vw;padding:6px 12px;border-radius:8px;background:rgba(255,255,255,.1);color:rgba(255,255,255,.7);font-size:13px}
+.apphdr .me{width:32px;height:32px;border-radius:50%;background:#e9b949;color:var(--hdr);display:grid;place-items:center;font-weight:700;font-size:12px}
+.shell{flex:1;display:flex;min-height:0}
+.nav{width:220px;flex:none;background:var(--card);border-right:1px solid var(--line);padding:14px 10px;display:flex;flex-direction:column;gap:2px}
+.nav .sec{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--faint);padding:12px 10px 6px}
+.nav button{display:flex;align-items:center;gap:10px;width:100%;text-align:left;border:0;background:none;padding:8px 10px;border-radius:8px;color:var(--muted)}
+.nav button:hover{background:var(--bg)}
+.nav button.on{background:var(--brand-soft);color:var(--brand);font-weight:600}
+.nav .count{margin-left:auto;font-size:12px;background:var(--bg);border-radius:999px;padding:0 8px}
+main{flex:1;overflow:auto;padding:22px 26px 120px}
+.pagehead{display:flex;align-items:flex-end;gap:12px;margin-bottom:16px}
+.pagehead p{margin:2px 0 0;color:var(--muted)}
+.pagehead .sp{flex:1}
+.crumbs{font-size:12.5px;color:var(--muted);margin-bottom:6px}
+.crumbs button{border:0;background:none;padding:0;color:var(--brand)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);box-shadow:0 1px 2px rgba(16,24,40,.04)}
+.card.pad{padding:18px 20px}
+
+/* Tables and pills */
+table{width:100%;border-collapse:collapse}
+th{text-align:left;font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;padding:10px 14px;border-bottom:1px solid var(--line);background:#fafbfc}
+td{padding:11px 14px;border-bottom:1px solid var(--line)}
+tbody tr{cursor:pointer}
+tbody tr:hover td{background:#f8faff}
+tbody tr:last-child td{border-bottom:0}
+.id{font-family:ui-monospace,Consolas,monospace;font-size:12.5px;color:var(--muted);white-space:nowrap}
+td.nw{white-space:nowrap}
+.pill{display:inline-block;padding:2px 10px;border-radius:999px;font-size:12px;font-weight:600}
+.pill.open{background:var(--warn-bg);color:var(--warn)}
+.pill.done{background:var(--ok-bg);color:var(--ok)}
+.pill.blocked{background:var(--bad-bg);color:var(--bad)}
+.empty{padding:40px;text-align:center;color:var(--muted)}
+
+/* A record */
+.grid2{display:grid;grid-template-columns:minmax(0,2fr) minmax(0,1fr);gap:16px}
+.fields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px 24px}
+.field label{display:block;font-size:12px;color:var(--muted);margin-bottom:2px}
+.field div{font-weight:500}
+.timeline{list-style:none;margin:0;padding:0}
+.timeline li{position:relative;padding:0 0 14px 18px;font-size:13px}
+.timeline li::before{content:"";position:absolute;left:0;top:6px;width:8px;height:8px;border-radius:50%;background:var(--brand)}
+.timeline li span{display:block;color:var(--faint);font-size:12px}
+.toasts{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);display:flex;flex-direction:column;gap:8px;z-index:60}
+.toast{background:var(--hdr);color:#fff;padding:10px 16px;border-radius:8px;box-shadow:0 8px 24px rgba(0,0,0,.2)}
+
+/* Show architecture: outline and label each part by how it's built. */
+body.arch [data-arch]{position:relative;outline:2px dashed var(--std);outline-offset:3px}
+body.arch [data-arch="custom"]{outline-color:var(--custom)}
+body.arch [data-arch]::after{content:attr(data-arch-label);position:absolute;top:-11px;right:10px;font-size:11px;font-weight:600;padding:1px 8px;border-radius:5px;background:var(--std);color:#fff;white-space:nowrap;z-index:5}
+body.arch [data-arch="custom"]::after{background:var(--custom)}
+
+/* The guide: bottom right, minimisable. */
+.guide{position:fixed;right:18px;bottom:18px;width:min(370px,calc(100vw - 36px));background:var(--card);border-radius:12px;border-top:4px solid var(--hdr);box-shadow:0 14px 40px rgba(16,24,40,.28);z-index:50}
+.guide .gh{display:flex;align-items:center;gap:8px;padding:11px 16px 2px;font-size:11.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;font-weight:600}
+.guide .gh span{flex:1}
+.guide .gt{padding:2px 16px;font-weight:650;font-size:16.5px;color:var(--hdr)}
+.guide .gb{padding:4px 16px;font-size:14px}
+.guide .where{margin-top:9px;padding:7px 10px;border-radius:6px;background:var(--bg);font-size:12.5px;color:var(--muted)}
+.guide .gf{display:flex;align-items:center;gap:8px;padding:12px 16px 14px}
+.guide .prog{flex:1;display:flex;gap:3px}
+.guide .prog i{flex:1;height:4px;border-radius:2px;background:var(--line)}
+.guide .prog i.on{background:var(--hdr)}
+.guide.min .gt,.guide.min .gb,.guide.min .gf{display:none}
+.x{border:0;background:none;color:var(--muted);font-size:16px;padding:0 4px}
+.pulse{animation:pulse 1.4s ease-out 3;border-radius:var(--r)}
+@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(36,87,214,.55)}100%{box-shadow:0 0 0 16px rgba(36,87,214,0)}}
+
+@media (max-width:760px){.nav{display:none}.grid2,.fields{grid-template-columns:minmax(0,1fr)}main{padding:16px 16px 140px}}
+@media print{.banner,.guide,.nav,.apphdr{display:none}}
+</style>
+</head>
+<body>
+<div class="banner">
+  <b>Mock: not the build.</b><span>REPLACE: one line, e.g. "Sample data; nothing here is real."</span>
+  <span class="archkey"><span><i style="background:var(--std)"></i>Standard</span><span><i style="background:var(--custom)"></i>Custom</span></span>
+  <span class="sp"></span>
+  <button class="btn" id="btn-arch" data-action="arch">Show architecture</button>
+  <button class="btn" data-action="guide-open">Demo guide</button>
+  <button class="btn" data-action="reset">Reset demo</button>
+</div>
+<header class="apphdr" data-arch="std" data-arch-label="REPLACE: platform shell (standard)">
+  <span class="logo">R</span><span class="name">REPLACE: Product</span>
+  <span class="search"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>Search</span>
+  <span class="me" title="REPLACE: the person using it">AB</span>
+</header>
+<div class="shell">
+  <nav class="nav" id="nav"></nav>
+  <main id="main"></main>
+</div>
+<div id="guide"></div>
+<div class="toasts" id="toasts"></div>
+
+<script type="application/json" id="data">
+{"REPLACE": "the mock's data, from the repo's seed or sample data: a dozen rows, awkward ones included",
+ "items": [
+  {"id": "REQ-1041", "name": "Replace the reception printer", "owner": "Priya Shah", "due": "2026-11-03", "status": "open", "log": [["Created", "Priya Shah", "28 Oct"]]},
+  {"id": "REQ-1042", "name": "Annual fire-door inspection, all three floors and the basement plant room", "owner": "Tom Okafor", "due": "2026-11-07", "status": "open", "log": [["Created", "Tom Okafor", "29 Oct"]]},
+  {"id": "REQ-1043", "name": "New starter laptop", "owner": "", "due": "", "status": "blocked", "log": [["Created", "Dan Reyes", "30 Oct"], ["Waiting for a cost code", "Finance", "30 Oct"]]},
+  {"id": "REQ-1038", "name": "Kitchen tap", "owner": "Priya Shah", "due": "2026-10-24", "status": "done", "log": [["Created", "Priya Shah", "20 Oct"], ["Done", "Priya Shah", "23 Oct"]]}
+ ]}
+</script>
+<script>
+const $ = (s) => document.querySelector(s)
+const esc = (s) => String(s ?? '').replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c])
+const DATA = JSON.parse($('#data').textContent)
+const ICON = {
+  list: '<svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg>',
+  check: '<svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M20 6 9 17l-5-5"/></svg>',
+}
+const STATUS = { open: 'Open', done: 'Done', blocked: 'Blocked' }
+const pill = (s) => `<span class="pill ${s}">${STATUS[s]}</span>`
+const shown = (v, blank = 'Not set') => (v ? esc(v) : `<span style="color:var(--faint)">${blank}</span>`)
+
+// All state lives here, so Reset is one line. REPLACE: the screens and whatever the flow changes.
+let S
+const initState = () => ({ view: 'list', filter: 'all', selected: null, items: structuredClone(DATA.items), arch: false, guide: 0, guideMin: false })
+
+// REPLACE: one render function per screen. Tag each part with how it's built:
+// data-arch="std" (an off-the-shelf part) or "custom", and data-arch-label="what it is".
+const SCREENS = {
+  list: () => {
+    const rows = S.items.filter((i) => S.filter === 'all' || i.status === S.filter)
+    return `<div class="pagehead"><div><h1>Requests</h1><p>${S.items.length} requests · ${S.items.filter((i) => i.status === 'open').length} open</p></div><span class="sp"></span>
+        ${['all', 'open', 'blocked', 'done'].map((f) => `<button class="btn ${S.filter === f ? 'primary' : ''}" data-action="filter" data-f="${f}">${f === 'all' ? 'All' : STATUS[f]}</button>`).join('')}</div>
+      <div class="card" id="list" data-arch="std" data-arch-label="REPLACE: standard list view">
+        ${rows.length ? `<table><thead><tr><th>Ref</th><th>Request</th><th>Owner</th><th>Due</th><th>Status</th></tr></thead><tbody>
+          ${rows.map((i) => `<tr data-action="open" data-id="${i.id}"><td class="id">${i.id}</td><td>${esc(i.name)}</td><td>${shown(i.owner, 'Unassigned')}</td><td class="nw">${shown(i.due)}</td><td>${pill(i.status)}</td></tr>`).join('')}
+        </tbody></table>` : '<div class="empty">Nothing here. Try another filter.</div>'}
+      </div>`
+  },
+  item: () => {
+    const i = S.items.find((x) => x.id === S.selected)
+    return `<div class="crumbs"><button data-action="back">Requests</button> / ${i.id}</div>
+      <div class="pagehead"><div><h1>${esc(i.name)}</h1><p>${pill(i.status)}</p></div><span class="sp"></span>
+        <button class="btn primary" id="btn-done" data-action="done" ${i.status === 'done' ? 'disabled' : ''}>${ICON.check} Mark done</button></div>
+      <div class="grid2">
+        <div class="card pad" id="record" data-arch="custom" data-arch-label="REPLACE: the custom screen">
+          <h3 style="margin-bottom:14px">Details</h3>
+          <div class="fields"><div class="field"><label>Reference</label><div class="id">${i.id}</div></div>
+            <div class="field"><label>Owner</label><div>${shown(i.owner, 'Unassigned')}</div></div>
+            <div class="field"><label>Due</label><div>${shown(i.due)}</div></div>
+            <div class="field"><label>Status</label><div>${STATUS[i.status]}</div></div></div>
+        </div>
+        <div class="card pad" data-arch="std" data-arch-label="REPLACE: standard audit history">
+          <h3 style="margin-bottom:14px">History</h3>
+          <ul class="timeline">${i.log.map(([what, who, when]) => `<li>${esc(what)}<span>${esc(who)} · ${esc(when)}</span></li>`).join('')}</ul>
+        </div>
+      </div>`
+  },
+}
+
+// The guide: one step per decision the mock settles, in the order the story is told.
+// t: the title; b: what you're looking at and why it was decided that way, in plain English;
+// where: how this part is built (optional); go: opens the step's screen; hl: the element to highlight.
+const GUIDE = [
+  { t: 'Welcome', b: 'REPLACE: what this is and who it is for. Use <b>Next</b> to follow the story, or click around: nothing you do here is saved.', where: 'Tip: <b>Show architecture</b> labels which parts are standard and which are custom.', go: () => nav('list') },
+  { t: 'REPLACE: the first decision', b: 'What the person sees, and why it was decided this way. Note the unassigned request: it shows as <b>Unassigned</b>, never blank.', where: 'REPLACE: standard list view.', go: () => nav('list'), hl: '#list' },
+  { t: 'REPLACE: the second decision', b: 'Open a request and try <b>Mark done</b>: the history records who and when.', where: 'REPLACE: the one custom screen.', go: () => open('REQ-1041'), hl: '#btn-done' },
+  { t: 'Standard and custom', b: 'Everything here is standard except the request screen. <b>Show architecture</b> shows the split; <b>Reset demo</b> starts again.', go: () => { S.arch = true; nav('list') } },
+]
+
+function nav(view) { S.view = view; render() }
+function open(id) { S.selected = id; S.view = 'item'; render() }
+function toast(text) { const t = document.createElement('div'); t.className = 'toast'; t.textContent = text; $('#toasts').append(t); setTimeout(() => t.remove(), 2600) }
+
+function render() {
+  $('#nav').innerHTML = `<div class="sec">REPLACE: Area</div>
+    <button class="${S.view === 'list' || S.view === 'item' ? 'on' : ''}" data-action="nav" data-view="list">${ICON.list} Requests <span class="count">${S.items.length}</span></button>`
+  $('#main').innerHTML = SCREENS[S.view]()
+  document.body.classList.toggle('arch', S.arch)
+  $('#btn-arch').classList.toggle('on', S.arch)
+  renderGuide()
+}
+
+function renderGuide() {
+  if (S.guide < 0) { $('#guide').innerHTML = ''; return }
+  const g = GUIDE[S.guide]
+  const last = S.guide === GUIDE.length - 1
+  $('#guide').innerHTML = `<div class="guide ${S.guideMin ? 'min' : ''}">
+    <div class="gh"><span>Demo guide · ${S.guide + 1} of ${GUIDE.length}</span>
+      <button class="x" data-action="guide-min" title="Minimise">${S.guideMin ? '&#9650;' : '&#9660;'}</button>
+      <button class="x" data-action="guide-close" title="Close">&times;</button></div>
+    <div class="gt">${g.t}</div>
+    <div class="gb">${g.b}${g.where ? `<div class="where">${g.where}</div>` : ''}</div>
+    <div class="gf"><button class="btn" data-action="guide-prev" ${S.guide ? '' : 'disabled'}>Back</button>
+      <span class="prog">${GUIDE.map((_, i) => `<i class="${i <= S.guide ? 'on' : ''}"></i>`).join('')}</span>
+      <button class="btn primary" data-action="guide-next">${last ? 'Finish' : 'Next'}</button></div>
+  </div>`
+}
+
+function guideGo(i) {
+  S.guide = i; S.guideMin = false
+  GUIDE[i].go()
+  render()
+  const sel = GUIDE[i].hl
+  if (sel) setTimeout(() => { const el = $(sel); if (el) { el.scrollIntoView({ block: 'nearest' }); el.classList.add('pulse'); setTimeout(() => el.classList.remove('pulse'), 4300) } }, 60)
+}
+
+// Every control says what it does with data-action; one listener handles them all.
+const ACTIONS = {
+  nav: (el) => nav(el.dataset.view),
+  filter: (el) => { S.filter = el.dataset.f; render() },
+  open: (el) => open(el.dataset.id),
+  back: () => nav('list'),
+  done: () => { const i = S.items.find((x) => x.id === S.selected); i.status = 'done'; i.log.push(['Done', 'You', 'just now']); render(); toast(i.id + ' marked done') },
+  arch: () => { S.arch = !S.arch; render() },
+  'guide-open': () => guideGo(Math.max(0, S.guide)),
+  'guide-next': () => (S.guide === GUIDE.length - 1 ? ((S.guide = -1), render()) : guideGo(S.guide + 1)),
+  'guide-prev': () => guideGo(Math.max(0, S.guide - 1)),
+  'guide-min': () => { S.guideMin = !S.guideMin; renderGuide() },
+  'guide-close': () => { S.guide = -1; render() },
+  reset: () => { const g = S.guide; S = initState(); if (g < 0) { S.guide = -1; render() } else guideGo(0); toast('Demo reset') },
+}
+document.addEventListener('click', (e) => {
+  const el = e.target.closest('[data-action]')
+  if (el && ACTIONS[el.dataset.action]) ACTIONS[el.dataset.action](el)
+})
+
+S = initState()
+guideGo(0)
+</script>
+</body>
+</html>

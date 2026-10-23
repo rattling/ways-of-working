@@ -1,0 +1,716 @@
+<!doctype html>
+<!--
+  Example mock with a guided tour, from /ways:mock: a grants review and approval workflow.
+
+  What it's for:    Harbour Arts Trust (fictional) gives small grants (£500 to £5,000) to local arts groups and runs it
+                    from a shared inbox and a spreadsheet. This mock settles what the replacement looks like, and which
+                    part has to be built: everything is a standard low-code platform except one custom screen.
+  Where the data is from: made up for this example. 12 fictional applications, groups and people, including the awkward
+                    ones: a missing budget (HAT-104), a duplicate (HAT-106), one over the limit (HAT-107), a very long
+                    group name (HAT-102), assessors who disagree (HAT-102), one still waiting for its second assessor
+                    (HAT-108), one with no phone number (HAT-103), and a late one that rolls into the next round (HAT-111).
+  Decisions it settles (the guide has a step per decision):
+    1. One record per application, with a status and assessors, instead of email threads.
+    2. Incomplete applications (no budget, over the limit, duplicates) are caught at the door, not by the panel.
+    3. Scoring is the only custom part: the weighted, two-assessor rule doesn't fit a standard form.
+    4. Disagreement between assessors (more than 2 points on a criterion) is flagged, not averaged away; a comment is required.
+    5. The panel decides against the real budget, with a running total showing what fits.
+    6. Every decision is kept on the record with who and why.
+    7. Decision letters come from the approved record only, through a standard document template.
+  Rounds:           round 1, first draft for the example pack.
+-->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Harbour Arts Trust grants (mock)</title>
+<style>
+:root{--ink:#18212b;--ink2:#3a4654;--muted:#667281;--line:#e2e6eb;--line2:#eef1f4;--bg:#f3f5f8;--card:#fff;
+  --accent:#0e6b84;--accent2:#e6f3f6;--navy:#10283a;--std:#0969da;--custom:#8250df;--banner:#fff8c5;
+  --ok:#1a7f37;--okbg:#e7f5ea;--warn:#9a6700;--warnbg:#fff4d6;--bad:#b42318;--badbg:#fdecea;--r:8px}
+*{box-sizing:border-box}
+body{margin:0;font:14px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;color:var(--ink);background:var(--bg)}
+button{font:inherit;cursor:pointer;color:inherit}
+h1,h2,h3{margin:0;line-height:1.25}
+h1{font-size:22px;font-weight:650}
+h2{font-size:15px;font-weight:650}
+h3{font-size:12px;font-weight:650;text-transform:uppercase;letter-spacing:.05em;color:var(--muted)}
+.ic{flex:none;vertical-align:-3px}
+.muted{color:var(--muted)}.small{font-size:12.5px}
+.btn{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);background:var(--card);border-radius:6px;padding:6px 12px;font-weight:500;white-space:nowrap}
+.btn:hover{background:var(--line2)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+.btn.primary:hover{background:#0b5a6f}
+.btn.danger{color:var(--bad)}
+.btn.on{background:var(--accent2);border-color:var(--accent);color:var(--accent)}
+.btn.sm{padding:3px 9px;font-size:13px}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+.link{border:0;background:none;padding:0;color:var(--accent);font-weight:500}
+
+/* The banner: says it's a mock, and holds the three demo controls. */
+.banner{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:5px 16px;background:var(--banner);border-bottom:1px solid #e7d87a;font-size:13px}
+.banner .sp{flex:1}
+.banner .btn{padding:3px 10px;font-size:13px}
+.banner .btn.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+.archkey{display:none;gap:12px}
+body.arch .archkey{display:flex}
+.archkey i{display:inline-block;width:11px;height:11px;border-radius:3px;margin-right:4px;vertical-align:-1px}
+
+/* App chrome */
+.appbar{display:flex;align-items:center;gap:14px;height:52px;padding:0 18px;background:var(--navy);color:#fff}
+.logo{display:flex;align-items:center;gap:10px;font-weight:650;font-size:15px}
+.logo b{display:grid;place-items:center;width:30px;height:30px;border-radius:7px;background:#2bb3c9;color:var(--navy);font-size:13px}
+.logo span{opacity:.6;font-weight:400}
+.appbar .sp{flex:1}
+.who{display:flex;align-items:center;gap:9px;font-size:13px}
+.who small{display:block;opacity:.65;font-size:11.5px}
+.av{display:inline-grid;place-items:center;width:28px;height:28px;border-radius:50%;font-size:11px;font-weight:650;color:#fff;flex:none}
+.av.s{width:22px;height:22px;font-size:9.5px}
+.shell{display:flex;min-height:calc(100vh - 52px - 31px)}
+.side{width:224px;flex:none;background:var(--card);border-right:1px solid var(--line);padding:14px 10px}
+.side .nv{display:flex;align-items:center;gap:10px;width:100%;border:0;background:none;padding:8px 10px;border-radius:6px;color:var(--ink2);font-weight:500;text-align:left}
+.side .nv:hover{background:var(--line2)}
+.side .nv.on{background:var(--accent2);color:var(--accent)}
+.side .nv .ct{margin-left:auto;font-size:11.5px;background:var(--line2);color:var(--muted);border-radius:10px;padding:0 7px}
+.side .nv.on .ct{background:#fff}
+.side h3{padding:16px 10px 6px}
+.side .rnd{margin:4px 10px;font-size:12.5px;color:var(--muted)}
+.mini{height:6px;border-radius:3px;background:var(--line);margin-top:6px;overflow:hidden}
+.mini i{display:block;height:100%;background:var(--accent)}
+main{flex:1;min-width:0;padding:22px 28px 120px;max-width:1320px}
+
+.cmdbar{display:flex;align-items:flex-end;gap:12px;margin-bottom:16px}
+.cmdbar .tt{flex:1}
+.cmdbar .tt p{margin:3px 0 0;color:var(--muted)}
+.crumb{font-size:12.5px;color:var(--muted);margin-bottom:6px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);margin-bottom:16px}
+.card>.hd{display:flex;align-items:center;gap:8px;padding:12px 16px;border-bottom:1px solid var(--line2)}
+.card>.hd h2{flex:1}
+.card>.bd{padding:14px 16px}
+
+.chips{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
+.chip{border:1px solid var(--line);background:var(--card);border-radius:14px;padding:3px 11px;font-size:13px;color:var(--ink2)}
+.chip b{font-weight:600;color:var(--muted);margin-left:4px}
+.chip.on{background:var(--ink);border-color:var(--ink);color:#fff}
+.chip.on b{color:#cfd6de}
+
+table{width:100%;border-collapse:collapse}
+th{text-align:left;font-size:12px;font-weight:600;color:var(--muted);padding:9px 12px;border-bottom:1px solid var(--line);background:#fafbfc;white-space:nowrap}
+th button{border:0;background:none;padding:0;font-weight:600;color:inherit;display:inline-flex;gap:4px;align-items:center}
+th .ar{opacity:.35}th.on .ar{opacity:1;color:var(--accent)}
+td{padding:10px 12px;border-bottom:1px solid var(--line2);vertical-align:top}
+tr.row{cursor:pointer}
+tr.row:hover td{background:#f7fafc}
+.num{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+.gname{font-weight:600;max-width:360px}
+.gsub{font-size:12.5px;color:var(--muted)}
+.pill{display:inline-flex;align-items:center;gap:5px;border-radius:12px;padding:1px 9px;font-size:12px;font-weight:600;white-space:nowrap}
+.pill::before{content:"";width:6px;height:6px;border-radius:50%;background:currentColor}
+.p-new{background:#e8f0fe;color:#1a56c4}.p-incomplete{background:var(--warnbg);color:var(--warn)}
+.p-duplicate{background:#eef0f3;color:#57606a}.p-ineligible{background:var(--badbg);color:var(--bad)}
+.p-inscoring{background:#efeafd;color:#6a3fc4}.p-scored{background:#e3f4f6;color:#0b6577}
+.p-approved{background:var(--okbg);color:var(--ok)}.p-declined{background:var(--badbg);color:var(--bad)}
+.miss{display:inline-block;border:1px dashed #d4a72c;color:var(--warn);background:var(--warnbg);border-radius:4px;padding:0 6px;font-size:12px;font-weight:600}
+.people{display:flex;flex-direction:column;gap:3px;font-size:13px}
+.people span{display:flex;align-items:center;gap:6px}
+.empty{padding:44px 16px;text-align:center;color:var(--muted)}
+.empty b{display:block;color:var(--ink);font-size:15px;margin-bottom:4px}
+
+/* Record */
+.rhead{display:flex;align-items:flex-start;gap:14px;margin-bottom:16px}
+.rhead .tt{flex:1}
+.rhead .meta{display:flex;gap:12px;align-items:center;margin-top:6px;color:var(--muted);font-size:13px}
+.alert{display:flex;gap:10px;padding:11px 14px;border-radius:var(--r);margin-bottom:16px;border:1px solid}
+.alert.warn{background:var(--warnbg);border-color:#f1d98b;color:#6b4a00}
+.alert.bad{background:var(--badbg);border-color:#f4c1bb;color:#8a1c12}
+.alert.ok{background:var(--okbg);border-color:#b7e1c1;color:#165c2b}
+.alert.info{background:#eef0f3;border-color:#d8dde3;color:var(--ink2)}
+.cols{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:16px;align-items:start}
+.sec{padding:14px 16px;border-bottom:1px solid var(--line2)}
+.sec:last-child{border-bottom:0}
+.fields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px 20px;margin-top:10px}
+.fields .w{grid-column:1/-1}
+.fl label{display:block;font-size:12px;color:var(--muted);margin-bottom:2px}
+.fl div{padding:6px 9px;border:1px solid var(--line);border-radius:5px;background:#fbfcfd;min-height:32px}
+.chk{display:flex;gap:9px;padding:7px 0;align-items:flex-start}
+.chk .ic{margin-top:2px}
+.c-ok{color:var(--ok)}.c-bad{color:var(--bad)}.c-na{color:var(--muted)}
+.file{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--line2)}
+.file:last-child{border-bottom:0}
+.file .fi{display:grid;place-items:center;width:30px;height:34px;border-radius:4px;background:#eef3f7;color:var(--accent);font-size:9px;font-weight:700}
+.file div{flex:1;min-width:0}
+.tl{list-style:none;margin:0;padding:0}
+.tl li{position:relative;padding:0 0 16px 26px}
+.tl li::before{content:"";position:absolute;left:7px;top:6px;width:9px;height:9px;border-radius:50%;background:#fff;border:2px solid var(--accent)}
+.tl li::after{content:"";position:absolute;left:12px;top:19px;bottom:0;width:1px;background:var(--line)}
+.tl li:last-child::after{display:none}
+.tl li.new::before{background:var(--accent)}
+.tl .when{font-size:12px;color:var(--muted)}
+.mail{display:flex;gap:10px;padding:8px 0;border-bottom:1px solid var(--line2)}
+.mail:last-child{border-bottom:0}
+
+/* Scoring */
+.sgrid{display:grid;grid-template-columns:240px minmax(0,1fr);gap:16px;align-items:start}
+.pick{display:block;width:100%;text-align:left;border:0;border-bottom:1px solid var(--line2);background:none;padding:10px 14px}
+.pick:hover{background:#f7fafc}
+.pick.on{background:var(--accent2);box-shadow:inset 3px 0 0 var(--accent)}
+.pick .gname{font-size:13.5px}
+.score-top{display:grid;grid-template-columns:minmax(0,1fr) 250px;gap:0}
+.score-top>div:first-child{border-right:1px solid var(--line2)}
+@media(max-width:1600px){.score-top{grid-template-columns:1fr}.score-top>div:first-child{border-right:0;border-bottom:1px solid var(--line2)}}
+.crit b{display:block}
+.wt{display:inline-block;margin-top:3px;font-size:11.5px;font-weight:600;color:var(--accent);background:var(--accent2);border-radius:4px;padding:0 6px}
+.seg{display:inline-flex;gap:2px;vertical-align:middle}
+.seg button{width:19px;height:24px;border:1px solid var(--line);background:#fff;border-radius:3px;font-size:10.5px;padding:0;color:var(--muted)}
+.seg button.f{background:var(--accent);border-color:var(--accent);color:#fff}
+.seg.b button.f{background:#2a8fa6;border-color:#2a8fa6}
+.seg button:disabled{cursor:not-allowed}
+.sv{display:inline-block;width:28px;text-align:right;font-weight:650;font-variant-numeric:tabular-nums}
+.gap{font-weight:650;font-variant-numeric:tabular-nums}
+tr.diff td{background:#fff8ec}
+tr.diff .gap{color:var(--bad)}
+.big{font-size:44px;font-weight:700;line-height:1;font-variant-numeric:tabular-nums;color:var(--accent)}
+.big small{font-size:16px;color:var(--muted);font-weight:500}
+.meter{height:8px;border-radius:4px;background:var(--line2);margin:10px 0 14px;overflow:hidden}
+.meter i{display:block;height:100%;background:linear-gradient(90deg,#2bb3c9,var(--accent))}
+.kv{display:flex;justify-content:space-between;padding:4px 0;font-size:13px}
+.kv b{font-variant-numeric:tabular-nums}
+textarea{width:100%;min-height:84px;font:inherit;padding:8px 10px;border:1px solid var(--line);border-radius:6px;resize:vertical}
+textarea.err{border-color:var(--bad);box-shadow:0 0 0 3px #fdecea}
+.errmsg{color:var(--bad);font-size:13px;margin-top:6px;display:flex;gap:6px}
+.req{color:var(--bad)}
+
+/* Panel */
+.bstats{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:12px}
+.bstats div small{display:block;color:var(--muted);font-size:12px}
+.bstats div b{font-size:20px;font-variant-numeric:tabular-nums}
+.bbar{position:relative;height:16px;border-radius:8px;background:var(--line2);overflow:hidden;display:flex}
+.bbar .a{background:var(--ok)}
+.bbar .p{background:repeating-linear-gradient(45deg,#9fd3dd 0 6px,#bfe3ea 6px 12px)}
+.legend{display:flex;gap:16px;margin-top:8px;font-size:12px;color:var(--muted)}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:5px;vertical-align:-1px}
+tr.line td{padding:4px 12px;background:#fff5f4;color:var(--bad);font-size:12px;font-weight:600;border-top:2px dashed #e99c94;border-bottom:2px dashed #e99c94}
+tr.out td{color:var(--muted)}
+.rank{display:inline-grid;place-items:center;width:24px;height:24px;border-radius:50%;background:var(--line2);font-weight:650;font-size:12px}
+.flag{display:inline-flex;gap:4px;align-items:center;font-size:12px;font-weight:600;color:var(--bad);background:var(--badbg);border-radius:4px;padding:0 6px}
+.fit{font-size:12.5px;font-weight:600}
+.fit.y{color:var(--ok)}.fit.n{color:var(--bad)}
+.acts{display:flex;gap:6px}
+
+/* Letter */
+.lgrid{display:grid;grid-template-columns:240px minmax(0,1fr);gap:16px;align-items:start}
+.paper{background:#fff;width:100%;max-width:720px;margin:0 auto;padding:56px 64px;box-shadow:0 1px 3px rgba(0,0,0,.08),0 8px 28px rgba(0,0,0,.08);border-radius:2px;font:14.5px/1.6 Georgia,"Times New Roman",serif;color:#222}
+.lh{display:flex;justify-content:space-between;align-items:flex-start;border-bottom:2px solid var(--navy);padding-bottom:14px;margin-bottom:28px;font-family:system-ui,sans-serif}
+.lh .nm{font-size:19px;font-weight:700;color:var(--navy);letter-spacing:.01em}
+.lh .nm small{display:block;font-size:11.5px;font-weight:400;color:var(--muted);letter-spacing:.08em;text-transform:uppercase}
+.lh address{font-style:normal;font-size:11.5px;color:var(--muted);text-align:right;line-height:1.5}
+.paper p{margin:0 0 12px}
+.paper .to{margin-bottom:22px}
+.paper .ref{font-family:system-ui,sans-serif;font-size:12px;color:var(--muted);margin-bottom:18px}
+.paper .subj{font-weight:700;margin-bottom:14px}
+.paper ul{margin:0 0 12px;padding-left:20px}
+.sig{margin-top:28px}
+.sig .sn{font-family:"Brush Script MT","Segoe Script",cursive;font-size:26px;color:var(--navy);line-height:1.1}
+.lfoot{margin-top:40px;padding-top:10px;border-top:1px solid #ddd;font:11px/1.4 system-ui,sans-serif;color:#888}
+.paper.showmf .mf{background:#fff1b8;box-shadow:0 0 0 2px #fff1b8;border-radius:2px}
+
+/* Toast */
+#toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);z-index:60}
+#toast div{background:var(--ink);color:#fff;padding:9px 16px;border-radius:6px;box-shadow:0 6px 20px rgba(0,0,0,.25);font-size:13.5px}
+
+/* Show architecture: outline and label each part by how it's built. */
+body.arch [data-arch]{position:relative;outline:2px dashed var(--std);outline-offset:2px}
+body.arch [data-arch="custom"]{outline-color:var(--custom);outline-style:solid;outline-width:3px}
+body.arch [data-arch]::after{content:attr(data-arch-label);position:absolute;top:-10px;right:8px;font:600 11px/1.5 system-ui,sans-serif;padding:1px 7px;border-radius:4px;background:var(--std);color:#fff;white-space:nowrap;z-index:5;pointer-events:none}
+body.arch [data-arch="custom"]::after{background:var(--custom)}
+
+/* The guide: bottom right, minimisable. */
+.guide{position:fixed;right:20px;bottom:20px;width:min(370px,calc(100vw - 40px));background:var(--card);border-radius:10px;border-top:4px solid var(--accent);box-shadow:0 12px 36px rgba(16,40,58,.28);z-index:50}
+.guide .gh{display:flex;align-items:center;gap:8px;padding:10px 14px 2px;font-size:11.5px;font-weight:600;color:var(--accent);text-transform:uppercase;letter-spacing:.05em}
+.guide .gh span{flex:1}
+.guide .gt{padding:2px 14px;font-weight:650;font-size:16px}
+.guide .gb{padding:4px 14px;font-size:13.5px;color:var(--ink2)}
+.guide .where{margin-top:9px;padding:6px 9px;border-radius:5px;background:var(--bg);font-size:12.5px;color:var(--muted)}
+.guide .gf{display:flex;align-items:center;gap:6px;padding:10px 14px 12px}
+.guide .prog{flex:1;display:flex;gap:3px}
+.guide .prog i{flex:1;height:4px;border-radius:2px;background:var(--line)}
+.guide .prog i.on{background:var(--accent)}
+.guide.min .gt,.guide.min .gb,.guide.min .gf{display:none}
+.x{border:0;background:none;color:var(--muted);font-size:16px;padding:0 4px}
+.pulse{animation:pulse 1.4s ease-out 3}
+@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(14,107,132,.6)}100%{box-shadow:0 0 0 16px rgba(14,107,132,0)}}
+
+@page{size:A4 portrait;margin:16mm}
+@media print{.banner,.guide,.appbar,.side,.cmdbar,.no-print,#toast{display:none!important}
+  body{background:#fff}.shell{display:block}main{padding:0}.lgrid{display:block}.paper{box-shadow:none;padding:0;max-width:none}.paper .mf{background:none!important;box-shadow:none!important}}
+</style>
+</head>
+<body>
+<div class="banner">
+  <b>Mock: not the build.</b><span>Harbour Arts Trust is fictional; every group, person and amount is made up.</span>
+  <span class="archkey"><span><i style="background:var(--std)"></i>Standard low-code platform</span><span><i style="background:var(--custom)"></i>Custom</span></span>
+  <span class="sp"></span>
+  <button class="btn" id="btn-arch" data-action="arch">Show architecture</button>
+  <button class="btn" data-action="guide-open">Demo guide</button>
+  <button class="btn" data-action="reset">Reset demo</button>
+</div>
+<header class="appbar">
+  <div class="logo"><b>HA</b>Harbour Arts Trust <span>Grants</span></div>
+  <span class="sp"></span>
+  <div class="who"><span class="av" style="background:#c2410c">HM</span><div>Helen Marchetti<small>Grants officer · panel chair</small></div></div>
+</header>
+<div class="shell">
+  <nav class="side" id="nav" data-arch="std" data-arch-label="Standard low-code app"></nav>
+  <main id="main"></main>
+</div>
+<div id="guide"></div>
+<div id="toast"></div>
+
+<script type="application/json" id="data">
+{"round": {"name": "Spring 2026", "budget": 12000, "closes": "31 Mar 2026", "panel": "12 May 2026"},
+ "criteria": [
+  {"name": "Artistic quality", "desc": "Clear idea, skilled people, worth seeing", "weight": 30},
+  {"name": "Community benefit", "desc": "Who takes part, who it reaches", "weight": 30},
+  {"name": "Deliverability", "desc": "Realistic plan, venue and dates", "weight": 20},
+  {"name": "Value for money", "desc": "Budget adds up, other funding", "weight": 20}],
+ "people": {"Tomasz Wierzbicki": "#2563eb", "Ama Owusu-Bennett": "#0f766e", "Gareth Lloyd-Pryce": "#7c3aed", "Helen Marchetti": "#c2410c"},
+ "apps": [
+  {"id": "HAT-101", "group": "Saltmarsh Community Choir", "legal": "Unincorporated group", "contact": "Priya Nandakumar", "email": "priya@saltmarshchoir.example.org", "phone": "07700 900 114", "address": ["St Brannoc's Church Hall", "Marsh Road", "Harbourmouth HB3 1QE"],
+   "project": "Songs of the Salt Pans: a new community song cycle", "summary": "Eight workshops and two free concerts setting local memories of the salt works to music, with the U3A and two primary schools.", "start": "1 Jul 2026", "end": "30 Nov 2026",
+   "amount": 2400, "total": 3900, "round": "Spring 2026", "submitted": "14 Mar 2026", "status": "Scored", "assessors": ["Ama Owusu-Bennett", "Tomasz Wierzbicki"],
+   "scores": {"A": [7, 8, 7, 6], "B": [8, 8, 6, 7]},
+   "files": [{"n": "Application form.pdf", "s": "212 KB"}, {"n": "Budget 2026.xlsx", "s": "31 KB"}, {"n": "Letter of support - Marsh Road Primary.pdf", "s": "88 KB"}],
+   "history": [{"when": "14 Mar 2026, 19:42", "who": "Priya Nandakumar", "what": "Submitted the application through the web form"}, {"when": "14 Mar 2026, 19:42", "who": "System", "what": "Checks passed: budget included, amount within limit, no duplicate"}, {"when": "2 Apr 2026, 09:10", "who": "Helen Marchetti", "what": "Assigned to Ama Owusu-Bennett and Tomasz Wierzbicki"}, {"when": "21 Apr 2026, 16:05", "who": "Ama Owusu-Bennett, Tomasz Wierzbicki", "what": "Scores saved: combined 7.25. \"Strong partners, schools confirmed. Concert venue costs look light.\""}],
+   "emails": [{"when": "14 Mar 2026", "to": "priya@saltmarshchoir.example.org", "subject": "We've received your application (HAT-101)"}]},
+  {"id": "HAT-102", "group": "The Old Ropeworks Young People's Theatre, Puppetry and Shadow-Play Collective (Tidewater and Lower Quay)", "legal": "Charitable incorporated organisation", "contact": "Declan Fairweather-Oyelaran", "email": "declan@oldropeworks.example.org", "phone": "01632 960 418", "address": ["Unit 4, The Old Ropeworks", "Tidewater Lane", "Harbourmouth HB2 4RT"],
+   "project": "The Lantern Tide: a shadow-puppet show made by 11 to 18 year olds", "summary": "A 12-week devising programme ending in four outdoor shadow-puppet performances on the Lower Quay, with BSL-interpreted shows.", "start": "6 Jun 2026", "end": "26 Sep 2026",
+   "amount": 4800, "total": 7350, "round": "Spring 2026", "submitted": "29 Mar 2026", "status": "Scored", "assessors": ["Tomasz Wierzbicki", "Ama Owusu-Bennett"],
+   "scores": {"A": [9, 9, 6, 7], "B": [5, 8, 6, 6]},
+   "files": [{"n": "Application form.pdf", "s": "340 KB"}, {"n": "Budget and match funding.xlsx", "s": "46 KB"}, {"n": "Safeguarding policy 2025.pdf", "s": "1.2 MB"}, {"n": "Photos from last year's show.zip", "s": "18.4 MB"}],
+   "history": [{"when": "29 Mar 2026, 23:51", "who": "Declan Fairweather-Oyelaran", "what": "Submitted the application through the web form"}, {"when": "29 Mar 2026, 23:51", "who": "System", "what": "Checks passed: budget included, amount within limit, no duplicate"}, {"when": "2 Apr 2026, 09:14", "who": "Helen Marchetti", "what": "Assigned to Tomasz Wierzbicki and Ama Owusu-Bennett"}, {"when": "24 Apr 2026, 11:30", "who": "Tomasz Wierzbicki, Ama Owusu-Bennett", "what": "Scores saved: combined 7.15. Assessors differ on Artistic quality (9 and 5), flagged for the panel. \"Tomasz: ambitious and well led. Ama: the show is unclear beyond the workshops.\""}],
+   "emails": [{"when": "29 Mar 2026", "to": "declan@oldropeworks.example.org", "subject": "We've received your application (HAT-102)"}]},
+  {"id": "HAT-103", "group": "Gull Street Printmakers", "legal": "Community interest company", "contact": "Morwenna Tregear", "email": "hello@gullstreetprint.example.org", "phone": null, "address": ["12 Gull Street", "Harbourmouth HB1 2AN"],
+   "project": "Open press: free Saturday printmaking for adults", "summary": "Twenty free drop-in Saturday sessions on a donated etching press, aimed at adults who have never made art.", "start": "4 Jul 2026", "end": "19 Dec 2026",
+   "amount": 1250, "total": 1900, "round": "Spring 2026", "submitted": "20 Mar 2026", "status": "Scored", "assessors": ["Gareth Lloyd-Pryce", "Ama Owusu-Bennett"],
+   "scores": {"A": [6, 5, 8, 8], "B": [6, 6, 7, 8]},
+   "files": [{"n": "Application form.pdf", "s": "198 KB"}, {"n": "Budget.pdf", "s": "54 KB"}],
+   "history": [{"when": "20 Mar 2026, 12:03", "who": "Morwenna Tregear", "what": "Submitted the application through the web form"}, {"when": "20 Mar 2026, 12:03", "who": "System", "what": "Checks passed: budget included, amount within limit, no duplicate"}, {"when": "2 Apr 2026, 09:16", "who": "Helen Marchetti", "what": "Assigned to Gareth Lloyd-Pryce and Ama Owusu-Bennett"}, {"when": "19 Apr 2026, 14:22", "who": "Gareth Lloyd-Pryce, Ama Owusu-Bennett", "what": "Scores saved: combined 6.55. \"Cheap and well run; reach is modest.\""}],
+   "emails": [{"when": "20 Mar 2026", "to": "hello@gullstreetprint.example.org", "subject": "We've received your application (HAT-103)"}]},
+  {"id": "HAT-104", "group": "Quayside Brass Band", "legal": "Unincorporated group", "contact": "Bill Cassidy", "email": "bill.cassidy@quaysidebrass.example.org", "phone": "07700 900 532", "address": ["The Bandroom, Ferry Steps", "Harbourmouth HB2 9DL"],
+   "project": "New instruments for the youth band", "summary": "Two tenor horns and a euphonium so the youth band can grow from 9 to 14 players.", "start": "1 Jun 2026", "end": "31 Aug 2026",
+   "amount": null, "total": null, "round": "Spring 2026", "submitted": "30 Mar 2026", "status": "Incomplete", "assessors": [],
+   "note": "Returned automatically on submission: no budget was attached and no amount entered. It was not sent to assessors. The band can resubmit before the next round closes.",
+   "files": [{"n": "Application form.pdf", "s": "176 KB"}],
+   "history": [{"when": "30 Mar 2026, 21:17", "who": "Bill Cassidy", "what": "Submitted the application through the web form"}, {"when": "30 Mar 2026, 21:17", "who": "System", "what": "Check failed: no budget and no amount. Status set to Incomplete and returned to the applicant"}],
+   "emails": [{"when": "30 Mar 2026", "to": "bill.cassidy@quaysidebrass.example.org", "subject": "Your application needs a budget before we can assess it (HAT-104)"}]},
+  {"id": "HAT-105", "group": "Harbourlight Film Club", "legal": "Unincorporated group", "contact": "Shirin Haddad", "email": "shirin@harbourlightfilm.example.org", "phone": "07700 900 287", "address": ["c/o The Mariners' Institute", "Quay Parade", "Harbourmouth HB1 5EW"],
+   "project": "Outdoor screenings on the Quay", "summary": "Six free outdoor film nights in August, one programmed by each of six local youth and community groups.", "start": "1 Aug 2026", "end": "31 Aug 2026",
+   "amount": 3000, "total": 4600, "round": "Spring 2026", "submitted": "17 Mar 2026", "status": "Scored", "assessors": ["Gareth Lloyd-Pryce", "Tomasz Wierzbicki"],
+   "scores": {"A": [5, 7, 7, 6], "B": [6, 6, 8, 6]},
+   "files": [{"n": "Application form.pdf", "s": "205 KB"}, {"n": "Budget.xlsx", "s": "22 KB"}, {"n": "Screen licence quote.pdf", "s": "64 KB"}],
+   "history": [{"when": "17 Mar 2026, 10:48", "who": "Shirin Haddad", "what": "Submitted the application through the web form"}, {"when": "17 Mar 2026, 10:48", "who": "System", "what": "Checks passed: budget included, amount within limit, no duplicate"}, {"when": "2 Apr 2026, 09:18", "who": "Helen Marchetti", "what": "Assigned to Gareth Lloyd-Pryce and Tomasz Wierzbicki"}, {"when": "22 Apr 2026, 17:40", "who": "Gareth Lloyd-Pryce, Tomasz Wierzbicki", "what": "Scores saved: combined 6.30. \"Popular and well planned; mostly film hire costs.\""}],
+   "emails": [{"when": "17 Mar 2026", "to": "shirin@harbourlightfilm.example.org", "subject": "We've received your application (HAT-105)"}]},
+  {"id": "HAT-106", "group": "Harbourlight Film Club", "legal": "Unincorporated group", "contact": "Shirin Haddad", "email": "shirin@harbourlightfilm.example.org", "phone": "07700 900 287", "address": ["c/o The Mariners' Institute", "Quay Parade", "Harbourmouth HB1 5EW"],
+   "project": "Outdoor screenings on the Quay", "summary": "Six free outdoor film nights in August (sent a second time).", "start": "1 Aug 2026", "end": "31 Aug 2026",
+   "amount": 3000, "total": 4600, "round": "Spring 2026", "submitted": "19 Mar 2026", "status": "Duplicate", "assessors": [], "dupOf": "HAT-105",
+   "note": "Same group and project as HAT-105, sent again two days later. Linked to HAT-105 and not scored twice; the applicant was told which one counts.",
+   "files": [{"n": "Application form (1).pdf", "s": "205 KB"}, {"n": "Budget.xlsx", "s": "22 KB"}],
+   "history": [{"when": "19 Mar 2026, 08:02", "who": "Shirin Haddad", "what": "Submitted the application through the web form"}, {"when": "19 Mar 2026, 08:02", "who": "System", "what": "Check failed: matches HAT-105 (same group and project title). Status set to Duplicate"}],
+   "emails": [{"when": "19 Mar 2026", "to": "shirin@harbourlightfilm.example.org", "subject": "You've already applied: we'll use HAT-105 (HAT-106)"}]},
+  {"id": "HAT-107", "group": "Northpier Dance Collective", "legal": "Community interest company", "contact": "Oluwaseun Adeyemi", "email": "seun@northpierdance.example.org", "phone": "01632 960 771", "address": ["Studio 2, Northpier Arcade", "Harbourmouth HB4 7PP"],
+   "project": "Pier to Pier: a summer dance festival", "summary": "A three-day festival of free dance classes and performances along the seafront.", "start": "17 Jul 2026", "end": "19 Jul 2026",
+   "amount": 7500, "total": 14200, "round": "Spring 2026", "submitted": "25 Mar 2026", "status": "Ineligible", "assessors": [],
+   "note": "Asks for £7,500; the most this fund gives is £5,000. Returned automatically with an invitation to reapply for up to £5,000.",
+   "files": [{"n": "Application form.pdf", "s": "290 KB"}, {"n": "Festival budget.xlsx", "s": "58 KB"}, {"n": "Programme draft.docx", "s": "112 KB"}],
+   "history": [{"when": "25 Mar 2026, 15:36", "who": "Oluwaseun Adeyemi", "what": "Submitted the application through the web form"}, {"when": "25 Mar 2026, 15:36", "who": "System", "what": "Check failed: £7,500 is over the £5,000 limit. Status set to Ineligible"}],
+   "emails": [{"when": "25 Mar 2026", "to": "seun@northpierdance.example.org", "subject": "Your request is over this fund's limit (HAT-107)"}]},
+  {"id": "HAT-108", "group": "Ferrybridge Ceramics Studio", "legal": "Unincorporated group", "contact": "Kit Lindqvist", "email": "kit@ferrybridgeclay.example.org", "phone": "07700 900 643", "address": ["The Old Tollhouse", "Ferrybridge", "Harbourmouth HB5 3TS"],
+   "project": "Clay for carers: a kiln and ten taster sessions", "summary": "A second-hand kiln and ten free taster sessions for unpaid carers, run with the Harbourmouth Carers' Network.", "start": "1 Jul 2026", "end": "31 Oct 2026",
+   "amount": 950, "total": 1400, "round": "Spring 2026", "submitted": "28 Mar 2026", "status": "In scoring", "assessors": ["Gareth Lloyd-Pryce", "Ama Owusu-Bennett"],
+   "scores": {"A": [7, 8, 8, 9], "B": [null, null, null, null]},
+   "files": [{"n": "Application form.pdf", "s": "187 KB"}, {"n": "Budget.pdf", "s": "41 KB"}, {"n": "Kiln quote.jpg", "s": "2.3 MB"}],
+   "history": [{"when": "28 Mar 2026, 13:20", "who": "Kit Lindqvist", "what": "Submitted the application through the web form"}, {"when": "28 Mar 2026, 13:20", "who": "System", "what": "Checks passed: budget included, amount within limit, no duplicate"}, {"when": "2 Apr 2026, 09:20", "who": "Helen Marchetti", "what": "Assigned to Gareth Lloyd-Pryce and Ama Owusu-Bennett"}, {"when": "18 Apr 2026, 10:12", "who": "Gareth Lloyd-Pryce", "what": "Scored as first assessor; waiting for the second"}],
+   "emails": [{"when": "28 Mar 2026", "to": "kit@ferrybridgeclay.example.org", "subject": "We've received your application (HAT-108)"}]},
+  {"id": "HAT-109", "group": "Little Anchor Storytellers", "legal": "Unincorporated group", "contact": "Rosa Penhaligon", "email": "rosa@littleanchor.example.org", "phone": "07700 900 905", "address": ["Harbourmouth Library", "Fore Street", "Harbourmouth HB1 1LB"],
+   "project": "Stories in the waiting room", "summary": "Volunteer storytellers in three GP and clinic waiting rooms, twice a month for a year, with new stories by local writers.", "start": "1 Jun 2026", "end": "31 May 2027",
+   "amount": 500, "total": 650, "round": "Spring 2026", "submitted": "8 Mar 2026", "status": "Scored", "assessors": ["Ama Owusu-Bennett", "Gareth Lloyd-Pryce"],
+   "scores": {"A": [8, 9, 8, 9], "B": [8, 9, 9, 8]},
+   "files": [{"n": "Application form.pdf", "s": "164 KB"}, {"n": "Budget.xlsx", "s": "18 KB"}, {"n": "Practice manager letter.pdf", "s": "72 KB"}],
+   "history": [{"when": "8 Mar 2026, 09:55", "who": "Rosa Penhaligon", "what": "Submitted the application through the web form"}, {"when": "8 Mar 2026, 09:55", "who": "System", "what": "Checks passed: budget included, amount within limit, no duplicate"}, {"when": "2 Apr 2026, 09:11", "who": "Helen Marchetti", "what": "Assigned to Ama Owusu-Bennett and Gareth Lloyd-Pryce"}, {"when": "15 Apr 2026, 12:47", "who": "Ama Owusu-Bennett, Gareth Lloyd-Pryce", "what": "Scores saved: combined 8.50. \"Small, clear, reaches people who'd never come to an arts event.\""}],
+   "emails": [{"when": "8 Mar 2026", "to": "rosa@littleanchor.example.org", "subject": "We've received your application (HAT-109)"}]},
+  {"id": "HAT-110", "group": "Wharfside Mural Project", "legal": "Community interest company", "contact": "Femi Ashworth", "email": "femi@wharfsidemural.example.org", "phone": "01632 960 239", "address": ["3 Coal Wharf", "Harbourmouth HB2 6WF"],
+   "project": "The Long Wall: a 40-metre mural on the coal wharf", "summary": "A mural designed with residents of the Wharfside estate, painted by two lead artists and 30 volunteers.", "start": "1 Aug 2026", "end": "30 Oct 2026",
+   "amount": 5000, "total": 11800, "round": "Spring 2026", "submitted": "31 Mar 2026", "status": "Scored", "assessors": ["Tomasz Wierzbicki", "Gareth Lloyd-Pryce"],
+   "scores": {"A": [7, 7, 5, 5], "B": [7, 6, 5, 6]},
+   "files": [{"n": "Application form.pdf", "s": "402 KB"}, {"n": "Budget.xlsx", "s": "39 KB"}, {"n": "Wall owner permission.pdf", "s": "95 KB"}, {"n": "Design sketches.pdf", "s": "6.8 MB"}],
+   "history": [{"when": "31 Mar 2026, 16:58", "who": "Femi Ashworth", "what": "Submitted the application through the web form"}, {"when": "31 Mar 2026, 16:58", "who": "System", "what": "Checks passed: budget included, amount within limit, no duplicate"}, {"when": "2 Apr 2026, 09:22", "who": "Helen Marchetti", "what": "Assigned to Tomasz Wierzbicki and Gareth Lloyd-Pryce"}, {"when": "25 Apr 2026, 09:05", "who": "Tomasz Wierzbicki, Gareth Lloyd-Pryce", "what": "Scores saved: combined 6.15. \"Good idea; £6,800 of match funding not yet confirmed.\""}],
+   "emails": [{"when": "31 Mar 2026", "to": "femi@wharfsidemural.example.org", "subject": "We've received your application (HAT-110)"}]},
+  {"id": "HAT-111", "group": "Eel Lane Folk Club", "legal": "Unincorporated group", "contact": "Jo Mabey", "email": "jo@eellanefolk.example.org", "phone": "07700 900 378", "address": ["The Ship Inn (back room)", "Eel Lane", "Harbourmouth HB3 8EL"],
+   "project": "Sea songs archive nights", "summary": "Monthly evenings recording older members singing local sea songs, with a free online archive.", "start": "1 Sep 2026", "end": "31 Mar 2027",
+   "amount": 1800, "total": 2100, "round": "Summer 2026", "submitted": "3 Apr 2026", "status": "New", "assessors": [],
+   "note": "Arrived after the Spring round closed, so it moved to the Summer 2026 round automatically. Not on this panel.",
+   "files": [{"n": "Application form.pdf", "s": "171 KB"}, {"n": "Budget.pdf", "s": "29 KB"}],
+   "history": [{"when": "3 Apr 2026, 20:30", "who": "Jo Mabey", "what": "Submitted the application through the web form"}, {"when": "3 Apr 2026, 20:30", "who": "System", "what": "Checks passed. Spring 2026 closed on 31 Mar 2026, so moved to Summer 2026"}],
+   "emails": [{"when": "3 Apr 2026", "to": "jo@eellanefolk.example.org", "subject": "We've received your application: it's in the Summer 2026 round (HAT-111)"}]},
+  {"id": "HAT-112", "group": "Tidemill Poetry Night", "legal": "Unincorporated group", "contact": "Anjali Mehta-Rowe", "email": "anjali@tidemillpoetry.example.org", "phone": "07700 900 816", "address": ["Tidemill Arts Café", "Mill Lane", "Harbourmouth HB3 2MM"],
+   "project": "Open mic and mentoring for new poets", "summary": "Ten open-mic nights with paid headline poets, each mentoring two first-time performers.", "start": "1 Sep 2026", "end": "30 Jun 2027",
+   "amount": 750, "total": 1150, "round": "Spring 2026", "submitted": "22 Mar 2026", "status": "Scored", "assessors": ["Ama Owusu-Bennett", "Tomasz Wierzbicki"],
+   "scores": {"A": [6, 7, 6, 7], "B": [7, 7, 6, 7]},
+   "files": [{"n": "Application form.pdf", "s": "158 KB"}, {"n": "Budget.xlsx", "s": "20 KB"}],
+   "history": [{"when": "22 Mar 2026, 18:11", "who": "Anjali Mehta-Rowe", "what": "Submitted the application through the web form"}, {"when": "22 Mar 2026, 18:11", "who": "System", "what": "Checks passed: budget included, amount within limit, no duplicate"}, {"when": "2 Apr 2026, 09:24", "who": "Helen Marchetti", "what": "Assigned to Ama Owusu-Bennett and Tomasz Wierzbicki"}, {"when": "20 Apr 2026, 15:33", "who": "Ama Owusu-Bennett, Tomasz Wierzbicki", "what": "Scores saved: combined 6.65. \"Well run, steady audience of about 40.\""}],
+   "emails": [{"when": "22 Mar 2026", "to": "anjali@tidemillpoetry.example.org", "subject": "We've received your application (HAT-112)"}]}
+ ]}
+</script>
+<script>
+const $ = (s) => document.querySelector(s)
+const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c])
+const DATA = JSON.parse($('#data').textContent)
+const ROUND = DATA.round
+const W = DATA.criteria.map((c) => c.weight)
+const STATUSES = ['All', 'New', 'Incomplete', 'Duplicate', 'Ineligible', 'In scoring', 'Scored', 'Approved', 'Declined']
+const CHAIR = 'Helen Marchetti'
+
+// All state lives here, so Reset is one line.
+let S
+const initState = () => ({ view: 'list', selected: null, apps: structuredClone(DATA.apps), filter: 'All', sort: { key: 'id', dir: 1 },
+  scoreId: 'HAT-108', comment: '', scoreErr: '', letterId: null, mf: true, toast: '', arch: false, guide: 0, guideMin: false })
+
+const ICONS = {
+  list: '<path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/>',
+  score: '<path d="M4 21v-7M4 10V3M12 21v-9M12 8V3M20 21v-5M20 12V3M1 14h6M9 8h6M17 16h6"/>',
+  panel: '<path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/>',
+  letter: '<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M16 13H8M16 17H8M10 9H8"/>',
+  mail: '<rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 6L2 7"/>',
+  ok: '<circle cx="12" cy="12" r="10"/><path d="m8 12 3 3 5-6"/>',
+  bad: '<circle cx="12" cy="12" r="10"/><path d="m15 9-6 6M9 9l6 6"/>',
+  na: '<circle cx="12" cy="12" r="10"/><path d="M8 12h8"/>',
+  warn: '<path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0zM12 9v4M12 17h.01"/>',
+  plus: '<path d="M12 5v14M5 12h14"/>', down: '<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/>',
+  print: '<path d="M6 9V2h12v7M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/>',
+  check: '<path d="M20 6 9 17l-5-5"/>', x: '<path d="M18 6 6 18M6 6l12 12"/>', back: '<path d="m15 18-6-6 6-6"/>',
+}
+const ic = (n, s = 16) => `<svg class="ic" width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${ICONS[n]}</svg>`
+
+// Helpers over the data.
+const fmt = (n) => (n == null ? '' : '£' + n.toLocaleString('en-GB'))
+const money = (n) => (n == null ? '<span class="miss">Missing</span>' : fmt(n))
+const pill = (s) => `<span class="pill p-${s.toLowerCase().replace(/ /g, '')}">${esc(s)}</span>`
+const initials = (n) => n.split(/[ -]/).filter(Boolean).map((w) => w[0]).slice(0, 2).join('')
+const av = (n, cls = 's') => `<span class="av ${cls}" style="background:${DATA.people[n] || '#667281'}">${initials(n)}</span>`
+const first = (n) => n.split(' ')[0]
+const getApp = (id) => S.apps.find((a) => a.id === id)
+const wscore = (arr) => (arr.some((v) => v == null) ? null : arr.reduce((s, v, i) => s + v * W[i], 0) / 100)
+const combined = (a) => { if (!a.scores) return null; const x = wscore(a.scores.A), y = wscore(a.scores.B); return x == null || y == null ? null : (x + y) / 2 }
+const sc = (n) => (n == null ? '–' : n.toFixed(2))
+const gaps = (a) => (a.scores ? DATA.criteria.map((c, i) => ({ c, i, a: a.scores.A[i], b: a.scores.B[i] })).filter((g) => g.a != null && g.b != null && Math.abs(g.a - g.b) > 2) : [])
+const decided = (a) => a.status === 'Approved' || a.status === 'Declined'
+const stamp = () => '12 May 2026, ' + new Date().toTimeString().slice(0, 5)
+const checks = (a) => [
+  { ok: a.amount != null, yes: 'Budget included', no: 'No budget or amount' },
+  { ok: a.amount == null ? null : a.amount >= 500 && a.amount <= 5000, yes: 'Amount within £500 to £5,000', no: `Asks for ${fmt(a.amount)}, over the £5,000 limit`, na: "Amount can't be checked without a budget" },
+  { ok: !a.dupOf, yes: 'Not already applied this round', no: `Same group and project as ${a.dupOf}` },
+  { ok: a.round === ROUND.name, yes: `Arrived before ${ROUND.name} closed`, no: `Arrived after ${ROUND.closes}: moved to ${a.round}` },
+]
+// The panel's ranked list: scored applications in this round, best first, with a running total against the budget.
+function ranked() {
+  const list = S.apps.filter((a) => a.round === ROUND.name && ['Scored', 'Approved', 'Declined'].includes(a.status) && combined(a) != null)
+    .sort((x, y) => combined(y) - combined(x))
+  let run = 0
+  return list.map((a, i) => { if (a.status !== 'Declined') run += a.amount; return { a, rank: i + 1, run, fits: run <= ROUND.budget } })
+}
+const approvedTotal = () => S.apps.filter((a) => a.status === 'Approved').reduce((s, a) => s + a.amount, 0)
+
+function renderNav() {
+  const n = (v, icon, label, ct) => `<button class="nv ${S.view === v || (v === 'list' && S.view === 'record') ? 'on' : ''}" data-action="nav" data-view="${v}">${ic(icon)}${label}${ct != null ? `<span class="ct">${ct}</span>` : ''}</button>`
+  const pct = Math.min(100, (approvedTotal() / ROUND.budget) * 100)
+  $('#nav').innerHTML = n('list', 'list', 'Applications', S.apps.length)
+    + n('score', 'score', 'Scoring', S.apps.filter((a) => a.status === 'In scoring').length)
+    + n('panel', 'panel', 'Panel', ranked().filter((r) => r.a.status === 'Scored').length)
+    + n('letter', 'letter', 'Letters', S.apps.filter((a) => a.status === 'Approved').length)
+    + `<h3>Current round</h3><div class="rnd"><b style="color:var(--ink)">${ROUND.name}</b><br>Closed ${ROUND.closes}<br>Panel ${ROUND.panel}
+       <div style="margin-top:8px">${fmt(approvedTotal())} of ${fmt(ROUND.budget)} approved</div><div class="mini"><i style="width:${pct}%"></i></div></div>`
+}
+
+const SCREENS = {
+  list: () => {
+    const count = (s) => (s === 'All' ? S.apps.length : S.apps.filter((a) => a.status === s).length)
+    const k = S.sort.key, d = S.sort.dir
+    const val = (a) => (k === 'amount' ? (a.amount == null ? Infinity : a.amount) : String(a[k]).toLowerCase())
+    const rows = S.apps.filter((a) => S.filter === 'All' || a.status === S.filter).sort((x, y) => (val(x) > val(y) ? d : val(x) < val(y) ? -d : 0))
+    const th = (key, label, cls = '') => `<th class="${cls} ${k === key ? 'on' : ''}"><button data-action="sort" data-key="${key}">${label}<span class="ar">${k === key && d < 0 ? '&#9660;' : '&#9650;'}</span></button></th>`
+    return `<div class="cmdbar"><div class="tt"><h1>Applications</h1><p>${ROUND.name} round · ${S.apps.filter((a) => a.round === ROUND.name).length} received · closed ${ROUND.closes}</p></div>
+      <button class="btn" data-action="toast" data-msg="Export to CSV is a standard platform feature.">${ic('down')}Export</button>
+      <button class="btn primary" data-action="toast" data-msg="Groups apply through the public web form; it creates the record here.">${ic('plus')}New application</button></div>
+    <div class="chips">${STATUSES.map((s) => `<button class="chip ${S.filter === s ? 'on' : ''}" data-action="filter" data-status="${s}">${s}<b>${count(s)}</b></button>`).join('')}</div>
+    <div class="card" id="app-table" data-arch="std" data-arch-label="Standard low-code app">
+      <table><thead><tr>${th('id', 'Ref')}${th('group', 'Group and project')}${th('amount', 'Requested', 'num')}${th('round', 'Round')}<th>Assessors</th>${th('status', 'Status')}</tr></thead>
+      <tbody>${rows.map((a) => `<tr class="row" data-action="open" data-id="${a.id}">
+        <td class="muted">${a.id}</td>
+        <td><div class="gname">${esc(a.group)}</div><div class="gsub">${esc(a.project)} · sent ${a.submitted}</div></td>
+        <td class="num">${money(a.amount)}</td><td>${esc(a.round)}</td>
+        <td><div class="people">${a.assessors.length ? a.assessors.map((p) => `<span>${av(p)}${esc(p)}</span>`).join('') : '<span class="muted">Not assigned</span>'}</div></td>
+        <td>${pill(a.status)}</td></tr>`).join('')}</tbody></table>
+      ${rows.length ? '' : `<div class="empty"><b>No applications are ${esc(S.filter)}</b>Applications appear here when they reach this status. <button class="link" data-action="filter" data-status="All">Show all</button></div>`}
+    </div>`
+  },
+
+  record: () => {
+    const a = getApp(S.selected)
+    const scorable = a.round === ROUND.name && ['In scoring', 'Scored', 'Approved', 'Declined'].includes(a.status)
+    const f = (label, v, w) => `<div class="fl ${w ? 'w' : ''}"><label>${label}</label><div>${v}</div></div>`
+    const tone = { Incomplete: 'warn', Ineligible: 'bad', Duplicate: 'info', New: 'info', Approved: 'ok', Declined: 'bad' }[a.status]
+    return `<div class="crumb"><button class="link" data-action="nav" data-view="list">Applications</button> / ${a.id}</div>
+    <div class="rhead"><div class="tt"><h1>${esc(a.group)}</h1><div class="meta">${pill(a.status)}<span>${a.id}</span><span>${esc(a.round)}</span><span>Sent ${a.submitted}</span></div></div>
+      <button class="btn" data-action="nav" data-view="list">${ic('back')}Back</button>
+      ${scorable ? `<button class="btn" data-action="score-pick" data-id="${a.id}">${ic('score')}Scores</button>` : ''}
+      ${a.status === 'Approved' ? `<button class="btn primary" data-action="letter" data-id="${a.id}">${ic('letter')}Decision letter</button>` : ''}</div>
+    ${a.note && tone ? `<div class="alert ${tone}">${ic(tone === 'ok' ? 'ok' : 'warn')}<div>${esc(a.note)}</div></div>` : ''}
+    <div class="cols"><div>
+      <div class="card" id="form" data-arch="std" data-arch-label="Standard low-code app">
+        <div class="sec"><h3>Applicant</h3><div class="fields">${f('Group', esc(a.group), 1)}${f('Legal status', esc(a.legal))}${f('Contact', esc(a.contact))}
+          ${f('Email', esc(a.email))}${f('Phone', a.phone ? esc(a.phone) : '<span class="miss">Not given</span>')}${f('Address', a.address.map(esc).join(', '), 1)}</div></div>
+        <div class="sec"><h3>Project</h3><div class="fields">${f('Title', esc(a.project), 1)}${f('Summary', esc(a.summary), 1)}${f('Starts', a.start)}${f('Ends', a.end)}</div></div>
+        <div class="sec"><h3>Request</h3><div class="fields">${f('Amount requested', money(a.amount))}${f('Total project cost', money(a.total))}
+          ${f('Assessors', a.assessors.length ? a.assessors.map(esc).join(' and ') : '<span class="muted">Not assigned</span>')}${f('Combined score', a.scores ? sc(combined(a)) + (gaps(a).length ? ' <span class="flag">Assessors differ</span>' : '') : '<span class="muted">Not scored</span>')}</div></div>
+      </div>
+      <div class="card" id="history" data-arch="std" data-arch-label="Standard low-code app"><div class="hd"><h2>History</h2><span class="muted small">${a.history.length} events · kept for 7 years</span></div>
+        <div class="bd"><ul class="tl">${a.history.slice().reverse().map((h, i) => `<li class="${i === 0 ? 'new' : ''}"><div class="when">${h.when}</div><div><b>${esc(h.who)}</b>: ${esc(h.what)}</div></li>`).join('')}</ul></div></div>
+    </div><div>
+      <div class="card" id="checks" data-arch="std" data-arch-label="Standard workflow"><div class="hd"><h2>Checks on submission</h2><span class="muted small">automatic</span></div>
+        <div class="bd">${checks(a).map((c) => `<div class="chk">${c.ok === true ? `<span class="c-ok">${ic('ok')}</span>${c.yes}` : c.ok === false ? `<span class="c-bad">${ic('bad')}</span><b>${esc(c.no)}</b>` : `<span class="c-na">${ic('na')}</span><span class="muted">${c.na}</span>`}</div>`).join('')}</div></div>
+      <div class="card"><div class="hd"><h2>Attachments</h2><span class="muted small">${a.files.length}</span></div><div class="bd" style="padding-top:4px;padding-bottom:4px">
+        ${a.files.map((x) => `<div class="file"><span class="fi">${x.n.split('.').pop().toUpperCase()}</span><div><div style="overflow-wrap:anywhere">${esc(x.n)}</div><div class="muted small">${x.s}</div></div></div>`).join('')}
+        ${a.amount == null ? '<div class="file"><span class="fi" style="color:var(--warn);background:var(--warnbg)">?</span><div><b>Budget</b><div class="muted small">Required, not attached</div></div></div>' : ''}</div></div>
+      <div class="card" id="emails" data-arch="std" data-arch-label="Standard workflow (email)"><div class="hd"><h2>Emails sent</h2></div><div class="bd" style="padding-top:4px;padding-bottom:4px">
+        ${a.emails.map((m) => `<div class="mail"><span class="muted">${ic('mail')}</span><div><div>${esc(m.subject)}</div><div class="muted small">${m.when} · to ${esc(m.to)}</div></div></div>`).join('')}</div></div>
+    </div></div>`
+  },
+
+  score: () => {
+    const list = S.apps.filter((a) => a.round === ROUND.name && ['In scoring', 'Scored', 'Approved', 'Declined'].includes(a.status))
+    const a = getApp(S.scoreId)
+    const [pa, pb] = a.assessors
+    const lock = decided(a)
+    const ga = gaps(a), wa = wscore(a.scores.A), wb = wscore(a.scores.B), cb = combined(a)
+    const seg = (who, i) => `<span class="seg ${who === 'B' ? 'b' : ''}">${[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((v) => `<button class="${a.scores[who][i] != null && v <= a.scores[who][i] ? 'f' : ''}" data-action="set" data-who="${who}" data-c="${i}" data-v="${v}" ${lock ? 'disabled' : ''} title="${v}">${v}</button>`).join('')}</span><span class="sv">${a.scores[who][i] ?? '–'}</span>`
+    const flag = cb == null && !ga.length
+      ? `<div class="alert info" id="flag">${ic('na')}<div>Waiting for ${esc(first(a.scores.A.includes(null) ? pa : pb))}'s scores. The combined score appears when both assessors have scored every criterion.</div></div>`
+      : ga.length
+        ? `<div class="alert bad" id="flag">${ic('warn')}<div><b>Assessors differ by more than 2 points</b> on ${ga.map((g) => `${g.c.name} (${first(pa)} ${g.a}, ${first(pb)} ${g.b})`).join(', ')}. Not averaged away: the panel sees this flag and both scores. Say why in the comment.</div></div>`
+        : `<div class="alert ok" id="flag">${ic('ok')}<div>Assessors are within 2 points on every criterion.</div></div>`
+    return `<div class="cmdbar"><div class="tt"><h1>Scoring</h1><p>Two assessors score each application from 1 to 10 against four weighted criteria.</p></div></div>
+    <div class="sgrid">
+      <div class="card"><div class="hd"><h2>To score</h2><span class="muted small">${ROUND.name}</span></div>
+        ${list.map((x) => `<button class="pick ${x.id === a.id ? 'on' : ''}" data-action="score-pick" data-id="${x.id}"><div class="gname">${esc(x.group)}</div>
+          <div class="gsub">${x.id} · ${fmt(x.amount)} · ${combined(x) == null ? 'waiting for 2nd assessor' : 'combined ' + sc(combined(x))}${gaps(x).length ? ' · <span class="flag">differ</span>' : ''}</div></button>`).join('')}</div>
+      <div class="card" id="score-card" data-arch="custom" data-arch-label="Custom component">
+        <div class="hd"><div style="flex:1;min-width:0"><h2>${esc(a.group)}</h2><div class="muted small">${a.id} · ${esc(a.project)} · requests ${fmt(a.amount)}</div></div>${pill(a.status)}</div>
+        <div class="score-top"><div>
+          <table id="score-grid"><thead><tr><th>Criterion</th><th>${av(pa)} ${esc(pa)}</th><th>${av(pb)} ${esc(pb)}</th><th class="num">Gap</th></tr></thead><tbody>
+          ${DATA.criteria.map((c, i) => { const x = a.scores.A[i], y = a.scores.B[i], g = x != null && y != null ? Math.abs(x - y) : null
+            return `<tr class="${g > 2 ? 'diff' : ''}"><td class="crit"><b>${c.name}</b><span class="muted small">${c.desc}</span><br><span class="wt">${c.weight}%</span></td><td>${seg('A', i)}</td><td>${seg('B', i)}</td><td class="num gap">${g ?? '–'}</td></tr>` }).join('')}
+          <tr><td><b>Weighted score</b></td><td><b>${sc(wa)}</b></td><td><b>${sc(wb)}</b></td><td></td></tr></tbody></table>
+        </div><div class="bd">
+          <h3>Combined score</h3><div class="big" id="combined" style="margin-top:8px">${sc(cb)} <small>/ 10</small></div>
+          <div class="meter"><i style="width:${cb == null ? 0 : cb * 10}%"></i></div>
+          <div class="kv"><span>${esc(first(pa))}</span><b>${sc(wa)}</b></div><div class="kv"><span>${esc(first(pb))}</span><b>${sc(wb)}</b></div>
+          <p class="muted small">Each assessor's score is weighted 30/30/20/20; the combined score is the average of the two.</p></div></div>
+        <div class="bd" style="border-top:1px solid var(--line2)">${flag}
+          ${lock ? `<div class="muted">The panel has decided this application, so its scores are locked.</div>` : `<label for="comment"><b>Assessors' comment</b> <span class="req">required</span></label>
+          <textarea id="comment" class="${S.scoreErr ? 'err' : ''}" placeholder="What the panel should know: strengths, worries, and why you differ if you do.">${esc(S.comment)}</textarea>
+          ${S.scoreErr ? `<div class="errmsg">${ic('warn')}${esc(S.scoreErr)}</div>` : ''}
+          <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:12px"><button class="btn" data-action="open" data-id="${a.id}">Open record</button><button class="btn primary" id="btn-save" data-action="score-save">${ic('check')}Save scores</button></div>`}
+        </div></div>
+    </div>`
+  },
+
+  panel: () => {
+    const rows = ranked(), appr = approvedTotal(), left = ROUND.budget - appr
+    const plan = Math.min(ROUND.budget, rows.filter((r) => r.fits && r.a.status === 'Scored').reduce((s, r) => s + r.a.amount, 0))
+    const notReady = S.apps.filter((a) => a.round === ROUND.name && !rows.some((r) => r.a === a))
+    let lineDone = false
+    const body = rows.map((r) => {
+      const a = r.a, decl = a.status === 'Declined'
+      let line = ''
+      if (!r.fits && !decl && !lineDone) { lineDone = true; line = `<tr class="line"><td colspan="8">Budget line: ${fmt(ROUND.budget)}. Applications below this line don't fit in what's left.</td></tr>` }
+      const act = a.status === 'Approved' ? `${pill('Approved')} <button class="link small" data-action="letter" data-id="${a.id}">Letter</button>`
+        : decl ? pill('Declined')
+        : `<div class="acts"><button class="btn sm primary" data-action="approve" data-id="${a.id}" ${a.amount > left ? `disabled title="Only ${fmt(left)} left"` : ''}>${ic('check', 14)}Approve</button><button class="btn sm danger" data-action="decline" data-id="${a.id}">${ic('x', 14)}Decline</button></div>`
+      return line + `<tr class="${decl ? 'out' : ''}"><td><span class="rank">${r.rank}</span></td>
+        <td><button class="link gname" style="text-align:left" data-action="open" data-id="${a.id}">${esc(a.group)}</button><div class="gsub">${a.id} · ${esc(a.assessors.map(first).join(' and '))}</div></td>
+        <td class="num">${fmt(a.amount)}</td><td class="num"><b>${sc(combined(a))}</b></td>
+        <td>${gaps(a).length ? `<span class="flag">${ic('warn', 12)}Assessors differ</span>` : '<span class="muted small">Agree</span>'}</td>
+        <td class="num">${decl ? '<span class="muted">–</span>' : fmt(r.run)}</td>
+        <td>${decl ? '' : r.fits ? '<span class="fit y">Fits</span>' : `<span class="fit n">Over by ${fmt(r.run - ROUND.budget)}</span>`}</td><td>${act}</td></tr>`
+    }).join('')
+    return `<div class="cmdbar"><div class="tt"><h1>Panel: ${ROUND.name}</h1><p>Meeting ${ROUND.panel} · chair ${CHAIR} · ranked by combined score</p></div></div>
+    <div class="card" id="budget" data-arch="std" data-arch-label="Standard low-code app"><div class="bd">
+      <div class="bstats"><div><small>Round budget</small><b>${fmt(ROUND.budget)}</b></div><div><small>Approved</small><b style="color:var(--ok)">${fmt(appr)}</b></div>
+        <div><small>Left to give</small><b>${fmt(left)}</b></div><div><small>Ranked requests</small><b>${fmt(rows.filter((r) => r.a.status !== 'Declined').reduce((s, r) => s + r.a.amount, 0))}</b></div></div>
+      <div class="bbar"><i class="a" style="width:${(appr / ROUND.budget) * 100}%"></i><i class="p" style="width:${(Math.max(0, Math.min(plan, left)) / ROUND.budget) * 100}%"></i></div>
+      <div class="legend"><span><i style="background:var(--ok)"></i>Approved</span><span><i style="background:#9fd3dd"></i>Still to decide, fits in rank order</span><span><i style="background:var(--line2)"></i>Unallocated</span></div>
+    </div></div>
+    <div class="card" id="panel-table" data-arch="std" data-arch-label="Standard workflow"><table>
+      <thead><tr><th>Rank</th><th>Application</th><th class="num">Requested</th><th class="num">Score</th><th>Assessors</th><th class="num">Running total</th><th>Budget</th><th>Decision</th></tr></thead>
+      <tbody>${body}</tbody></table>
+      ${rows.length ? '' : '<div class="empty"><b>Nothing ready for the panel</b>Applications appear here once both assessors have scored them.</div>'}</div>
+    <div class="card"><div class="hd"><h2>Not on the panel list</h2><span class="muted small">${notReady.length}</span></div><div class="bd">
+      ${notReady.map((a) => `<div class="chk">${pill(a.status)}<div><button class="link" data-action="open" data-id="${a.id}">${esc(a.group)}</button> <span class="muted small">${a.id} · ${a.status === 'In scoring' ? 'waiting for the second assessor' : 'stopped by the checks on submission'}</span></div></div>`).join('') || '<span class="muted">Everything in this round is on the list.</span>'}</div></div>`
+  },
+
+  letter: () => {
+    const done = S.apps.filter((a) => a.status === 'Approved')
+    if (!done.length) return `<div class="cmdbar"><div class="tt"><h1>Decision letters</h1></div></div>
+      <div class="card" id="letter"><div class="empty"><b>No approved applications yet</b>A letter is made from the record once the panel approves it.<br><br><button class="btn primary" data-action="nav" data-view="panel">Go to the panel</button></div></div>`
+    const a = done.find((x) => x.id === S.letterId) || done[0]
+    const m = (v) => `<span class="mf">${esc(v)}</span>`
+    const first80 = Math.round(a.amount * 0.8)
+    return `<div class="cmdbar"><div class="tt"><h1>Decision letters</h1><p>Made from the approved record. Nobody retypes a name or an amount.</p></div>
+      <button class="btn ${S.mf ? 'on' : ''}" data-action="mf">${S.mf ? 'Hide' : 'Show'} merge fields</button><button class="btn primary" data-action="print">${ic('print')}Print or save PDF</button></div>
+    <div class="lgrid"><div class="card no-print"><div class="hd"><h2>Approved</h2><span class="muted small">${done.length}</span></div>
+      ${done.map((x) => `<button class="pick ${x.id === a.id ? 'on' : ''}" data-action="letter" data-id="${x.id}"><div class="gname">${esc(x.group)}</div><div class="gsub">${x.id} · ${fmt(x.amount)}</div></button>`).join('')}</div>
+    <div class="paper ${S.mf ? 'showmf' : ''}" id="letter" data-arch="std" data-arch-label="Standard document template">
+      <div class="lh"><div class="nm">Harbour Arts Trust<small>Small grants for local arts</small></div><address>The Customs House, Quay Parade<br>Harbourmouth HB1 5EQ<br>grants@harbourarts.example.org</address></div>
+      <div class="to">${m(a.contact)}<br>${m(a.group)}<br>${a.address.map(m).join('<br>')}</div>
+      <div class="ref">Our ref: ${m(a.id)} · ${ROUND.panel}</div>
+      <p>Dear ${m(first(a.contact))},</p>
+      <p class="subj">Your application to the ${m(a.round)} round: approved</p>
+      <p>I'm pleased to tell you that our grants panel met on ${ROUND.panel} and approved a grant of <b>${m(fmt(a.amount))}</b> to ${m(a.group)} for <i>${m(a.project)}</i>.</p>
+      <p>The grant comes with these conditions:</p>
+      <ul><li>We'll pay ${m(fmt(first80))} (80%) when you return the signed acceptance form, and the remaining ${m(fmt(a.amount - first80))} when we receive your end-of-project report.</li>
+        <li>The money is for the project described in your application, running from ${m(a.start)} to ${m(a.end)}. Please tell us before you change it.</li>
+        <li>Please credit Harbour Arts Trust on your publicity, and send your report within eight weeks of the project ending.</li></ul>
+      <p>Your acceptance form is enclosed. If you have any questions, reply to this letter quoting ${m(a.id)}.</p>
+      <p>Congratulations, and good luck with the project.</p>
+      <div class="sig">Yours sincerely,<div class="sn">Helen Marchetti</div>Helen Marchetti<br>Chair, Grants Panel</div>
+      <div class="lfoot">Harbour Arts Trust is a fictional charity, made up for this mock. Generated from record ${a.id} on ${ROUND.panel}.</div>
+    </div></div>`
+  },
+}
+
+function approve(id) {
+  const r = ranked(), row = r.find((x) => x.a.id === id), a = row.a
+  a.status = 'Approved'
+  const left = ROUND.budget - approvedTotal()
+  a.history.push({ when: stamp(), who: `Panel (chair ${CHAIR})`, what: `Approved ${fmt(a.amount)}. Ranked ${row.rank} of ${r.length} with a combined score of ${sc(combined(a))}; ${fmt(left)} of the budget left after this.` })
+  a.history.push({ when: stamp(), who: 'System', what: 'Decision letter made from this record and emailed to the contact' })
+  a.emails.push({ when: '12 May 2026', to: a.email, subject: `Your Harbour Arts Trust grant: approved (${a.id})` })
+  flash(`${a.id} approved. The email and letter go from the standard workflow.`)
+}
+function decline(id) {
+  const r = ranked(), row = r.find((x) => x.a.id === id), a = row.a, left = ROUND.budget - approvedTotal()
+  a.status = 'Declined'
+  a.history.push({ when: stamp(), who: `Panel (chair ${CHAIR})`, what: `Declined. Ranked ${row.rank} of ${r.length}; ${a.amount > left ? `asked for ${fmt(a.amount)} with ${fmt(left)} left in the budget` : `the panel funded higher-scoring applications first`}.` })
+  a.emails.push({ when: '12 May 2026', to: a.email, subject: `Your Harbour Arts Trust application: decision (${a.id})` })
+  flash(`${a.id} declined. The reason is kept on the record.`)
+}
+function ensureApproved() {
+  let a = S.apps.find((x) => x.status === 'Approved')
+  if (!a) { approve(ranked()[0].a.id); a = S.apps.find((x) => x.status === 'Approved') }
+  return a.id
+}
+
+let toastTimer
+function flash(msg) {
+  S.toast = msg; $('#toast').innerHTML = `<div>${esc(msg)}</div>`
+  clearTimeout(toastTimer); toastTimer = setTimeout(() => { S.toast = ''; $('#toast').innerHTML = '' }, 3200)
+}
+
+// The guide: one step per decision the mock settles, in the order the story is told.
+const GUIDE = [
+  { t: 'Welcome', b: 'This is a mock of the grants app for Harbour Arts Trust, replacing a shared inbox and a spreadsheet. Use <b>Next</b> to follow the story, or click around: every screen works with sample data.', where: 'Tip: <b>Show architecture</b> labels which parts come from the low-code platform and which part is built.', go: () => nav('list') },
+  { t: 'One record per application', b: 'Each application is one row and one record, with a status, an amount, a round and its assessors, instead of an email thread. Filter by status to see the work waiting at each stage.', where: 'Standard low-code app: a list view.', go: () => nav('list'), hl: '#app-table' },
+  { t: 'Everything about it in one place', b: 'Open any row: the details, the attachments, the emails sent, and a history of who did what and when. Nobody searches the inbox for the latest budget.', where: 'Standard low-code app: a form with its audit history.', go: () => open('HAT-102'), hl: '#history' },
+  { t: 'Incomplete applications are caught at the door', b: 'Quayside Brass Band sent no budget. The check on submission catches it and sends it back with an email. It never reaches an assessor or the panel.', where: 'Standard workflow: validation rules on submit.', go: () => open('HAT-104'), hl: '#checks' },
+  { t: 'So are duplicates and requests over the limit', b: 'The same checks stop a request for £7,500 when the limit is £5,000, and a second copy of the Film Club application (HAT-106). The panel only sees what it can fund.', where: 'Standard workflow.', go: () => open('HAT-107'), hl: '#checks' },
+  { t: 'Scoring is the only custom part', b: 'Two assessors each score four criteria, weighted 30, 30, 20 and 20. A standard form can\'t do that rule, so this one screen is built. Ama hasn\'t scored yet: click her scores and watch the combined score change.', where: 'Custom component, inside the standard app.', go: () => scorePick('HAT-108'), hl: '#score-grid' },
+  { t: 'Disagreement is flagged, not averaged away', b: 'Tomasz gave Artistic quality 9 and Ama gave it 5. An average would hide that. More than 2 points apart is flagged here and on the panel list, and the comment can\'t be left empty: try <b>Save scores</b> with no comment.', where: 'Custom component.', go: () => scorePick('HAT-102'), hl: '#flag' },
+  { t: 'The panel decides against the real budget', b: 'Scored applications, ranked, against the round\'s £12,000. The running total shows where the money runs out: the Film Club misses by £700. As the panel approves, the money left goes down, and Approve turns off for any request bigger than what is left.', where: 'Standard low-code app: a report view with approve and decline actions.', go: () => nav('panel'), hl: '#budget' },
+  { t: 'Every decision is kept, with who and why', b: 'When the panel approves or declines, the record keeps who decided, when, the rank and the budget left. The email to the group goes automatically.', where: 'Standard workflow (email) and the record\'s history.', go: () => open(ensureApproved()), hl: '#history' },
+  { t: 'Letters come from the approved record only', b: 'The letter is a standard template filled from the approved record. The highlighted parts are merge fields, so a name or an amount can\'t be typed wrong. There\'s no letter until the panel approves.', where: 'Standard document template.', go: () => { S.letterId = ensureApproved(); nav('letter') }, hl: '#letter' },
+  { t: 'Standard, except scoring', b: 'Everything here is the standard low-code platform: the list, the form, the checks, the panel, the emails and the letter. Only the scoring screen is custom. <b>Show architecture</b> is on; <b>Reset demo</b> starts again.', go: () => { S.arch = true; nav('list') } },
+]
+
+function nav(view) { S.view = view; render() }
+function open(id) { S.selected = id; S.view = 'record'; render() }
+function scorePick(id) {
+  const a = getApp(id)
+  if (!a.scores) a.scores = { A: [null, null, null, null], B: [null, null, null, null] }
+  if (S.scoreId !== id) S.comment = ''
+  S.scoreId = id; S.scoreErr = ''; S.view = 'score'; render()
+}
+
+function render() {
+  renderNav()
+  $('#main').innerHTML = SCREENS[S.view]()
+  document.body.classList.toggle('arch', S.arch)
+  $('#btn-arch').classList.toggle('on', S.arch)
+  renderGuide()
+}
+
+function renderGuide() {
+  if (S.guide < 0) { $('#guide').innerHTML = ''; return }
+  const g = GUIDE[S.guide]
+  const last = S.guide === GUIDE.length - 1
+  $('#guide').innerHTML = `<div class="guide ${S.guideMin ? 'min' : ''}">
+    <div class="gh"><span>Demo guide · ${S.guide + 1} of ${GUIDE.length}</span>
+      <button class="x" data-action="guide-min" title="Minimise">${S.guideMin ? '&#9650;' : '&#9660;'}</button>
+      <button class="x" data-action="guide-close" title="Close">&times;</button></div>
+    <div class="gt">${g.t}</div>
+    <div class="gb">${g.b}${g.where ? `<div class="where">${g.where}</div>` : ''}</div>
+    <div class="gf"><button class="btn" data-action="guide-prev" ${S.guide ? '' : 'disabled'}>Back</button>
+      <span class="prog">${GUIDE.map((_, i) => `<i class="${i <= S.guide ? 'on' : ''}"></i>`).join('')}</span>
+      <button class="btn primary" data-action="guide-next">${last ? 'Finish' : 'Next'}</button></div>
+  </div>`
+}
+
+function guideGo(i) {
+  S.guide = i; S.guideMin = false
+  GUIDE[i].go()
+  render()
+  const sel = GUIDE[i].hl
+  if (sel) setTimeout(() => { const el = $(sel); if (el) { el.scrollIntoView({ block: 'nearest' }); el.classList.add('pulse'); setTimeout(() => el.classList.remove('pulse'), 4300) } }, 60)
+}
+
+// Every button says what it does with data-action; one listener handles them all.
+const ACTIONS = {
+  nav: (el) => nav(el.dataset.view),
+  open: (el) => open(el.dataset.id),
+  filter: (el) => { S.filter = el.dataset.status; render() },
+  sort: (el) => { const k = el.dataset.key; S.sort = { key: k, dir: S.sort.key === k ? -S.sort.dir : 1 }; render() },
+  toast: (el) => flash(el.dataset.msg),
+  'score-pick': (el) => scorePick(el.dataset.id),
+  set: (el) => { const a = getApp(S.scoreId); a.scores[el.dataset.who][+el.dataset.c] = +el.dataset.v; S.scoreErr = ''; render() },
+  'score-save': () => {
+    const a = getApp(S.scoreId), cb = combined(a), ga = gaps(a)
+    if (cb == null) { S.scoreErr = 'Both assessors need to score all four criteria first.'; return render() }
+    if (!S.comment.trim()) { S.scoreErr = 'Add a comment: the panel reads it beside the scores.'; return render() }
+    a.status = 'Scored'
+    a.history.push({ when: stamp(), who: a.assessors.join(', '), what: `Scores saved: combined ${sc(cb)}.${ga.length ? ` Assessors differ on ${ga.map((g) => g.c.name).join(', ')}, flagged for the panel.` : ''} "${S.comment.trim()}"` })
+    S.comment = ''; S.scoreErr = ''; render(); flash(`Scores saved. ${a.id} is on the panel list.`)
+  },
+  approve: (el) => { approve(el.dataset.id); render() },
+  decline: (el) => { decline(el.dataset.id); render() },
+  letter: (el) => { S.letterId = el.dataset.id; nav('letter') },
+  mf: () => { S.mf = !S.mf; render() },
+  print: () => window.print(),
+  arch: () => { S.arch = !S.arch; render() },
+  'guide-open': () => guideGo(Math.max(0, S.guide)),
+  'guide-next': () => (S.guide === GUIDE.length - 1 ? ((S.guide = -1), render()) : guideGo(S.guide + 1)),
+  'guide-prev': () => guideGo(Math.max(0, S.guide - 1)),
+  'guide-min': () => { S.guideMin = !S.guideMin; renderGuide() },
+  'guide-close': () => { S.guide = -1; render() },
+  reset: () => { const g = S.guide; S = initState(); flash('Demo reset: sample data back to the start.'); if (g < 0) { S.guide = -1; render() } else guideGo(0) },
+}
+document.addEventListener('click', (e) => {
+  const el = e.target.closest('[data-action]')
+  if (!el || el.disabled) return
+  const c = $('#comment'); if (c) S.comment = c.value // keep the comment across re-renders
+  if (ACTIONS[el.dataset.action]) ACTIONS[el.dataset.action](el)
+})
+
+S = initState()
+guideGo(0)
+</script>
+</body>
+</html>
