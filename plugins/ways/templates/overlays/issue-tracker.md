@@ -36,7 +36,9 @@ Read the parent issue, follow its `Spec:` line, and read the file.
 - **Opus** for the rules that must never be wrong (the charter's invariants), a high-risk path in `REVIEW.md` or `CODEOWNERS`, a contract other systems read, or a ticket that leaves judgement calls.
 - The code review and its fixes stay on the session's model.
 
-**Screenshots of visual changes.** Each implementer attaches headless-browser screenshots of what it changed on screen (and print previews, if it's printed) to its PR's evidence, and the integration PR collects them.
+**Screenshots of visual changes.** Each implementer attaches headless-browser screenshots of what it changed on screen to its PR's evidence, and the integration PR collects them. For printed work a headless PDF isn't enough: the human verification names the real browser's print dialog.
+
+**Containers.** Each implementer stops the containers it started (and any dev server or watcher) before reporting done. After each merge, check with `docker ps` that none of that worktree's are still running, and stop any that are: left running, they hold memory and their ports (8080, say) and block the next ticket.
 
 **Progress, without being asked.** The draft PR's body opens with a checklist of the tickets in build order, plus the code review, and you tick each one as it merges. Every update you post starts with "N of M done", saying what's building and what's next. After each merge, write `<done> <total>` to `.claude/ways/progress` (for example `2 9`), and the band shows it. Delete the file at handover, with the marker.
 
@@ -56,7 +58,7 @@ Work closes through a PR, never by closing the issue directly.
 
 ### Briefs
 
-An agent brief also has a **Human verification** line: how someone who didn't build it confirms it. For visual work, say what to look at, not just "the page renders": for example, "print preview at A3, in mono", or "matches `specs/prd/<slug>-mock.html`: same columns, same empty state".
+An agent brief also has a **Human verification** line: how someone who didn't build it confirms it. For visual work, say what to look at, not just "the page renders". For printed work, name the real browser's print dialog, not a headless PDF: for example, "Chrome, Ctrl+P, A3 landscape, mono, 1 page". Or "matches `specs/prd/<slug>-mock.html`: same columns, same empty state".
 
 ### Sizing, when triaging
 
