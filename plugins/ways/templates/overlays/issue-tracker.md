@@ -42,7 +42,7 @@ Read the parent issue, follow its `Spec:` line, and read the file.
 
 **Progress, without being asked.** The draft PR's body opens with a checklist of the tickets in build order, plus the code review, and you tick each one as it merges. Every update you post starts with "N of M done", saying what's building and what's next. After each merge, write `<done> <total>` to `.claude/ways/progress` (for example `2 9`), and the band shows it. Delete the file at handover, with the marker.
 
-**What the run cost, in the integration PR.** People need to know whether a spec is a sensible size for their usage. The plan's usage windows are in `.claude/ways/usage` (five-hour and weekly, as percentages, written by the `ways-band` mod). If the file isn't there, ask the person to run `/usage` and tell you the two figures.
+**What the run cost, in the integration PR.** People need to know whether a spec is a sensible size for their usage. Read the plan's usage windows (five-hour and weekly, as percentages) with the `ways-band` mod's tool, `mcp__ways-band__usage`: it answers for this session's own account. Don't read `.claude/ways/usage`: older versions of the mod wrote it from every session in the repo, so it can hold another session's numbers. If the tool isn't there, ask the person to run `/usage` and tell you the two figures.
 
 - **At the start**, in the draft PR body: the usage windows now, and a rough estimate (the number of tickets, and what one ticket has cost so far in this repo, if a previous run says).
 - **As each ticket merges**, a row in the PR body: the ticket, the model, the agent's time, tokens and tool calls (from its completion notice), and both usage windows at that point.

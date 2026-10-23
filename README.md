@@ -70,9 +70,9 @@ An optional second plugin, and a small worked example of a [mod](https://code.cl
 
 - **A band above the prompt** in an opted-in repo: `ways 0.7.0 · autonomous #9 · 2 of 9 · gate ✔ 2m ago · dial default · feature/3-walking-skeleton · context 42% · usage 5h 34% · wk 9%`.
 - **`/gate`** runs the repo's gate at once, without a Claude turn or any tokens, and records the result for the band.
-- **The plan's usage windows** (five-hour and weekly) go in `.claude/ways/usage` whenever they move. The agent can't read them itself, and an autonomous run reports them in its integration PR. Where Claude Code has no reading (off a subscription, and possibly some plan types), the band leaves usage out.
+- **A `usage` tool for the agent** (`mcp__ways-band__usage`): this session's plan usage windows (five-hour and weekly), which the agent can't read itself, so an autonomous run can report them in its integration PR. It answers for its own session; up to 0.3.0 the mod wrote them to `.claude/ways/usage`, which every session in the repo overwrote. Where Claude Code has no reading (off a subscription, and possibly some plan types), the band leaves usage out.
 
-`claude plugin install ways-band@ways-of-working`. Its code is one file, `plugins/ways-band/hooks/register.js`, with tests beside it (`claude plugin test` in that directory). Mods run unsandboxed with your permissions; this one reads a few files under `.claude/` and `AGENTS.md`, writes `.claude/ways/last-gate` and `.claude/ways/usage`, runs `git branch` and, on `/gate`, the gate.
+`claude plugin install ways-band@ways-of-working`. Its code is one file, `plugins/ways-band/hooks/register.js`, with tests beside it (`claude plugin test` in that directory). Mods run unsandboxed with your permissions; this one reads a few files under `.claude/` and `AGENTS.md`, writes `.claude/ways/last-gate`, offers the agent its `usage` tool, runs `git branch` and, on `/gate`, the gate.
 
 [`WORKING-CONTRACT.md`](WORKING-CONTRACT.md) is the reasoning behind it: who owns what, and why.
 
