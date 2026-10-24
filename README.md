@@ -25,7 +25,7 @@ Known to be big                       →  /ways:plan #n, then /ways:build #n
 Known to be small                     →  /ways:work #n      (one or several, one at a time by default)
 
 /ways:discover   → the brief                person merges the discovery PR    documents in specs/brief/inbox/
-/ways:plan #n    → the PRD, what and how    person merges the spec PR          requirements, a mock if visual, then design
+/ways:plan #n    → the PRD, what and how    person merges the spec PR          requirements (prototype, grill or both), then design
 /ways:build #n   → tickets, then code       person merges the integration PR   resumes a build under way
 /ways:work #n    → one reviewed PR          sizes, reproduces and briefs a raw issue, then waits for go
 

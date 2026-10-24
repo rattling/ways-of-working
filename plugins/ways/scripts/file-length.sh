@@ -18,6 +18,12 @@ file="${file//\\//}"
 case "$file" in
   *.lock|*.min.*|*.svg|*.json|*.csv|*.sql|*.md|*/vendor/*|*/node_modules/*) exit 0 ;;
 esac
+# Prototypes and mocks are one self-contained file on purpose, and scratch files are thrown away.
+shopt -s nocasematch
+case "$file" in
+  *prototype*|*-mock.*|*/mocks/*|*/scratchpad/*|*/.scratch/*) exit 0 ;;
+esac
+shopt -u nocasematch
 
 lines=$(wc -l < "$file")
 (( lines > limit )) || exit 0
