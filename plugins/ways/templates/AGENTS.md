@@ -41,7 +41,7 @@ Pick the path by what's known about the work. A person types each command; when 
 
 Big work is two commands, each ending in one PR a person merges:
 
-- **`/ways:plan #<n>`**: requirements (from the discovery brief if there is one), a mock if the result is visual, then the system-level design, in one sitting. Ends in one spec PR: merging it agrees what it should do and how the system changes. Don't clear the session during a plan.
+- **`/ways:plan #<n>`**: requirements (from the discovery brief if there is one), worked out by prototyping, grilling or both, then the system-level design, in one sitting. The agreed prototype is kept as the mock. Ends in one spec PR: merging it agrees what it should do and how the system changes. Don't clear the session during a plan.
 - **`/ways:build #<n>`**: tickets, then the code on one integration branch. Ends in the integration PR: merging it ships the feature. It resumes a build under way.
 
 When different people do the two halves of a plan, `/ways:requirements` and `/ways:design` run them separately, with the PRD file as the hand-off. Pocock's skills run underneath (`grilling`, `domain-modeling`, `to-spec`, `to-tickets`, `implement-spec`, `code-review`, `triage`) and can still be typed on their own.

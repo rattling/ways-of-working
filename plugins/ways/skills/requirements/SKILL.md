@@ -1,6 +1,6 @@
 ---
 name: requirements
-description: The first half of /ways:plan, on its own, for when different people do requirements and design. Grills the what and why with Pocock's grilling and domain-modeling (or takes written requirements as they are), offers a mock when the result is visual, then writes the PRD with /to-spec in the same session. Sizes an untriaged issue first.
+description: The first half of /ways:plan, on its own, for when different people do requirements and design. Works out the what and why by prototyping, grilling (Pocock's grilling and domain-modeling) or both, switching as the questions change (or takes written requirements as they are), keeps the agreed prototype as the mock, then writes the PRD with /to-spec in the same session. Sizes an untriaged issue first.
 disable-model-invocation: true
 ---
 
@@ -18,7 +18,7 @@ Follow `${CLAUDE_PLUGIN_ROOT}/reference/PARTS.md`: look for the output first, op
 - **Nobody has sized it** (no state label, or only `needs-triage`): size it first, as `/triage` would, by the sizing rules in `docs/agents/issue-tracker.md`. Big work: label it as triage would and carry on. One ticket: say so and offer `/ways:work #<n>` instead. The problem isn't understood: offer `/ways:discover`. Don't carry on for work that isn't big.
 - **The problem isn't understood** (labelled `needs-info` for discovery, or nobody can say who it's for): say `/ways:discover` comes first.
 
-## 2. Grill
+## 2. Work them out: prototype, grill, or both
 
 Read the issue and its comments. If it has a `Brief:` line, read the brief (`specs/brief/<slug>/README.md` and what it links): the grill starts from what discovery settled, and asks only what's still open.
 
@@ -28,15 +28,27 @@ Read the issue and its comments. If it has a `Brief:` line, read the brief (`spe
 
 Recommend grilling only if they have gaps that would change the build, and name the gaps. Whether they're agreed is the person's call: don't assume it. **As they are** skips the grill and goes to step 3, with the written requirements as `/to-spec`'s input instead of a conversation.
 
-Otherwise, or if the person says grill, call the Skill tool for Pocock's `grilling`, and for `domain-modeling` (as `/grill-with-docs` does). Terms settled on the way go into `GLOSSARY.md`, and hard-to-reverse decisions into ADRs, as `domain-modeling` says.
+Otherwise, **ask how to start**, with a recommendation:
 
-## 3. Mock, if the result is visual
+- **Prototype** when the open questions are about shape and flow: what a screen holds, what comes first, how a task feels to do.
+- **Grill** when they're about rules: edge cases, invariants, who may do what, what happens when it goes wrong.
+- **Both** when it's a mix, which is usual. Start with whichever holds the bigger questions.
 
-When the result is something people look at (a page, a screen, a printout, a chart), offer a mock before the PRD is written: follow `${CLAUDE_PLUGIN_ROOT}/skills/mock/SKILL.md`. If discovery left a test prototype that passed, the mock starts from it. Skip it if the person says no.
+**Grilling:** call the Skill tool for Pocock's `grilling`, and for `domain-modeling` (as `/grill-with-docs` does). Terms settled on the way go into `GLOSSARY.md`, and hard-to-reverse decisions into ADRs, as `domain-modeling` says.
+
+**Prototyping:** rounds of a clickable prototype, built and shown as `${CLAUDE_PLUGIN_ROOT}/skills/mock/SKILL.md` says, finished-looking from the first round, with real data. When the person judges a round, give it the guided tour: step N of M, a line on what they're looking at, the part that matters highlighted. Use side-by-side variants only for a narrow "A or B?" question, and keep the words on screen to a minimum. For several radically different directions at once, Pocock's `prototype` is the tool; bring its pick back here. If discovery left a test prototype that passed, start from it.
+
+**Switch when the questions change.** After a few prototype rounds, if what's left is rules: "A few rules are still open (…). Shall I grill those?" Partway through a grill, if a question is about how something looks or flows: "This is about the screen. Shall I prototype it?" Either way it ends in the same place: agreed requirements, then the PRD.
+
+**Keep an "Agreed so far" list on the issue** as you go: one comment, edited after each round or each settled question, a line per decision. It's what `/to-spec` writes the PRD from, it survives a compaction, and the person can see what they've agreed without scrolling back.
+
+## 3. The mock
+
+The prototype is evidence, not the spec. When it's agreed, it becomes the mock kept with the PRD: tidy it, give it the full guided tour (a step per decision, Show architecture, Reset demo), and save it as `/ways:mock`'s step 4 says. If there was no prototype and the result is something people look at (a page, a screen, a printout, a chart), offer a mock now, from the agreed decisions. Skip it if the person says no.
 
 ## 4. Write the PRD
 
-Call the Skill tool for Pocock's `to-spec`, in this session, so it synthesises the grill above (or the written requirements, read in full, when the grill was skipped). `docs/agents/issue-tracker.md` says how this repo publishes it: a file in `specs/prd/` on a `spec/<feature-slug>` branch, the request issue becoming the parent with a `Spec:` line, and a draft spec PR.
+Call the Skill tool for Pocock's `to-spec`, in this session, so it synthesises the "Agreed so far" list, the grill and the prototype rounds (or the written requirements, read in full, when they went in as they are). `docs/agents/issue-tracker.md` says how this repo publishes it: a file in `specs/prd/` on a `spec/<feature-slug>` branch, the request issue becoming the parent with a `Spec:` line, and a draft spec PR.
 
 Two checks after it:
 

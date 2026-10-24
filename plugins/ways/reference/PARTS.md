@@ -14,7 +14,7 @@ Big work is two commands, with discovery before them when it's needed:
 | Command | What it does | Ends in | The person merges |
 |---|---|---|---|
 | `/ways:discover` (optional, separate: its input can take days) | Works out what the problem is | A brief in `specs/brief/<slug>/` and an intake issue | The discovery PR: the brief agreed |
-| `/ways:plan #n` | Requirements, a mock if the result is visual, then design, in one sitting | The PRD, what and how, and one spec PR | The spec PR: what it should do and how the system changes, agreed together |
+| `/ways:plan #n` | Requirements (prototype, grill, or both), then design, in one sitting | The PRD, what and how, and one spec PR | The spec PR: what it should do and how the system changes, agreed together |
 | `/ways:build #n` | Tickets, then the code | One integration PR | The integration PR: the feature shipped |
 
 `/ways:plan` is `/ways:requirements` then `/ways:design` in one session. Those two stay as commands of their own for when different people do the halves (a product person grills, an engineer designs): the PRD file between them is the hand-off.

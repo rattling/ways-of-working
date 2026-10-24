@@ -1,6 +1,6 @@
 ---
 name: plan
-description: Plan big work in one sitting, between discovery and build. Requirements (Pocock's grill, or written requirements as they are), a mock if the result is visual, then the system-level design, ending in one spec PR that the person merges once. Sizes an untriaged issue first.
+description: Plan big work in one sitting, between discovery and build. Requirements by prototyping, grilling or both, switching as the questions change (or written requirements as they are), the agreed prototype kept as the mock, then the system-level design, ending in one spec PR that the person merges once. Sizes an untriaged issue first.
 disable-model-invocation: true
 ---
 
@@ -14,7 +14,7 @@ Follow `${CLAUDE_PLUGIN_ROOT}/reference/PARTS.md`: look for the output first, op
 
 ## 1. Requirements
 
-Follow `${CLAUDE_PLUGIN_ROOT}/skills/requirements/SKILL.md`, steps 1 to 4: look for an existing PRD, size an untriaged issue first, ask about written requirements, grill (or not), offer the mock, and write the PRD with `/to-spec`. Skip its step 5: there's no hand-on in the middle of a plan.
+Follow `${CLAUDE_PLUGIN_ROOT}/skills/requirements/SKILL.md`, steps 1 to 4: look for an existing PRD, size an untriaged issue first, ask about written requirements, work the requirements out by prototyping, grilling or both (switching as the questions change, with an "Agreed so far" list on the issue), keep the agreed prototype as the mock, and write the PRD with `/to-spec`. Skip its step 5: there's no hand-on in the middle of a plan.
 
 **Write it to disk as soon as the grill ends**, before design starts: the PRD's requirements sections, committed and pushed on the `spec/<feature-slug>` branch, as `/to-spec` does. An auto-compaction mid-plan then loses nothing, because design reads the file, not the conversation. Don't make this a step the person sees.
 
