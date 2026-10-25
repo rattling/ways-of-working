@@ -46,6 +46,8 @@ Show it: open it in the browser pane if there is one, or give the path to double
 
 Change it and show it again. Two or three rounds is normal. Keep a short list in the top comment of what changed each round and why: those are the decisions, and they're what the spec needs.
 
+**When the feedback is about taste** ("stark", "busy", "dated", "very monotone"), don't guess at a fix. Offer two or three named directions (say, *Defined*: borders and tinted cards; *Colourful*: a coloured bar and tints; *Warm*: a sand palette) and show them as screenshots: each a small stylesheet override applied to the real app, or the prototype, at screenshot time, with no app code changed. Shoot the same screens with the same data for each, and lay them out on one contact sheet beside today's look, so the choice is about the look and nothing else. The same works for a layout question. It's cheap (minutes, no PR, nothing to undo) and usually settles it in a line ("Colourful, with a lighter bar"). The pick becomes the mock's look, or a single theme ticket for the app.
+
 ## 4. Agree it and keep it
 
 When the person says it's right:
