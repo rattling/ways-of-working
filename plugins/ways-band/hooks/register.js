@@ -87,7 +87,7 @@ async function refresh($) {
     issues: marker ? marker.match(/\d+/g) || [] : [],
     progress: marker && total ? done + ' of ' + total : null,
     part,
-    gateResult: result === 'pass' || result === 'fail' ? result : null,
+    gateResult: ['pass', 'fail', 'unrunnable'].includes(result) ? result : null,
     gateAt: at ? Number(at) : null,
     dial: agents ? (agents.match(/\*\*Dial:\*\*\s*([a-z]+)/i) || [])[1] || null : null,
     branch,
@@ -189,6 +189,7 @@ export function register(on) {
     if (gateRunning) gate = Text({ color: 'yellow', children: ['gate running…'] })
     else if (view.gateResult === 'pass') gate = Text({ color: 'green', children: ['gate ✔ ' + ago(view.gateAt)] })
     else if (view.gateResult === 'fail') gate = Text({ color: 'red', bold: true, children: ['gate ✘ ' + ago(view.gateAt)] })
+    else if (view.gateResult === 'unrunnable') gate = Text({ color: 'yellow', children: ["gate can't run here"] })
     else gate = Text({ dimColor: true, children: ['gate not run (/gate)'] })
 
     const parts = [Text({ bold: true, children: ['ways' + (view.version ? ' ' + view.version : '')] }), sep(), mode, sep(), gate]

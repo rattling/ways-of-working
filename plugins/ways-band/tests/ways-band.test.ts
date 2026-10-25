@@ -88,6 +88,15 @@ test('without a part file, no part is shown', async ($, on) => {
   await ui.unmount()
 })
 
+test("a gate that can't run on this machine says so", async ($, on) => {
+  stubRepo(on, { ...REPO, '.claude/ways/last-gate': `unrunnable ${Math.round(Date.now() / 1000)}
+` })
+  await $.session.start({ cwd: '/repo' })
+  const ui = await $.ui.mount(BAND as any)
+  expect(await ui.find({ type: 'Text', text: "gate can't run here" })).toBeDefined()
+  await ui.unmount()
+})
+
 test('a batch shows every issue the lead is running, in merge order', async ($, on) => {
   stubRepo(on, { ...REPO, '.claude/ways/autonomous': '12 14 17\n' })
   await $.session.start({ cwd: '/repo' })

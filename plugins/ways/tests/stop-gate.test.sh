@@ -67,6 +67,12 @@ sed -i 's/"true"/"false"/' "$r/.claude/ways.json"
 stop "$r" true
 check "a green gate resets the count" '[[ $code == 2 && $err != *"third"* ]]'
 
+r="$(repo no-such-gate-program-xyz)"
+stop "$r" false
+check "a gate whose program isn't installed lets the turn end" '[[ $code == 0 ]]'
+check "and says it can't run here, naming the program" '[[ $out == *"can'"'"'t run on this machine"* && $out == *no-such-gate-program-xyz* ]]'
+check "and records it as unrunnable, not failed" '[[ $(cut -d" " -f1 "$r/.claude/ways/last-gate") == unrunnable ]]'
+
 echo
 if (( failures )); then echo "$failures failed"; exit 1; fi
 echo "all passed"
