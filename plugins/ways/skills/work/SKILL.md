@@ -27,6 +27,7 @@ Triage is optional. If the issue has no state label (or only `needs-triage`), do
 2. Check the brief has an outcome, acceptance criteria, scope boundaries and human verification. Missing one: ask once, then proceed on a stated assumption and add it to the issue. In autonomous mode with no runnable acceptance and no human verification, stop: label it `needs-human` and say what's missing.
 3. Check it isn't blocked (open blockers) or assigned to someone else. Assign yourself.
 4. Branch from an up-to-date `main`, named as `docs/agents/issue-tracker.md` says.
+5. If the issue's work touches `.github/workflows/`, check now that the GitHub token has the `workflow` scope (`gh auth status`), and ask for `gh auth refresh -s workflow` if it doesn't, rather than finding out at the push.
 
 ## 2. Interactive mode
 

@@ -9,7 +9,7 @@
 - **A dev seed from early on:** realistic demo data, loaded with one command, with the awkward rows (the longest name, the empty list, the missing value). People judge screens, mocks and style choices far better against data that looks real, and builders can screenshot the same thing every time.
 - **Every worktree runs its own containers.** Agents build in worktrees (`.claude/worktrees/`), beside the main checkout, so the stack has to run more than once on one machine:
   - **No fixed project name.** Leave `name:` out of `docker-compose.yml` (and don't pass a fixed `-p`), so each worktree gets its own Compose project, named after its folder. A shared project lets one worktree's gate rebuild the database under another, or under the app someone is looking at.
-  - **Published ports come from a variable with a default**, like `"${APP_PORT:-8080}:80"`. The main checkout keeps the default; a builder that needs the app in a browser runs on another port (`APP_PORT=8081`), so it never fights the main checkout for 8080.
+  - **Published ports come from a variable with a default**, like `"${APP_PORT:-8080}:80"`. The main checkout keeps the default; a builder that needs the app in a browser runs on another port (`APP_PORT=8081`), so it never fights the main checkout for 8080. Agents pass these as environment variables on the command, not through `.env` files, which they can't read.
   - **The gate needs no host port.** It reaches the app and the database inside the Compose network, so two gates can run at once.
   - **Whatever starts containers stops them** before reporting done (`docker compose down -v` for a throwaway stack), and `docker ps` shows none of that worktree's left. A container left running holds memory and its port, and blocks the next run.
 
