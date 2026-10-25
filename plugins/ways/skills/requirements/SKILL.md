@@ -48,7 +48,7 @@ The prototype is evidence, not the spec. When it's agreed, it becomes the mock k
 
 ## 4. Write the PRD
 
-Call the Skill tool for Pocock's `to-spec`, in this session, so it synthesises the "Agreed so far" list, the grill and the prototype rounds (or the written requirements, read in full, when they went in as they are). `docs/agents/issue-tracker.md` says how this repo publishes it: a file in `specs/prd/` on a `spec/<feature-slug>` branch, the request issue becoming the parent with a `Spec:` line, and a draft spec PR.
+Run Pocock's `to-spec` steps (`${CLAUDE_PLUGIN_ROOT}/reference/POCOCK.md`: only a person can type it, so read its instructions and follow them here), in this session, so it synthesises the "Agreed so far" list, the grill and the prototype rounds (or the written requirements, read in full, when they went in as they are). `docs/agents/issue-tracker.md` says how this repo publishes it: a file in `specs/prd/` on a `spec/<feature-slug>` branch, the request issue becoming the parent with a `Spec:` line, and a draft spec PR.
 
 Two checks after it:
 
