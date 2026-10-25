@@ -16,6 +16,12 @@ Then, in a repo, run `/setup-matt-pocock-skills` (accept GitHub, the default lab
 
 A repo set up this way declares both marketplaces and plugins in `.claude/settings.json`, so anyone who opens it in Claude Code is offered the same setup.
 
+### Platforms
+
+Windows, macOS and Linux, and a team can mix them. Claude Code runs hooks in bash everywhere: on Windows that's Git Bash, which Claude Code needs anyway. So ways' hooks, and the `ways-band` mod's `/gate`, are bash scripts that find Git Bash on Windows rather than WSL's `bash`. You'll also need `gh`, signed in.
+
+Commands written for a repo (the gate, scripts, examples in the skills) have to run on every platform the team uses. That means no `&&` and no shell-only syntax, and no program that one platform lacks. `make` is the usual trap, because Windows doesn't have it. `docs/standards/delivery.md` has the rule.
+
 ## The flow
 
 ```
