@@ -24,11 +24,13 @@ Read the parent issue, its `Spec:` line, its sub-issues, the `integration/<featu
 
 Before cutting, ask once: "I'll cut the tickets first. Then go straight into the build, or stop so you can check them?"
 
-Run Pocock's `to-tickets` steps (`${CLAUDE_PLUGIN_ROOT}/reference/POCOCK.md`: only a person can type it, so read its instructions and follow them here), with the parent issue. It shows the breakdown for approval: that step always happens. In straight-through mode, that one approval also starts the build; otherwise stop after publishing, with the merge sentence (nothing to merge yet) and "Next: `/ways:build #<n>`".
+Run Pocock's `to-tickets` steps (`${CLAUDE_PLUGIN_ROOT}/reference/POCOCK.md`: only a person can type it, so read its instructions and follow them here), with the parent issue. It shows the breakdown for approval: that step always happens. With it, show which tickets are independent of the main chain (no blocking edge between them, and they touch different parts), and offer parallel as an explicit choice: "Tickets 4, 6 and 9 don't depend on the main chain. Build them alongside it? That saves roughly <time>, but runs a stack per worktree at once (more memory) and is harder to follow. Default: one at a time." Take the answer with the approval. In straight-through mode, that one approval also starts the build; otherwise stop after publishing, with the merge sentence (nothing to merge yet) and "Next: `/ways:build #<n>`".
 
 Every ticket gets a **Human verification** line, which `to-tickets`' template lacks and `/ways:work` needs: from the PRD's Human verification, or "matches the mock" with what to compare. `docs/agents/issue-tracker.md` says the rest.
 
 ## 3. Build
+
+0. **Check what the build will need to push.** If any ticket, or the PRD's design, touches `.github/workflows/`, check the GitHub token can push workflow changes (`gh auth status` lists a `workflow` scope). If it can't, ask before starting: "Ticket 11 changes `.github/workflows/deploy.yml`, and your GitHub token can't push workflow files. Run `gh auth refresh -s workflow`, then say go." Don't find out at the last push.
 
 1. **Marker.** Write the parent's number to `.claude/ways/autonomous` (`echo <n> > .claude/ways/autonomous`), so the Stop hook holds the gate and a fresh context resumes from the issue. Nobody should have to know about it.
 2. **Build.** Run Pocock's `implement-spec` steps (`${CLAUDE_PLUGIN_ROOT}/reference/POCOCK.md`: only a person can type it, so read its instructions and follow them here), with the parent issue. In straight-through mode this follows the ticket approval without stopping. `docs/agents/issue-tracker.md` sets how: one ticket at a time unless the person asked for parallel, a model per ticket, progress as "N of M done", the run's cost in the integration PR, on `integration/<feature-slug>`.
@@ -40,4 +42,4 @@ Every ticket gets a **Human verification** line, which `to-tickets`' template la
 
 Delete `.claude/ways/autonomous`, `.claude/ways/progress` and `.claude/ways/part`. Mark the integration PR ready. Say what was built and what's left in a few lines, with anything labelled `needs-human` and why.
 
-Then the merge sentence: "To ship it, merge PR #<m>: that's every ticket and the review, and merging closes them." Next: nothing in this feature; follow-ups are new issues: `/ways:work` for small ones, `/triage` for a pile.
+Then the merge sentence: "To ship it, merge PR #<m>: that's every ticket and the review, and merging closes them." Next: nothing in this feature; follow-ups are new issues: `/ways:work` for small ones, `/triage` for a pile. Then one line, once: "Anything about how this run went worth sending back to ways? `/ways:feedback` drafts it."

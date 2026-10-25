@@ -52,7 +52,7 @@ Skips, and only these:
 - **Big work that stays inside one part and touches no contract, schema or data store:** the plan says so and writes "Design: no change of shape" into the PRD.
 - Nothing else is skipped. If a step feels unnecessary, the work is probably one ticket, not big work.
 
-Also: `/ways:explain` before working in code you don't know; `/ways:arch-review` at the start of a repo, before a big change, and every so often.
+Also: `/ways:explain` before working in code you don't know; `/ways:arch-review` at the start of a repo, before a big change, and every so often. `/ways:feedback` when a run shows something about the method worth sending back.
 
 ## Working an issue
 
