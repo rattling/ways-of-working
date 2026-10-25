@@ -24,14 +24,14 @@ Read the parent issue, its `Spec:` line, its sub-issues, the `integration/<featu
 
 Before cutting, ask once: "I'll cut the tickets first. Then go straight into the build, or stop so you can check them?"
 
-Call the Skill tool for Pocock's `to-tickets`, with the parent issue. It shows the breakdown for approval: that step always happens. In straight-through mode, that one approval also starts the build; otherwise stop after publishing, with the merge sentence (nothing to merge yet) and "Next: `/ways:build #<n>`".
+Run Pocock's `to-tickets` steps (`${CLAUDE_PLUGIN_ROOT}/reference/POCOCK.md`: only a person can type it, so read its instructions and follow them here), with the parent issue. It shows the breakdown for approval: that step always happens. In straight-through mode, that one approval also starts the build; otherwise stop after publishing, with the merge sentence (nothing to merge yet) and "Next: `/ways:build #<n>`".
 
 Every ticket gets a **Human verification** line, which `to-tickets`' template lacks and `/ways:work` needs: from the PRD's Human verification, or "matches the mock" with what to compare. `docs/agents/issue-tracker.md` says the rest.
 
 ## 3. Build
 
 1. **Marker.** Write the parent's number to `.claude/ways/autonomous` (`echo <n> > .claude/ways/autonomous`), so the Stop hook holds the gate and a fresh context resumes from the issue. Nobody should have to know about it.
-2. **Build.** Call the Skill tool for Pocock's `implement-spec`, with the parent issue. `docs/agents/issue-tracker.md` sets how: one ticket at a time unless the person asked for parallel, a model per ticket, progress as "N of M done", the run's cost in the integration PR, on `integration/<feature-slug>`.
+2. **Build.** Run Pocock's `implement-spec` steps (`${CLAUDE_PLUGIN_ROOT}/reference/POCOCK.md`: only a person can type it, so read its instructions and follow them here), with the parent issue. In straight-through mode this follows the ticket approval without stopping. `docs/agents/issue-tracker.md` sets how: one ticket at a time unless the person asked for parallel, a model per ticket, progress as "N of M done", the run's cost in the integration PR, on `integration/<feature-slug>`.
 3. **Review.** The code review is Pocock's `code-review` (`mattpocock-skills:code-review`), not Claude Code's built-in skill of the same name. Call it by that full name.
 
 ## 4. Hand over

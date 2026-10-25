@@ -19,7 +19,7 @@ Big work is two commands, with discovery before them when it's needed:
 
 `/ways:plan` is `/ways:requirements` then `/ways:design` in one session. Those two stay as commands of their own for when different people do the halves (a product person grills, an engineer designs): the PRD file between them is the hand-off.
 
-Pocock's skills run underneath (`grilling`, `domain-modeling`, `to-spec`, `to-tickets`, `implement-spec`, `code-review`, `triage`) and can still be typed on their own. These commands call them; they don't copy them.
+Pocock's skills run underneath (`grilling`, `domain-modeling`, `to-spec`, `to-tickets`, `implement-spec`, `code-review`, `triage`) and can still be typed on their own. These commands call them; they don't copy them. `to-spec`, `to-tickets` and `implement-spec` can only be typed by a person, so the commands read and follow their instructions instead, as `reference/POCOCK.md` says, and the flow doesn't stop for someone to type them.
 
 Every flow command follows the three rules below.
 
