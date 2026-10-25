@@ -29,9 +29,20 @@ cd "$project" || exit 0
 log="$(mktemp)"
 # Record the result for anything that shows gate state, such as the ways-band mod.
 record() { echo "$1 $(date +%s)" > "$project/.claude/ways/last-gate"; }
-if bash -c "$gate" >"$log" 2>&1; then
+bash -c "$gate" >"$log" 2>&1
+status=$?
+if (( status == 0 )); then
   rm -f "$log" "$blocks_file"
   record pass
+  exit 0
+fi
+# 127 is "command not found": the gate can't run on this machine, which isn't a red gate.
+# Blocking would only make the agent retry something it can't fix, so let the turn end and say so.
+if (( status == 127 )); then
+  record unrunnable
+  missing="$(grep -m1 -o '[^ :]*: command not found' "$log" | sed 's/: command not found//')"
+  rm -f "$log" "$blocks_file"
+  echo "{\"systemMessage\": \"The gate (\`$gate\`) can't run on this machine: ${missing:-a program it calls} isn't installed. Autonomous mode can't check the work here until it is, or the gate in .claude/ways.json uses a runner this machine has.\"}"
   exit 0
 fi
 record fail
