@@ -37,6 +37,11 @@ Work in rounds, as Pocock's `grilling` does: number the questions, give your rec
 6. **Seams.** Where the feature is tested and built behind: prefer existing seams, the highest one possible, as few as possible. Deep modules: what sits behind each interface.
 7. **NFRs**, only when `architecture.md`'s walkthrough is triggered (new service, new integration, data store or public contract change, high risk): security and data, failure, performance, observability, operability, cost, compliance.
 
+8. **The look**, when the feature has screens. Raise it as a decision, not a rule. Compare the look the prototype or mock used with the app's own (its stylesheet, colour and spacing tokens, component library or style guide), and say which case this is:
+   - **The same look.** The usual case: the prototype used the app's look. Say so in one line; no extra ticket.
+   - **The prototype tried a new look.** Ask: adopt it (a ticket changes the theme, for this part of the app or all of it, before the screens that need it), or keep the current look and take only the prototype's layout and content. Record the choice in the PRD.
+   - **The app has no shared look yet** (each screen styles itself, or browser defaults show through, as in dark mode): recommend a first "theme and shell" ticket (`docs/standards/code.md`, "One look, set once") that the screen tickets wait for.
+
 Recommend the simplest design that keeps the charter's invariants. Where two designs are close and the choice is hard to reverse, compare them in a few lines before recommending.
 
 ## 3. Write it down as it settles

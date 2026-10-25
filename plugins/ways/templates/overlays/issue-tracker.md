@@ -16,7 +16,7 @@ A spec is a PRD, and it lives in the repo, not in an issue.
 
 ### When a skill says "publish the tickets" (`/to-tickets`)
 
-Each ticket is a sub-issue of the parent, labelled `ready-for-agent`, as `/to-tickets` says. Add a **Human verification** section to each, after its acceptance criteria: how someone who didn't build it confirms it, from the PRD's Human verification, or "matches the mock" with what to compare. `/ways:work` won't build a ticket autonomously without it.
+Each ticket is a sub-issue of the parent, labelled `ready-for-agent`, as `/to-tickets` says. Add a **Human verification** section to each, after its acceptance criteria: how someone who didn't build it confirms it, from the PRD's Human verification, or "matches the mock" with what to compare. `/ways:work` won't build a ticket autonomously without it. If the PRD's design chose a new look, or says the app has no shared look yet, the first ticket builds the theme (and the styled shell, if there's none), and the screen tickets are blocked by it. If it keeps the app's current look, there's no such ticket.
 
 A feature needs a PRD only if it needs more than one ticket or changes an invariant or a contract between systems. Otherwise the issue is the spec.
 
@@ -36,7 +36,7 @@ Read the parent issue, follow its `Spec:` line, and read the file.
 - **Opus** for the rules that must never be wrong (the charter's invariants), a high-risk path in `REVIEW.md` or `CODEOWNERS`, a contract other systems read, or a ticket that leaves judgement calls.
 - The code review and its fixes stay on the session's model.
 
-**Screenshots of visual changes.** Each implementer attaches headless-browser screenshots of what it changed on screen to its PR's evidence, and the integration PR collects them. For printed work a headless PDF isn't enough: the human verification names the real browser's print dialog.
+**Screenshots of visual changes.** Each implementer attaches headless-browser screenshots of what it changed on screen, with the operating system in light and in dark mode (unstyled defaults show up there), each beside the matching mock screen, to its PR's evidence. It compares layout and content with the mock, and the look with the one the PRD chose, which may be the app's own rather than the mock's, and says where they differ. The integration PR collects them. A screenshot alone proves the page renders, not that it looks right. For printed work a headless PDF isn't enough: the human verification names the real browser's print dialog.
 
 **Containers.** Each implementer runs the stack under its worktree's own Compose project and, if it publishes ports, on a port other than the default (`docs/standards/delivery.md`). It stops the containers it started (and any dev server or watcher) before reporting done. After each merge, check with `docker ps` that none of that worktree's are still running, and stop any that are: left running, they hold memory and their ports (8080, say) and block the next ticket.
 
