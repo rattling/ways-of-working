@@ -36,6 +36,8 @@ Every ticket gets a **Human verification** line, which `to-tickets`' template la
 
 ## 4. Hand over
 
+**Look at it before calling it ready.** If the feature has screens, run the app from the integration branch once, the way a person would, and open each screen beside its mock, in light and dark colour schemes. Fix what doesn't match, or list it in the integration PR. If you can't run it, say plainly in the PR and the handover that nobody has looked at it yet.
+
 Delete `.claude/ways/autonomous`, `.claude/ways/progress` and `.claude/ways/part`. Mark the integration PR ready. Say what was built and what's left in a few lines, with anything labelled `needs-human` and why.
 
 Then the merge sentence: "To ship it, merge PR #<m>: that's every ticket and the review, and merging closes them." Next: nothing in this feature; follow-ups are new issues: `/ways:work` for small ones, `/triage` for a pile.

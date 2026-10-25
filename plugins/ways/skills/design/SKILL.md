@@ -37,6 +37,8 @@ Work in rounds, as Pocock's `grilling` does: number the questions, give your rec
 6. **Seams.** Where the feature is tested and built behind: prefer existing seams, the highest one possible, as few as possible. Deep modules: what sits behind each interface.
 7. **NFRs**, only when `architecture.md`'s walkthrough is triggered (new service, new integration, data store or public contract change, high risk): security and data, failure, performance, observability, operability, cost, compliance.
 
+8. **The look**, when the feature has screens. Does the app already have the mock's theme and frame: the tokens, light and dark, the shell, the navigation? Open the running app (or its stylesheets) beside the mock and say what's missing. If anything is, the PRD's Implementation Decisions say so, and the first ticket builds the theme and shell before any screen that needs them (`docs/standards/code.md`, "One look, set once"). A mock linked from the PRD is not the look until something builds it.
+
 Recommend the simplest design that keeps the charter's invariants. Where two designs are close and the choice is hard to reverse, compare them in a few lines before recommending.
 
 ## 3. Write it down as it settles
