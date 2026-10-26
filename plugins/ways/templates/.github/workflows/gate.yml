@@ -2,21 +2,49 @@
 # so there is one place to change it. Make this a required check in branch protection.
 #
 # Add whatever the gate needs before it runs (a language runtime, a database service).
+#
+# Sized for Actions minutes: each job bills rounded up to the whole minute, and private repos on
+# the free plan get 2,000 a month. /ways:build opens a PR per ticket into an integration branch;
+# those rely on the builder's local gate and the Stop hook, so CI runs only on PRs into main:
+# - not on drafts: a draft integration PR runs once, when it's marked ready;
+# - a newer push cancels the PR's run in progress (never a push to main);
+# - a PR that changes only documentation passes at once, without running the gate. It's done in
+#   a step, not with paths-ignore, because a required check that never reports blocks the PR;
+# - every push to main runs in full, so a deploy can rely on "this commit passed the Gate".
 
 name: Gate
 
 on:
   pull_request:
+    branches: [main]
+    types: [opened, synchronize, reopened, ready_for_review]
   push:
     branches: [main]
 
 permissions:
   contents: read
 
+concurrency:
+  group: gate-${{ github.event.pull_request.number || github.sha }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
 jobs:
   gate:
     runs-on: ubuntu-latest
+    if: ${{ !github.event.pull_request.draft }}
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Documentation only?
+        id: docs
+        if: github.event_name == 'pull_request'
+        run: |
+          changed="$(git diff --name-only "origin/${{ github.base_ref }}...HEAD")"
+          if [ -n "$changed" ] && ! printf '%s\n' "$changed" | grep -qvE '(\.md$|^specs/|^docs/)'; then
+            echo "Only documentation changed: the gate passes without running."
+            echo "only=true" >> "$GITHUB_OUTPUT"
+          fi
       - name: Run the gate
+        if: steps.docs.outputs.only != 'true'
         run: bash -c "$(jq -r .gate .claude/ways.json)"
