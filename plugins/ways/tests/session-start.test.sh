@@ -21,8 +21,30 @@ start() {
     [[ ${3:-} == no-agents ]] || cp "$root/templates/AGENTS.md" "$repo/AGENTS.md"
     [[ -z ${4:-} ]] || { mkdir -p "$repo/.claude/ways"; echo "$4" > "$repo/.claude/ways/part"; }
   fi
-  out="$(CLAUDE_PROJECT_DIR="$repo" CLAUDE_PLUGIN_ROOT="$plugin" bash "$script")"
+  out="$(echo '{}' | CLAUDE_PROJECT_DIR="$repo" CLAUDE_PLUGIN_ROOT="$plugin" bash "$script")"
   rm -rf "$repo" "$plugin"
+}
+
+# A git repo set up for ways, with a worktree beside it. Sets main and wt.
+# .claude/ways/ isn't committed, so each checkout has its own markers, as in a real repo.
+pair() {
+  main="$(mktemp -d)"; wt="$main-wt"
+  git -C "$main" init -q
+  mkdir -p "$main/.claude"
+  echo '{"version": "0.5.0", "gate": "true"}' > "$main/.claude/ways.json"
+  echo '.claude/ways/' > "$main/.gitignore"
+  git -C "$main" -c core.autocrlf=false add -A
+  git -C "$main" -c user.name=t -c user.email=t@t commit -qm init
+  git -C "$main" worktree add -q --detach "$wt"
+}
+
+# Run the hook as a session in folder $1 would be, with CLAUDE_PROJECT_DIR at the main checkout.
+start_in() {
+  local plugin
+  plugin="$(mktemp -d)"; mkdir -p "$plugin/.claude-plugin"
+  echo '{"name": "ways", "version": "0.5.0"}' > "$plugin/.claude-plugin/plugin.json"
+  out="$(printf '{"cwd":"%s"}' "$1" | CLAUDE_PROJECT_DIR="$main" CLAUDE_PLUGIN_ROOT="$plugin" bash "$script")"
+  rm -rf "$plugin"
 }
 
 check() { # description, then a test expression
@@ -54,6 +76,18 @@ check "a minor release nudges setup" '[[ $out == *"Suggest running /ways:setup"*
 
 start 0.5.0 1.0.0
 check "a major release nudges setup" '[[ $out == *"Suggest running /ways:setup"* ]]'
+
+# Claude Desktop sets CLAUDE_PROJECT_DIR to the main checkout even for a session in a worktree.
+pair
+mkdir -p "$main/.claude/ways"; echo 7 > "$main/.claude/ways/autonomous"
+start_in "$wt"
+check "a worktree session ignores the main checkout's autonomous marker" '[[ $out == *"ways"* && $out != *"Autonomous mode is ON"* ]]'
+mkdir -p "$wt/.claude/ways"; echo 9 > "$wt/.claude/ways/autonomous"
+start_in "$wt"
+check "and reports its own" '[[ $out == *"Autonomous mode is ON"* && $out == *"#9"* && $out != *"#7"* ]]'
+start_in "$main"
+check "the main checkout still sees its own" '[[ $out == *"#7"* ]]'
+git -C "$main" worktree remove --force "$wt"; rm -rf "$main"
 
 echo
 if (( failures )); then echo "$failures failed"; exit 1; fi
