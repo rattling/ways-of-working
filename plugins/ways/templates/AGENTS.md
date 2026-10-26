@@ -54,6 +54,8 @@ Skips, and only these:
 
 Also: `/ways:explain` before working in code you don't know; `/ways:arch-review` at the start of a repo, before a big change, and every so often. `/ways:feedback` when a run shows something about the method worth sending back.
 
+**Working here with another agent** (Codex, say). The `/ways:*` commands are Claude Code skills, but everything they rely on is in this repo and GitHub, and holds for any agent: this file, the specs and standards, the tracker conventions in `docs/agents/issue-tracker.md`, the labels, one PR per ticket with `Closes #n` and a How to check, and the gate before every push. To run a command's steps, read its `SKILL.md` from the ways plugin (the folder for `ways:plan` is `skills/plan/`) and follow its intent, adapting what's Claude Code specific: the Skill tool, subagents, `${CLAUDE_PLUGIN_ROOT}` paths. No hook holds the gate for you, so run it yourself before each push. Say in the PR what you adapted or skipped.
+
 ## Working an issue
 
 Use `/ways:work #<n>`. It runs interactively for `ready-for-human` and autonomously for `ready-for-agent`. An untriaged issue is fine: it sizes it, reproduces a bug, and posts the brief it will work to before you say go. For a whole spec at once, `/ways:build #<parent>`: it sets the autonomous marker itself so the gate holds, and builds one ticket at a time unless you ask for parallel (`docs/agents/issue-tracker.md` says why).
