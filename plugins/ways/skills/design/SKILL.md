@@ -41,6 +41,7 @@ Work in rounds, as Pocock's `grilling` does: number the questions, give your rec
    - **The same look.** The usual case: the prototype used the app's look. Say so in one line; no extra ticket.
    - **The prototype tried a new look.** Ask: adopt it (a ticket changes the theme, for this part of the app or all of it, before the screens that need it), or keep the current look and take only the prototype's layout and content. Record the choice in the PRD.
    - **The app has no shared look yet** (each screen styles itself, or browser defaults show through, as in dark mode): recommend a first "theme and shell" ticket (`docs/standards/code.md`, "One look, set once") that the screen tickets wait for.
+9. **Demo data**, when a person will try the feature by hand. What does someone need in the dev seed to try every user story, the awkward cases included: the record with none, the one with fifty, the closed one, the longest name? Check the seed (`docs/standards/delivery.md`). If it lacks them, say what's missing in the PRD's Implementation Decisions, and recommend how it gets built: a **seed ticket first** (the default: the screens can be tried from the first slice), or **each ticket adds its own records** (spread out, never stale). Name the records people will use to check it, so the tickets can point at them. If the repo has no seed at all, the seed ticket starts it.
 
 Recommend the simplest design that keeps the charter's invariants. Where two designs are close and the choice is hard to reverse, compare them in a few lines before recommending.
 
