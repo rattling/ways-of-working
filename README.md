@@ -20,6 +20,8 @@ A repo set up this way declares both marketplaces and plugins in `.claude/settin
 
 Windows, macOS and Linux, and a team can mix them. Claude Code runs hooks in bash everywhere: on Windows that's Git Bash, which Claude Code needs anyway. So ways' hooks, and the `ways-band` mod's `/gate`, are bash scripts that find Git Bash on Windows rather than WSL's `bash`. You'll also need `gh`, signed in.
 
+Ways is built for Claude Code. Another agent (Codex, say) can work in a repo set up with it: the files, conventions, CI and gate hold for any agent, and the `AGENTS.md` template says what to adapt from the skills and to say so in the PR. The hooks and the band are Claude Code only.
+
 Commands written for a repo (the gate, scripts, examples in the skills) have to run on every platform the team uses. That means no `&&` and no shell-only syntax, and no program that one platform lacks. `make` is the usual trap, because Windows doesn't have it. `docs/standards/delivery.md` has the rule.
 
 ## The flow
