@@ -12,12 +12,18 @@
 
 name: PR hygiene
 
+# Only PRs into main: a ticket's PR into an integration branch is checked by the integration PR.
 on:
   pull_request:
+    branches: [main]
     types: [opened, edited, synchronize, ready_for_review, labeled, unlabeled]
 
 permissions:
   pull-requests: read
+
+concurrency:
+  group: pr-hygiene-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
 
 jobs:
   check:

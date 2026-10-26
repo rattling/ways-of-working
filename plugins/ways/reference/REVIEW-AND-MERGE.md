@@ -43,7 +43,7 @@ A revert or an incident in an area moves that area up a tier, and can move the r
 - One short-lived branch per issue off `main`, named `<type>/<issue>-<slug>`. One PR, squash-merged, branch deleted. Hours to a couple of days.
 - No long-lived per-person branches. No stacked PRs.
 - Multi-slice autonomous runs: low risk, merge each slice to `main` as its gate goes green and branch the next from the updated `main`. Medium or high risk: one short-lived integration branch per feature (`/implement-spec`), refreshed from `main` as it goes.
-- **Merges into an integration branch are the agent's.** Each slice merges once its gate is green, with no person involved. The review and the people's approval happen once, on the integration PR to `main`, after `code-review` has run over the whole branch.
+- **Merges into an integration branch are the agent's.** Each slice merges once its gate is green, with no person involved. That's the builder's local gate and the Stop hook, not CI: the Gate workflow runs on PRs into `main`, so it runs once on the integration PR when it's marked ready, not on every ticket's PR. A failure that only shows on CI's machine (Linux, say) is caught there, still before `main`. The review and the people's approval happen once, on the integration PR to `main`, after `code-review` has run over the whole branch.
 - **Integration PRs are not squashed.** They keep one commit per slice, so the PR can be reviewed slice by slice and a slice can be reverted alone. Sub-issues close when it lands on `main`.
 - An unfinished slice can merge behind a feature flag (off) instead of waiting on an integration branch.
 
