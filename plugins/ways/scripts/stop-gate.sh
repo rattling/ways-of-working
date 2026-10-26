@@ -10,13 +10,19 @@
 # sets stop_hook_active when a stop follows one this hook blocked.
 
 set -u
-project="${CLAUDE_PROJECT_DIR:-$PWD}"
+input="$(cat)"
+# The session's own folder, from the hook input. Inside a git worktree, CLAUDE_PROJECT_DIR
+# can point at the main checkout, which would share .claude/ways/ state between sessions.
+# sed -E, so the pattern works in GNU and BSD sed alike.
+cwd="$(printf '%s' "$input" | sed -nE 's/.*"cwd"[[:space:]]*:[[:space:]]*"(([^"\\]|\\.)*)".*/\1/p' | head -1 | sed 's/\\\\/\\/g')"
+project=""
+[[ -n "$cwd" ]] && project="$(git -C "$cwd" rev-parse --show-toplevel 2>/dev/null)"
+project="${project:-${CLAUDE_PROJECT_DIR:-$PWD}}"
 marker="$project/.claude/ways/autonomous"
 stamp="$project/.claude/ways.json"
 blocks_file="$project/.claude/ways/stop-blocks"
 max_blocks=3
 
-input="$(cat)"
 [[ -f "$marker" && -f "$stamp" ]] || exit 0
 
 gate="$(sed -n 's/.*"gate"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p' "$stamp" | head -1)"

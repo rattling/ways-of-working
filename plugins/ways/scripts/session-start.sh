@@ -5,7 +5,14 @@
 # Stdout from a SessionStart hook is added to Claude's context.
 
 set -u
-project="${CLAUDE_PROJECT_DIR:-$PWD}"
+input="$(cat)"
+# The session's own folder, from the hook input. Inside a git worktree, CLAUDE_PROJECT_DIR
+# can point at the main checkout, which would share .claude/ways/ state between sessions.
+# sed -E, so the pattern works in GNU and BSD sed alike.
+cwd="$(printf '%s' "$input" | sed -nE 's/.*"cwd"[[:space:]]*:[[:space:]]*"(([^"\\]|\\.)*)".*/\1/p' | head -1 | sed 's/\\\\/\\/g')"
+project=""
+[[ -n "$cwd" ]] && project="$(git -C "$cwd" rev-parse --show-toplevel 2>/dev/null)"
+project="${project:-${CLAUDE_PROJECT_DIR:-$PWD}}"
 stamp="$project/.claude/ways.json"
 root="${CLAUDE_PLUGIN_ROOT:?}"
 

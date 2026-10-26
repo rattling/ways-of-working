@@ -28,6 +28,31 @@ stop() {
   rm -f "$o" "$e"
 }
 
+# A git repo with ways set up and a gate of $1, with a worktree beside it. Sets main and wt.
+# .claude/ways/ isn't committed, so each checkout has its own markers, as in a real repo.
+pair() {
+  main="$(mktemp -d)"; wt="$main-wt"
+  git -C "$main" init -q
+  mkdir -p "$main/.claude"
+  echo "{\"version\": \"0.4.0\", \"gate\": \"$1\"}" > "$main/.claude/ways.json"
+  echo '.claude/ways/' > "$main/.gitignore"
+  git -C "$main" -c core.autocrlf=false add -A
+  git -C "$main" -c user.name=t -c user.email=t@t commit -qm init
+  git -C "$main" worktree add -q --detach "$wt"
+}
+
+# Run the hook as a session whose cwd is $1 (as the hook input spells it), with
+# CLAUDE_PROJECT_DIR at the main checkout, as Claude Desktop sets it. Sets code, out and err.
+stop_in() {
+  local o e
+  o="$(mktemp)"; e="$(mktemp)"
+  printf '{"hook_event_name": "Stop", "stop_hook_active": false, "cwd": "%s"}' "$1" \
+    | CLAUDE_PROJECT_DIR="$main" bash "$script" >"$o" 2>"$e"
+  code=$?
+  out="$(cat "$o")"; err="$(cat "$e")"
+  rm -f "$o" "$e"
+}
+
 check() { # description, then a test expression
   if eval "$2"; then echo "ok    $1"; else echo "FAIL  $1"; failures=$((failures + 1)); fi
 }
@@ -72,6 +97,31 @@ stop "$r" false
 check "a gate whose program isn't installed lets the turn end" '[[ $code == 0 ]]'
 check "and says it can't run here, naming the program" '[[ $out == *"can'"'"'t run on this machine"* && $out == *no-such-gate-program-xyz* ]]'
 check "and records it as unrunnable, not failed" '[[ $(cut -d" " -f1 "$r/.claude/ways/last-gate") == unrunnable ]]'
+
+# Worktrees. Claude Desktop sets CLAUDE_PROJECT_DIR to the main checkout even for a session
+# in a worktree, so the hook takes the project from the session's cwd instead.
+pair false
+mkdir -p "$main/.claude/ways"; echo 3 > "$main/.claude/ways/autonomous"
+stop_in "$wt"
+check "a worktree session isn't held by the main checkout's autonomous run" '[[ $code == 0 && ! -f $main/.claude/ways/last-gate ]]'
+
+mkdir -p "$wt/.claude/ways"; echo 5 > "$wt/.claude/ways/autonomous"
+stop_in "$wt"
+check "a worktree's own run is held by its own gate" '[[ $code == 2 ]]'
+check "and its state is written in the worktree, not the main checkout" '[[ -f $wt/.claude/ways/last-gate && -f $wt/.claude/ways/stop-blocks && ! -f $main/.claude/ways/stop-blocks ]]'
+
+stop_in "$main"
+check "the main checkout behaves as before" '[[ $code == 2 && -f $main/.claude/ways/last-gate ]]'
+
+if command -v cygpath >/dev/null; then
+  rm -f "$wt/.claude/ways/last-gate" "$wt/.claude/ways/stop-blocks"
+  win="$(cygpath -w "$wt")"
+  stop_in "${win//\\/\\\\}"
+  check "a Windows cwd, backslashes escaped as in the hook's JSON, resolves" '[[ $code == 2 && -f $wt/.claude/ways/last-gate ]]'
+else
+  echo "skip  a Windows cwd (no cygpath here)"
+fi
+git -C "$main" worktree remove --force "$wt"; rm -rf "$main"
 
 echo
 if (( failures )); then echo "$failures failed"; exit 1; fi
