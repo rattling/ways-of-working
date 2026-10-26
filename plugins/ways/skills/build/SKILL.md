@@ -38,7 +38,7 @@ Every ticket gets a **Human verification** line, which `to-tickets`' template la
 
 ## 4. Hand over
 
-**Look at it before calling it ready.** If the feature has screens, run the app from the integration branch once, the way a person would, and open each screen beside its mock: the layout and content as the mock has them, the look as the PRD chose (the app's own, or a new one). Fix what doesn't match, or list it in the integration PR. If you can't run it, say plainly in the PR and the handover that nobody has looked at it yet. If the person's reaction to it is about taste, offer style directions as screenshots of the running app (`${CLAUDE_PLUGIN_ROOT}/skills/mock/SKILL.md`, step 3); the pick becomes a theme ticket for `/ways:work`.
+**Look at it before calling it ready.** If the feature has screens, reset the dev seed, run the app from the integration branch once, and walk each user story the way a person would, with the seeded records the tickets name. If a story can't be tried with the seeded data, say so in the integration PR. Open each screen beside its mock: the layout and content as the mock has them, the look as the PRD chose (the app's own, or a new one). Fix what doesn't match, or list it in the integration PR. If you can't run it, say plainly in the PR and the handover that nobody has looked at it yet. If the person's reaction to it is about taste, offer style directions as screenshots of the running app (`${CLAUDE_PLUGIN_ROOT}/skills/mock/SKILL.md`, step 3); the pick becomes a theme ticket for `/ways:work`.
 
 Delete `.claude/ways/autonomous`, `.claude/ways/progress` and `.claude/ways/part`. Mark the integration PR ready. Say what was built and what's left in a few lines, with anything labelled `needs-human` and why.
 

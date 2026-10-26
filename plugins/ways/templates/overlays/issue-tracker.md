@@ -16,7 +16,7 @@ A spec is a PRD, and it lives in the repo, not in an issue.
 
 ### When a skill says "publish the tickets" (`/to-tickets`)
 
-Each ticket is a sub-issue of the parent, labelled `ready-for-agent`, as `/to-tickets` says. Add a **Human verification** section to each, after its acceptance criteria: how someone who didn't build it confirms it, from the PRD's Human verification, or "matches the mock" with what to compare. `/ways:work` won't build a ticket autonomously without it. If the PRD's design chose a new look, or says the app has no shared look yet, the first ticket builds the theme (and the styled shell, if there's none), and the screen tickets are blocked by it. If it keeps the app's current look, there's no such ticket.
+Each ticket is a sub-issue of the parent, labelled `ready-for-agent`, as `/to-tickets` says. Add a **Human verification** section to each, after its acceptance criteria: how someone who didn't build it confirms it, from the PRD's Human verification, or "matches the mock" with what to compare. `/ways:work` won't build a ticket autonomously without it. If the PRD's design chose a new look, or says the app has no shared look yet, the first ticket builds the theme (and the styled shell, if there's none), and the screen tickets are blocked by it. If it keeps the app's current look, there's no such ticket. If the PRD says the dev seed lacks what the feature needs, the seed ticket comes first (or each ticket adds its own records, as the PRD chose).
 
 A feature needs a PRD only if it needs more than one ticket or changes an invariant or a contract between systems. Otherwise the issue is the spec.
 
@@ -58,7 +58,7 @@ Work closes through a PR, never by closing the issue directly.
 
 ### Briefs
 
-An agent brief also has a **Human verification** line: how someone who didn't build it confirms it. For visual work, say what to look at, not just "the page renders". For printed work, name the real browser's print dialog, not a headless PDF: for example, "Chrome, Ctrl+P, A3 landscape, mono, 1 page". Or "matches `specs/prd/<slug>-mock.html`: same columns, same empty state".
+An agent brief also has a **Human verification** line: how someone who didn't build it confirms it. Where the app has a dev seed, name the record to try ("reset the seed, open *Harbour Lettings*: it has three engagements, one overdue"), so how to check it is never a puzzle. For visual work, say what to look at, not just "the page renders". For printed work, name the real browser's print dialog, not a headless PDF: for example, "Chrome, Ctrl+P, A3 landscape, mono, 1 page". Or "matches `specs/prd/<slug>-mock.html`: same columns, same empty state".
 
 ### Sizing, when triaging
 
