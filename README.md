@@ -12,7 +12,7 @@ claude plugin install ways@ways-of-working
 
 Installing `ways` also installs [`mattpocock-skills`](https://github.com/mattpocock/skills) from Anthropic's official marketplace, at the version that marketplace currently lists.
 
-Then, in a repo, run `/setup-matt-pocock-skills` (accept GitHub, the default labels and single-context), then `/ways:setup`. It seeds the files and labels below, never overwrites what's there, and opens a PR. Run it again later to pick up a newer version; the repo is stamped with the version it was set up at.
+Then, in a repo, run `/ways:setup`. It also writes Pocock's per-repo config (`docs/agents/` and the `## Agent skills` section), with the answers the method fixes, so there's no separate `/setup-matt-pocock-skills` step; a repo that already has that config keeps it. It seeds the files and labels below, never overwrites what's there, and opens a PR. Run it again later to pick up a newer version; the repo is stamped with the version it was set up at.
 
 A repo set up this way declares both marketplaces and plugins in `.claude/settings.json`, so anyone who opens it in Claude Code is offered the same setup.
 

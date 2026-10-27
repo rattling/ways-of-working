@@ -67,6 +67,20 @@ Use `/ways:work #<n>`. It runs interactively for `ready-for-human` and autonomou
 - **Learning:** a person reviews every PR before it merges.
 - High-risk paths are in `.github/CODEOWNERS` and need a code owner's approval whatever the dial says.
 
+## Agent skills
+
+### Issue tracker
+
+Issues live in this repo's GitHub Issues, worked with the `gh` CLI. See `docs/agents/issue-tracker.md`.
+
+### Triage labels
+
+The five default roles, each label named as its role (`needs-triage`, `needs-info`, `ready-for-agent`, `ready-for-human`, `wontfix`). See `docs/agents/triage-labels.md`.
+
+### Domain docs
+
+Single-context: one `GLOSSARY.md` and `docs/adr/` at the root. See `docs/agents/domain.md`.
+
 ## Rules for this repo
 
 <Only facts an agent can't infer: environment quirks, commands, invariants and the tests that prove them, things that must not be touched.>

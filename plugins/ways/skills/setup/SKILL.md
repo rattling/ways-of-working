@@ -12,7 +12,8 @@ Seed the files, labels and settings the method expects, without losing anything 
 
 - Plugin version: the `version` in `${CLAUDE_PLUGIN_ROOT}/.claude-plugin/plugin.json`.
 - Repo stamp: `.claude/ways.json`. If its `version` matches the plugin's, say the repo is current and stop, unless the person asked for something specific.
-- Pocock's config: `docs/agents/issue-tracker.md`, `docs/agents/triage-labels.md`, `docs/agents/domain.md`, and an `## Agent skills` section in `AGENTS.md` or `CLAUDE.md`. If they're missing, stop and ask the person to run `/setup-matt-pocock-skills` first, accepting GitHub, the default labels and single-context, and choosing `AGENTS.md` if asked which file to edit. Then run this again.
+- Pocock's config: `docs/agents/issue-tracker.md`, `docs/agents/triage-labels.md`, `docs/agents/domain.md`, and an `## Agent skills` section in `AGENTS.md` or `CLAUDE.md`. Whatever is missing, this skill writes in step 4; the person doesn't need to run `/setup-matt-pocock-skills`. Note what's already there: someone may have run Pocock's setup with other choices, and those stay.
+- The remote: `git remote -v` should point at GitHub. If it doesn't, stop: the method keeps its status in GitHub.
 - Existing material: `AGENTS.md`, `CLAUDE.md`, `README.md`, `docs/`, `specs/`, `GLOSSARY.md`, any charter, roadmap, milestones file, ADRs, PR or issue templates, CI workflows, `Makefile` or other gate commands.
 - `gh repo view` and `gh label list`, to confirm the CLI works and see what labels exist.
 
@@ -48,7 +49,7 @@ Templates live in `${CLAUDE_PLUGIN_ROOT}/templates/`. For each one, except `over
 
 `.github/CODEOWNERS`: fill in the high-risk paths this repo actually has, matching `REVIEW.md`. Owners are a judgement call: leave `@owner` and list it as `needs-human` unless the person names them.
 
-`AGENTS.md`: Pocock's setup may already have created it with only the `## Agent skills` section. Add the template's sections around that section; never remove or rewrite it. Fill in the gate command, the read order and the merge policy from what the repo shows. Leave genuine judgement calls as placeholders and list them.
+`AGENTS.md`: Pocock's setup may already have created it with only the `## Agent skills` section. Add the template's sections around that section; never remove or rewrite it. If the `## Agent skills` section is in `CLAUDE.md` instead, it moves to `AGENTS.md` with the rest of `CLAUDE.md`'s content (below), unchanged. Fill in the gate command, the read order and the merge policy from what the repo shows. Leave genuine judgement calls as placeholders and list them.
 
 The one exception to "never overwrite": `## How work goes` belongs to the plugin. On every run, replace that section, from its heading to the next `## `, with the template's current one, so the SessionStart hook (which prints it) shows the flow this plugin version has. If the repo's copy had changes of its own, say so in the report and point them to `## Rules for this repo`; the setup PR's diff shows what was replaced.
 
@@ -58,11 +59,38 @@ The one exception to "never overwrite": `## How work goes` belongs to the plugin
 
 ## 4. Pocock's config
 
-Append `${CLAUDE_PLUGIN_ROOT}/templates/overlays/issue-tracker.md` to the end of `docs/agents/issue-tracker.md`. If a `## This repo's conventions (ways)` section is already there, replace it with the current one. Leave the rest of the file alone.
+This is what `/setup-matt-pocock-skills` would write, with the answers the method fixes: GitHub, the default triage labels, single-context, `AGENTS.md`. Ways writes it itself rather than asking four questions whose answers are settled.
+
+**Find Pocock's templates** in the installed plugin, not in a copy of ours, so they follow his updates. The newest version is the last line of:
+
+```bash
+ls -d ~/.claude/plugins/cache/*/mattpocock-skills/*/skills/*/setup-matt-pocock-skills | sort -V | tail -1
+```
+
+If that finds nothing, try `find ~/.claude/plugins -type d -path '*mattpocock-skills*' -name setup-matt-pocock-skills`. If there's still nothing, fall back: ask the person to run `/setup-matt-pocock-skills`, accepting GitHub, the default labels and single-context, and choosing `AGENTS.md` if asked; then run this again.
+
+**Write each file that's missing**, from that folder, as it is:
+
+| File | From |
+|---|---|
+| `docs/agents/issue-tracker.md` | `issue-tracker-github.md` (leave its "PRs as a request surface" flag off) |
+| `docs/agents/triage-labels.md` | `triage-labels.md` |
+| `docs/agents/domain.md` | `domain.md` |
+
+A file that's already there stays as it is, whatever it says: a repo that chose other labels or a multi-context layout keeps them.
+
+**The `## Agent skills` section** comes with the `AGENTS.md` template (step 3). If `AGENTS.md` already has one, or `CLAUDE.md` had one that moved, keep it as it is and don't add a second.
+
+**Then the ways conventions:** append `${CLAUDE_PLUGIN_ROOT}/templates/overlays/issue-tracker.md` to the end of `docs/agents/issue-tracker.md`. If a `## This repo's conventions (ways)` section is already there, replace it with the current one. Leave the rest of the file alone.
 
 ## 5. Labels
 
-Create the labels in `${CLAUDE_PLUGIN_ROOT}/templates/labels.txt` with `gh label create <name> --color <hex> --description "<text>" --force`, except `bug` and `enhancement`: create those only if they're missing, without `--force`, so a repo's own colours stay. `/triage` needs one of the two, and they exist only where GitHub's defaults came with the repo. Leave other labels alone.
+Create the labels in `${CLAUDE_PLUGIN_ROOT}/templates/labels.txt` with `gh label create <name> --color <hex> --description "<text>" --force`, except the ones it marks *if missing*: create those only where no label of that name exists, without `--force`, so a repo's own colours stay.
+
+- The triage roles are what `/triage` applies. If `docs/agents/triage-labels.md` maps a role to another name, that repo's name is the label: don't create the default one beside it.
+- `/triage` needs `bug` or `enhancement`, and they exist only where GitHub's defaults came with the repo.
+
+Leave other labels alone.
 
 ## 6. Settings and stamp
 

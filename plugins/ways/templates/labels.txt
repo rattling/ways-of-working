@@ -1,7 +1,13 @@
 # name | colour | description
-# The triage roles (needs-triage, needs-info, ready-for-agent, ready-for-human, wontfix) come from /setup-matt-pocock-skills.
 needs-human | E99695 | Needs a decision, an acceptance, or information only a person has
 no-issue | EEEEEE | PR deliberately has no issue behind it (skips pr-hygiene)
+# If missing: create each of the rest only where no label of that name exists.
+# The triage roles, from Pocock's triage-labels.md. A repo that maps a role to another name keeps its own.
+needs-triage | FBCA04 | Maintainer needs to evaluate this issue
+needs-info | D4C5F9 | Waiting on reporter for more information
+ready-for-agent | 0E8A16 | Fully specified, ready for an AFK agent
+ready-for-human | 1D76DB | Requires human implementation
+wontfix | FFFFFF | Will not be actioned
 # /triage needs one of these two. GitHub's defaults, so creating them changes nothing where they exist.
 bug | d73a4a | Something isn't working
 enhancement | a2eeef | New feature or request
