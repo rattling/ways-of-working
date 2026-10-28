@@ -91,10 +91,10 @@ git -C "$main" worktree remove --force "$wt"; rm -rf "$main"
 
 pair
 start_in "$main"
-check "points at notes for ways, with no leftover notes" '[[ $out == *FEEDBACK.md* && $out != *"notes for ways from an earlier session"* ]]'
+check "points at the notes, with none left over" '[[ $out == *FEEDBACK.md* && $out != *"notes from an earlier session"* ]]'
 mkdir -p "$main/.claude/ways"; echo "- setup, step 1: a note" > "$main/.claude/ways/feedback.md"
 start_in "$main"
-check "leftover notes for ways get offered" '[[ $out == *"notes for ways from an earlier session"* ]]'
+check "leftover notes get offered" '[[ $out == *"notes from an earlier session"* ]]'
 git -C "$main" worktree remove --force "$wt"; rm -rf "$main"
 
 echo

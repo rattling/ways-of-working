@@ -42,4 +42,4 @@ Every ticket gets a **Human verification** line, which `to-tickets`' template la
 
 Delete `.claude/ways/autonomous`, `.claude/ways/progress` and `.claude/ways/part`. Mark the integration PR ready. Say what was built and what's left in a few lines, with anything labelled `needs-human` and why.
 
-Then the merge sentence: "To ship it, merge PR #<m>: that's every ticket and the review, and merging closes them." Next: nothing in this feature; follow-ups are new issues: `/ways:work` for small ones, `/triage` for a pile. Then the notes for ways, if there are any (`${CLAUDE_PLUGIN_ROOT}/reference/FEEDBACK.md`).
+Then the merge sentence: "To ship it, merge PR #<m>: that's every ticket and the review, and merging closes them." Next: nothing in this feature; follow-ups are new issues: `/ways:work` for small ones, `/triage` for a pile. Then the notes, for this repo and for ways, if there are any (`${CLAUDE_PLUGIN_ROOT}/reference/FEEDBACK.md`).

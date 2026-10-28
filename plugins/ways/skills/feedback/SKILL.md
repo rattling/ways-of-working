@@ -8,9 +8,9 @@ disable-model-invocation: true
 
 How the method worked in practice is what improves it: where the flow stopped, what a skill got wrong, what worked better than expected. This turns a session's experience into an issue on the ways-of-working repo, without leaking anything from the repo it happened in.
 
-Input, optional: what the person wants to say. Start from the notes in `.claude/ways/feedback.md` if there are any (`${CLAUDE_PLUGIN_ROOT}/reference/FEEDBACK.md` says how they're kept), and from the session. If there's nothing in either, ask the person what they'd change rather than drafting from vague memory.
+Input, optional: what the person wants to say. Start from the `[ways]` notes in `.claude/ways/feedback.md` if there are any (`${CLAUDE_PLUGIN_ROOT}/reference/FEEDBACK.md` says how they're kept), and from the session. If there's nothing in either, ask the person what they'd change rather than drafting from vague memory.
 
-When the notes are being offered at the end of a command, the person has already picked which to keep: draft only those, with what they added folded in. Once they're sent or dropped, delete `.claude/ways/feedback.md`.
+When the notes are being offered at the end of a command, the person has already picked which to keep: draft only those, with what they added folded in. Once they're sent or dropped, remove them from `.claude/ways/feedback.md`, and delete the file if nothing's left. `[repo]` notes aren't this skill's: leave them for the end of the next command, or offer them now as `FEEDBACK.md` says.
 
 ## 1. Draft it
 
