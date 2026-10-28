@@ -52,6 +52,6 @@ The last thing said is one plain sentence about what to merge and what merging m
 
 Ask for no other merges: the command's own PR is the only one a person merges, and tickets merge into the integration branch without anyone being asked. When a command ends with nothing to merge (`/ways:requirements` alone), say so in the same sentence and name the next command.
 
-## 4. Note what ways got wrong, as it happens
+## 4. Note what's worth improving, as it happens
 
-Throughout the command, note anything about ways itself that pops out, in `.claude/ways/feedback.md`, and after the merge sentence offer the person those specific findings, as `reference/FEEDBACK.md` says. No notes, no mention of feedback.
+Throughout the command, note anything that pops out worth improving, in this repo or in ways, in `.claude/ways/feedback.md`, and after the merge sentence offer the person those specific findings, as `reference/FEEDBACK.md` says. No notes, nothing said about them.

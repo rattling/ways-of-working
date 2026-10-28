@@ -8,7 +8,7 @@ disable-model-invocation: true
 
 Seed the files, labels and settings the method expects, without losing anything already here. The result is a PR a person reviews.
 
-As you go, note anything about ways itself that pops out, and offer those findings when you hand over: `${CLAUDE_PLUGIN_ROOT}/reference/FEEDBACK.md`. Setup is often the first ways command run in a repo, so it's where the method's rough edges show most.
+As you go, note anything that pops out worth improving, in this repo or in ways, and offer those findings when you hand over: `${CLAUDE_PLUGIN_ROOT}/reference/FEEDBACK.md`. Setup is often the first ways command run in a repo, so it's where the method's rough edges show most, and where the repo's gaps first come to light.
 
 ## 1. Look before writing
 
@@ -140,6 +140,6 @@ Setup installs the method. On an established repo, the backfill takes days and m
 
 Leave out what the repo already has. With no remote yet, list them in the report as the first issues to file instead.
 
-## 9. Notes for ways
+## 9. Notes
 
-After the report and the backfill, offer the notes for ways, if there are any (`${CLAUDE_PLUGIN_ROOT}/reference/FEEDBACK.md`). `.claude/ways/feedback.md` may exist before this run's `.gitignore` line does: keep it out of the setup PR.
+After the report and the backfill, offer the notes, if there are any (`${CLAUDE_PLUGIN_ROOT}/reference/FEEDBACK.md`). `.claude/ways/feedback.md` may exist before this run's `.gitignore` line does: keep it out of the setup PR. A repo finding that's already a backfill sub-issue is covered: drop the note.
