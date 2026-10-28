@@ -37,6 +37,7 @@ A revert or an incident in an area moves that area up a tier, and can move the r
 - Every finding gets an answer: **fixed**, or **not a problem because…**. Verify a finding before acting on it.
 - At most three review rounds. After the first, re-review only the new diff.
 - Flag a class of bug once, not every instance.
+- **The docs match the change.** A PR that changes how the system runs, its parts, a contract or a term updates `docs/ARCHITECTURE.md`, the README, `GLOSSARY.md` or the standards' stack lines with it, or says it checked them. A reviewer who finds them now untrue treats it as a finding, not a follow-up.
 
 ## Branching
 

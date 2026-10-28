@@ -31,11 +31,11 @@ Triage is optional. If the issue has no state label (or only `needs-triage`), do
 
 ## 2. Interactive mode
 
-Work with the person turn by turn, and keep the gate green as you go. Then go to step 4.
+Work with the person turn by turn, and keep the gate green as you go. When the approach is clear, say which docs it will touch (step 4.2's list). Then go to step 4.
 
 ## 3. Autonomous mode
 
-1. **Plan comment.** Post a short plan on the issue: the approach, the seams you'll test at, anything you're assuming, and how you'll prove each acceptance item. Wait for a person to say go, unless they've said in this session that you needn't.
+1. **Plan comment.** Post a short plan on the issue: the approach, the seams you'll test at, anything you're assuming, how you'll prove each acceptance item, and which docs the change will touch (step 4.2's list), or "no docs change expected", so they're agreed before go. Wait for a person to say go, unless they've said in this session that you needn't.
 2. **Marker.** Write the issue number to `.claude/ways/autonomous` (`echo <n> > .claude/ways/autonomous`). While it exists, the Stop hook runs the gate and won't let a turn end on red (after three blocks in a row it tells you to hand over, then lets the turn end), and after a compaction the SessionStart hook points you back at the issue.
 3. **Draft PR early.** After the first meaningful commit, push and open a draft PR with `Closes #<n>`. Commits are the progress record.
 4. **Build.** Use `tdd` at the seams in your plan comment, and `diagnosing-bugs` for a bug. Commit in small steps with messages that say why.
@@ -45,12 +45,19 @@ Work with the person turn by turn, and keep the gate green as you go. Then go to
 ## 4. Before the PR is ready
 
 1. Run the gate. It must be green.
-2. Run Pocock's `code-review` (call it as `mattpocock-skills:code-review`, not Claude Code's built-in skill of the same name) against `main`. Answer every finding: **fixed**, or **not a problem because…**, verifying each before acting. At most three rounds; whatever is still disputed goes in the PR body.
-3. Decide the risk tier from `${CLAUDE_PLUGIN_ROOT}/reference/REVIEW-AND-MERGE.md`, `REVIEW.md` and `.github/CODEOWNERS`. If the review argued for a higher tier, take it. High risk: also run `/security-review`.
-4. Write the PR body with the `pr` skill, plus `Closes #<n>`, a `## How to check` section and the risk tier. Evidence is output you actually ran. For a visual change, that includes headless-browser screenshots of what changed, each beside the matching mock screen if there is one, comparing layout and content with the mock and the look with the one the PRD chose, attached to the PR. For printed work, a headless PDF isn't enough: the How to check names the real browser's print dialog and what it should show ("Chrome, Ctrl+P, A4 portrait, 1 page").
-5. **Stop the containers you started**, and anything else you left running (a dev server, a watcher). While building in a worktree, run the stack under its own project and, if it publishes ports, on a port other than the default (`docs/standards/delivery.md`). Check with `docker ps` that none of this worktree's are still up: a container left running holds memory and its port (8080, say) and blocks the next run.
-6. Delete `.claude/ways/autonomous` if it exists.
-7. Mark the PR ready (`gh pr ready`).
+2. **Keep the docs true to the change.** Only `/ways:plan` designs the architecture, but any change can make the docs wrong: a new container, a part that moves, a contract that changes shape, a new term. Read the diff against `main` beside what the repo says about itself, and fix in this PR whatever the change has made untrue:
+   - `docs/ARCHITECTURE.md`: the containers, the parts table, the contracts, the flows, and where and how it runs;
+   - the README's setup and run instructions;
+   - `GLOSSARY.md`, for a term the change adds, renames or uses differently;
+   - the stack lines (**Today**) in `docs/standards/`.
+
+   A decision that's hard to reverse (a data store, a framework, how it's hosted) gets a drafted ADR in `docs/adr/`, marked as a draft, for the person to agree, and the PR says so. If nothing needed changing, the PR body says what was checked: "Docs: checked ARCHITECTURE, README, GLOSSARY, standards; no change." Fix only what the change made untrue: older drift you notice is a `[repo]` note (`${CLAUDE_PLUGIN_ROOT}/reference/FEEDBACK.md`).
+3. Run Pocock's `code-review` (call it as `mattpocock-skills:code-review`, not Claude Code's built-in skill of the same name) against `main`. Answer every finding: **fixed**, or **not a problem because…**, verifying each before acting. At most three rounds; whatever is still disputed goes in the PR body.
+4. Decide the risk tier from `${CLAUDE_PLUGIN_ROOT}/reference/REVIEW-AND-MERGE.md`, `REVIEW.md` and `.github/CODEOWNERS`. If the review argued for a higher tier, take it. High risk: also run `/security-review`.
+5. Write the PR body with the `pr` skill, plus `Closes #<n>`, a `## How to check` section, the docs it changed or checked (step 2), and the risk tier. Evidence is output you actually ran. For a visual change, that includes headless-browser screenshots of what changed, each beside the matching mock screen if there is one, comparing layout and content with the mock and the look with the one the PRD chose, attached to the PR. For printed work, a headless PDF isn't enough: the How to check names the real browser's print dialog and what it should show ("Chrome, Ctrl+P, A4 portrait, 1 page").
+6. **Stop the containers you started**, and anything else you left running (a dev server, a watcher). While building in a worktree, run the stack under its own project and, if it publishes ports, on a port other than the default (`docs/standards/delivery.md`). Check with `docker ps` that none of this worktree's are still up: a container left running holds memory and its port (8080, say) and blocks the next run.
+7. Delete `.claude/ways/autonomous` if it exists.
+8. Mark the PR ready (`gh pr ready`).
 
 ## 5. Merge and close
 
@@ -66,7 +73,7 @@ Input: several issue numbers, or "everything `ready-for-agent`". You are the lea
 2. **Check they're independent.** Drop any with open blockers, any assigned to someone else, and any without acceptance or human verification (label those `needs-human`). Where two will plainly touch the same code, say so and order them; don't run them blind in parallel. The merge order is the order given, or yours, stated.
 3. **One plan comment per issue** (raw ones already have theirs, from step 1), then wait once for a person to say go for the whole batch, unless they've said in this session that you needn't.
 4. **Marker:** write the issue numbers, space-separated in merge order, to `.claude/ways/autonomous`. After a compaction, the SessionStart hook lists them and points you at their PRs.
-5. **One builder per issue**: a subagent with its own worktree (`isolation: "worktree"`), in the background, briefed with the issue number and these steps: branch, build (steps 3.3–3.5), then step 4, ending with a ready PR. The Stop hook doesn't run inside subagents, so the brief says plainly: run the gate and report its output, don't report done on red, stop the containers you started before reporting done (step 4.5), and, if the repo's stack publishes ports, run yours on a port other than the default (`docs/standards/delivery.md`). When a builder finishes, check with `docker ps` that its containers are gone, and stop any it left. One builder at a time unless the person asks for parallel ("two at a time", "in parallel"); then cap at what they'll review, five unless told otherwise. Each builder has its own worktree, and in a repo that runs in containers each worktree starts its own copy of them: several at once can run a laptop out of memory.
+5. **One builder per issue**: a subagent with its own worktree (`isolation: "worktree"`), in the background, briefed with the issue number and these steps: branch, build (steps 3.3–3.5), then step 4, docs included (4.2), ending with a ready PR. The Stop hook doesn't run inside subagents, so the brief says plainly: run the gate and report its output, don't report done on red, stop the containers you started before reporting done (step 4.6), and, if the repo's stack publishes ports, run yours on a port other than the default (`docs/standards/delivery.md`). When a builder finishes, check with `docker ps` that its containers are gone, and stop any it left. One builder at a time unless the person asks for parallel ("two at a time", "in parallel"); then cap at what they'll review, five unless told otherwise. Each builder has its own worktree, and in a repo that runs in containers each worktree starts its own copy of them: several at once can run a laptop out of memory.
 6. **Don't take their word for it.** For each finished builder, read the PR's diff, the gate output and the How to check, and run the How to check if it's cheap. Send a builder back once, with the specific defect. If it's still wrong, label the issue `needs-human` and move on.
 7. **Merge one at a time, in order,** as the dial allows (step 5 for each). After each merge, the next PR rebases onto `main` and reruns the gate before it merges; resolve conflicts yourself, and if a conflict changes behaviour, say so in that PR. PRs the dial won't let you merge stay open for their reviewer, and the rest carry on.
 8. **Hand over:** delete the marker and post one summary as your reply: each issue, its PR, merged or waiting on whom, and anything labelled `needs-human` with the reason.

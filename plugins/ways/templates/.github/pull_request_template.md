@@ -8,6 +8,8 @@ Closes #
 
 ## Evidence
 
+**Docs:** <!-- what this changed in ARCHITECTURE, README, GLOSSARY or the standards, or "checked, no change" -->
+
 ## Merge danger
 
 **Risk tier:** low / medium / high
