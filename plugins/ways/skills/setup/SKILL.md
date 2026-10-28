@@ -8,6 +8,8 @@ disable-model-invocation: true
 
 Seed the files, labels and settings the method expects, without losing anything already here. The result is a PR a person reviews.
 
+As you go, note anything about ways itself that pops out, and offer those findings when you hand over: `${CLAUDE_PLUGIN_ROOT}/reference/FEEDBACK.md`. Setup is often the first ways command run in a repo, so it's where the method's rough edges show most.
+
 ## 1. Look before writing
 
 - Plugin version: the `version` in `${CLAUDE_PLUGIN_ROOT}/.claude-plugin/plugin.json`.
@@ -137,3 +139,7 @@ Setup installs the method. On an established repo, the backfill takes days and m
 | The existing backlog: open items from the old tracker, `TODO`/`FIXME` comments, the suspected bugs found during setup | `/triage` | `needs-triage` |
 
 Leave out what the repo already has. With no remote yet, list them in the report as the first issues to file instead.
+
+## 9. Notes for ways
+
+After the report and the backfill, offer the notes for ways, if there are any (`${CLAUDE_PLUGIN_ROOT}/reference/FEEDBACK.md`). `.claude/ways/feedback.md` may exist before this run's `.gitignore` line does: keep it out of the setup PR.
