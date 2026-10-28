@@ -10,6 +10,8 @@ Walk the architecture through the Well-Architected pillars, question by question
 
 Input, optional: the scope ("before we add menus", "just security", "the whole system"). Without one, the whole system as it is today.
 
+As you go, note anything about ways itself that pops out, and offer those findings when you hand over: `${CLAUDE_PLUGIN_ROOT}/reference/FEEDBACK.md`.
+
 ## 1. Read first
 
 Finding facts is your job, never the person's. Read, with subagents for anything large:

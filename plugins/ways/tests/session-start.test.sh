@@ -89,6 +89,14 @@ start_in "$main"
 check "the main checkout still sees its own" '[[ $out == *"#7"* ]]'
 git -C "$main" worktree remove --force "$wt"; rm -rf "$main"
 
+pair
+start_in "$main"
+check "points at notes for ways, with no leftover notes" '[[ $out == *FEEDBACK.md* && $out != *"notes for ways from an earlier session"* ]]'
+mkdir -p "$main/.claude/ways"; echo "- setup, step 1: a note" > "$main/.claude/ways/feedback.md"
+start_in "$main"
+check "leftover notes for ways get offered" '[[ $out == *"notes for ways from an earlier session"* ]]'
+git -C "$main" worktree remove --force "$wt"; rm -rf "$main"
+
 echo
 if (( failures )); then echo "$failures failed"; exit 1; fi
 echo "all passed"

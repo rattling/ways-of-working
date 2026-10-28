@@ -1,7 +1,7 @@
 {
   "name": "ways",
   "displayName": "Ways of working",
-  "version": "0.22.0",
+  "version": "0.23.0",
   "description": "How a team works with Matt Pocock's skills: specs in the repo, status in GitHub, interactive and autonomous modes with a gate that holds, merge policy by risk, and the PR body as the report.",
   "author": {
     "name": "John Curry"

@@ -21,7 +21,7 @@ Big work is two commands, with discovery before them when it's needed:
 
 Pocock's skills run underneath (`grilling`, `domain-modeling`, `to-spec`, `to-tickets`, `implement-spec`, `code-review`, `triage`) and can still be typed on their own. These commands call them; they don't copy them. `to-spec`, `to-tickets` and `implement-spec` can only be typed by a person, so the commands read and follow their instructions instead, as `reference/POCOCK.md` says, and the flow doesn't stop for someone to type them.
 
-Every flow command follows the three rules below.
+Every flow command follows the four rules below.
 
 ## 1. Look for the output before starting
 
@@ -51,3 +51,7 @@ The last thing said is one plain sentence about what to merge and what merging m
 > To agree the spec, merge PR #14: that's what it should do and how the system changes. Next: `/ways:build #12`.
 
 Ask for no other merges: the command's own PR is the only one a person merges, and tickets merge into the integration branch without anyone being asked. When a command ends with nothing to merge (`/ways:requirements` alone), say so in the same sentence and name the next command.
+
+## 4. Note what ways got wrong, as it happens
+
+Throughout the command, note anything about ways itself that pops out, in `.claude/ways/feedback.md`, and after the merge sentence offer the person those specific findings, as `reference/FEEDBACK.md` says. No notes, no mention of feedback.
