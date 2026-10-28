@@ -13,6 +13,7 @@
   - **Made-up data only,** never a copy of production, and nothing personal.
   - **Separate from test fixtures.** Tests build their own data for each run; the seed is for people, demos and screenshots, and no test depends on it.
   - **Local and test environments only.** It never runs against production.
+  - **A test account for each role**, with a made-up password, and `AGENTS.md` says how an agent signs in locally as each, so screenshots behind sign-in need no improvising.
   - **Records worth naming have stable names** ("Harbour Lettings: three engagements, one overdue"), so a ticket can say which one to open.
 - **Every worktree runs its own containers.** Agents build in worktrees (`.claude/worktrees/`), beside the main checkout, so the stack has to run more than once on one machine:
   - **No fixed project name.** Leave `name:` out of `docker-compose.yml` (and don't pass a fixed `-p`), so each worktree gets its own Compose project, named after its folder. A shared project lets one worktree's gate rebuild the database under another, or under the app someone is looking at.

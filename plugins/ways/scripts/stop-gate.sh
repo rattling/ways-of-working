@@ -64,7 +64,7 @@ if (( blocks > max_blocks )); then
   # Let the turn end, and tell the person. The marker stays, so the run's state is visible.
   rm -f "$log" "$blocks_file"
   issues="$(tr -cs '0-9' ' ' < "$marker" | xargs | sed 's/[0-9][0-9]*/#&/g')"
-  echo "{\"systemMessage\": \"The gate is still red after ${max_blocks} attempts in autonomous mode${issues:+ on $issues}, so this turn was allowed to end. Check whether the issue is labelled needs-human, and delete .claude/ways/autonomous when you take over.\"}"
+  echo "{\"systemMessage\": \"The gate is still red after ${max_blocks} attempts in autonomous mode${issues:+ on $issues}, so this turn was allowed to end. The cause may be the code (check whether the issue is labelled needs-human) or the environment (a service not running, say). Delete .claude/ways/autonomous when you take over.\"}"
   exit 0
 fi
 echo "$blocks" > "$blocks_file"
@@ -72,9 +72,9 @@ echo "$blocks" > "$blocks_file"
 {
   echo "The gate failed (\`$gate\`), and autonomous mode doesn't end a turn on red."
   if (( blocks == max_blocks )); then
-    echo "This is the third block in a row. Stop trying: label the issue needs-human, say in five lines or fewer what you need from a person, and delete .claude/ways/autonomous. If you don't, the next stop is let through with the gate still red."
+    echo "This is the third block in a row. Stop trying: say in five lines or fewer what you need from a person, delete .claude/ways/autonomous, and, if the code is at fault, label the issue needs-human. If you don't, the next stop is let through with the gate still red."
   else
-    echo "Fix the cause, not the symptom. If it can't be made green without a person, label the issue needs-human, say why, and delete .claude/ways/autonomous."
+    echo "Fix the cause, not the symptom. The cause may be the environment, not the code: a service that isn't running (Docker, a database), generated files left stale by a dev server, a missing dependency. Fix that if you can. If it can't be made green without a person, say exactly what's needed and delete .claude/ways/autonomous; label the issue needs-human only if the code is at fault."
   fi
   echo
   echo "Last lines of output:"

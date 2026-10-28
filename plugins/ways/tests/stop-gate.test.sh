@@ -70,6 +70,7 @@ r="$(repo false)"
 stop "$r" false
 check "red gate: the stop is blocked" '[[ $code == 2 ]]'
 check "red gate: Claude is told why" '[[ $err == *"The gate failed"* ]]'
+check "red gate: the environment is named as a possible cause" '[[ $err == *"environment"* && $err == *"only if the code is at fault"* ]]'
 stop "$r" true
 check "second block in a row: still blocked" '[[ $code == 2 && $err != *"third"* ]]'
 stop "$r" true
