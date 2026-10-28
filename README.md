@@ -18,7 +18,7 @@ A repo set up this way declares both marketplaces and plugins in `.claude/settin
 
 ### Platforms
 
-Windows, macOS and Linux, and a team can mix them. Claude Code runs hooks in bash everywhere: on Windows that's Git Bash, which Claude Code needs anyway. So ways' hooks, and the `ways-band` mod's `/gate`, are bash scripts that find Git Bash on Windows rather than WSL's `bash`. You'll also need `gh`, signed in.
+Windows, macOS and Linux, and a team can mix them. Claude Code runs hooks in bash everywhere: on Windows that's Git Bash, which Claude Code needs anyway. So ways' hooks, and the `ways-band` mod's `/gate`, are bash scripts that find Git Bash on Windows rather than WSL's `bash`. A repo's own gate needs the same care when a person types it in PowerShell, where `bash` is often WSL's: setup records a bash-script gate as `git -c alias.gate='!bash scripts/check.sh' gate`, which finds Git's bash everywhere. You'll also need `gh`, signed in.
 
 Ways is built for Claude Code. Another agent (Codex, say) can work in a repo set up with it: the files, conventions, CI and gate hold for any agent, and the `AGENTS.md` template says what to adapt from the skills and to say so in the PR. The hooks and the band are Claude Code only.
 
