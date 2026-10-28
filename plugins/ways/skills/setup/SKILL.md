@@ -43,7 +43,7 @@ Templates live in `${CLAUDE_PLUGIN_ROOT}/templates/`. For each one, except `over
 
 **A dev seed.** If the app has screens or an API a person tries by hand, but no dev seed (`docs/standards/delivery.md`), list it as a gap in the report and suggest its issue: a seed that lets someone try the existing features, worked by `/ways:work`. If the repo's `delivery.md` came from ways with the shorter seed rule, replace that bullet with the current one.
 
-**Signing in.** If the app has sign-in, check that `AGENTS.md` or the README says how an agent signs in locally with test credentials (`docs/standards/delivery.md`, the dev seed). If neither does, list it as a gap in the report and suggest its issue: test accounts in the seed, and a line in `AGENTS.md` saying how to sign in as each. If the repo's `docs/standards/delivery.md` came from ways and lacks the test-account bullet, add it.
+**Signing in.** If the app has sign-in, check that `AGENTS.md` or the README says how an agent signs in locally with test credentials (`docs/standards/delivery.md`, the dev seed). If neither does, list it as a gap in the report and suggest its issue: test accounts in the seed, and a line in `AGENTS.md` saying how to sign in as each. If the repo's `docs/standards/delivery.md` came from ways and lacks the test-account bullet, add it, and likewise the "docs move with the code" bullet.
 
 **The look.** If the app has screens but no shared design tokens, no `color-scheme` or no styled shell (`docs/standards/code.md`, "One look, set once"), list it as a gap in the report and suggest its issue: a "theme and shell" ticket, done before the next visual feature. If the repo's `docs/standards/code.md` came from ways and lacks that bullet, add it.
 
