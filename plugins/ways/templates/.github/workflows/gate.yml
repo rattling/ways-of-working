@@ -1,7 +1,9 @@
 # The gate: the same command the Stop hook runs in autonomous mode, read from .claude/ways.json
 # so there is one place to change it. Make this a required check in branch protection.
 #
-# Add whatever the gate needs before it runs (a language runtime, a database service).
+# The runner and the steps before the gate depend on the stack: docs/standards/delivery.md,
+# "CI by stack", has them, and /ways:setup fills them in. Every step runs in bash (Git Bash on
+# Windows), so the same lines work on ubuntu-latest and windows-latest.
 #
 # Sized for Actions minutes: each job bills rounded up to the whole minute, and private repos on
 # the free plan get 2,000 a month. /ways:build opens a PR per ticket into an integration branch;
@@ -30,8 +32,11 @@ concurrency:
 
 jobs:
   gate:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-latest # windows-latest for .NET Framework (delivery.md, "CI by stack")
     if: ${{ !github.event.pull_request.draft }}
+    defaults:
+      run:
+        shell: bash # Git Bash on windows-latest, whose default is PowerShell
     steps:
       - uses: actions/checkout@v4
         with:
@@ -45,6 +50,8 @@ jobs:
             echo "Only documentation changed: the gate passes without running."
             echo "only=true" >> "$GITHUB_OUTPUT"
           fi
+      # The stack's toolchain goes here, each step with the same `if:` as the gate
+      # (delivery.md, "CI by stack"). None for a gate that runs in Docker Compose.
       - name: Run the gate
         if: steps.docs.outputs.only != 'true'
         run: bash -c "$(jq -r .gate .claude/ways.json)"

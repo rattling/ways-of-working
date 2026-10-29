@@ -192,7 +192,10 @@ export function register(on) {
     else if (view.gateResult === 'unrunnable') gate = Text({ color: 'yellow', children: ["gate can't run here"] })
     else gate = Text({ dimColor: true, children: ['gate not run (/gate)'] })
 
-    const parts = [Text({ bold: true, children: ['ways' + (view.version ? ' ' + view.version : '')] }), sep(), mode, sep(), gate]
+    // The version is the repo's stamp (the ways it was set up with), not the installed plugin's,
+    // which the band can't read reliably. Saying "repo" keeps a stale stamp from looking like a
+    // stale plugin; the SessionStart hook compares the two and suggests /ways:setup.
+    const parts = [Text({ bold: true, children: ['ways' + (view.version ? ' · repo ' + view.version : '')] }), sep(), mode, sep(), gate]
     if (view.part) parts.splice(1, 0, sep(), Text({ color: 'magenta', children: [view.part] }))
     if (view.dial) parts.push(sep(), Text({ children: ['dial ' + view.dial] }))
     if (view.branch) parts.push(sep(), Text({ dimColor: true, children: [view.branch] }))
