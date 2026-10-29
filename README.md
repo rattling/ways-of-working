@@ -42,13 +42,13 @@ You'll also need [`gh`](https://cli.github.com/), signed in. Installing `ways` i
 ## How work flows
 
 ```mermaid
-flowchart LR
+flowchart TD
     I([An issue]) --> Q{What do we know?}
-    Q -->|"Not sure what<br/>the problem is"| D["/ways:discover"]
+    Q -->|Problem unclear| D["/ways:discover"]
+    Q -->|Big| P["/ways:plan #n"]
+    Q -->|Small| W["/ways:work #n"]
     D --> P
-    Q -->|"Big: more than<br/>one ticket"| P["/ways:plan #n"]
-    P -->|"you merge<br/>the spec"| B["/ways:build #n"]
-    Q -->|"Small: a bug,<br/>a tweak"| W["/ways:work #n"]
+    P -->|you merge the spec| B["/ways:build #n"]
     B -->|you merge| S([Shipped])
     W -->|you merge| S
 ```
