@@ -128,7 +128,7 @@ Always list as `needs-human`, with the command to run:
 - **Branch protection on `main`:** a ruleset requiring a PR, the `Gate` check, code-owner review, and the approval count the Merging dial implies (one while it's on learning). Linear history, except that integration PRs merge with their slice commits. Check what's there first with `gh api repos/<owner>/<repo>/rules/branches/main`, and report which of three it is:
   - **Rules listed:** name any of the above that's missing.
   - **`[]`:** nothing protects `main`. Give the ruleset to add.
-  - **403, "Upgrade to GitHub Pro":** a private repo on GitHub's free plan can't protect `main` at all, so an agent with push access can push to it and whatever deploys from it. Say so plainly, and give the two fixes: GitHub Pro (or Team, for an organisation), or a deploy step that refuses any commit that isn't a merged PR's merge commit. Until one is in place, `main` is protected by agreement only, and nothing should run unattended against the repo.
+  - **403, "Upgrade to GitHub Pro":** a private repo on GitHub's free plan, where GitHub can't protect `main`. Say so plainly, and that ways guards it instead: in autonomous runs its hook refuses a push to `main`, and a merge into it while the dial is on learning, so keep the dial on learning here (GitHub can't hold high-risk PRs for a code owner either). If anything deploys from `main`, add the deploy check from `docs/standards/delivery.md`. A paid plan (Pro, or Team for an organisation) brings GitHub's rules back.
 - **The `pr-hygiene` check:** make it required once the first PR has passed it.
 - **`specs/charter.md` and `specs/roadmap.md`:** a person needs to write or confirm them.
 

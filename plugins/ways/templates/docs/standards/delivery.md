@@ -1,7 +1,18 @@
 # Delivery
 
 - **Short-lived branches from `main`, one PR each, squash-merged.** Integration branches for a multi-ticket spec are the exception: their PR keeps its slice commits.
-- **`main` is protected:** a PR, the gate check, `CODEOWNERS` review, and the approvals the repo's merge dial sets. A private repo on GitHub's free plan can't enforce any of it: there it holds by agreement, and the deploy step refuses any commit that isn't a merged PR's merge commit, or the repo moves to a paid plan, before anything works it unattended.
+- **`main` is protected:** a PR, the gate check, `CODEOWNERS` review, and the approvals the repo's merge dial sets. A private repo on GitHub's free plan can't enforce any of it, so there:
+  - **The ways hook guards it for agents.** In an autonomous run it refuses a push to `main`, and a merge into it while the merge dial is on learning. Keep the dial on learning, since nothing holds a high-risk PR for a code owner. The hook reads the command as typed, so it stops mistakes, not someone set on getting round it.
+  - **Deploys check where a commit came from.** A deploy from `main` first checks that the commit is a merged PR's merge commit, so nothing pushed straight to `main` reaches an environment. As the first step of the deploy job:
+
+    ```yaml
+    - name: Only deploy what a merged PR put on main
+      env: { GH_TOKEN: "${{ github.token }}" }
+      run: |
+        merged=$(gh api "repos/${{ github.repository }}/commits/${{ github.sha }}/pulls" \
+          --jq '[.[] | select(.merged_at != null and .merge_commit_sha == "${{ github.sha }}")] | length')
+        [ "$merged" -gt 0 ] || { echo "${{ github.sha }} isn't a merged PR's merge commit"; exit 1; }
+    ```
 - **The gate is one command**, recorded in `.claude/ways.json`: the same locally, in CI, and in the agent's Stop hook. Format, lint, static analysis, dependency audit, tests.
   - **One command that runs as it is in PowerShell and bash**: no `&&`, no shell-specific syntax. Anything more goes in a script the command calls.
   - **Its programs exist on every machine the team uses.** Passing the syntax rule isn't enough: `make check` has no `&&` and still fails on Windows, which doesn't ship `make`. Prefer a runner the repo already depends on (an npm or Composer script, `dotnet test`, `uv run`) that doesn't itself call `bash`.
