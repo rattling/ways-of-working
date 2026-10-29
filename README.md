@@ -134,9 +134,10 @@ A little more code buys an agreed spec, a review, and safer, better-tested code.
 | `docs/agents/` | Where the skills find the tracker, labels and conventions | Setup writes it |
 | Everything else | `AGENTS.md`, `REVIEW.md`, `.github/`, issues, PRs, tests | Claude builds; people review |
 
-Three hooks keep it honest in every session:
+Four hooks keep it honest in every session:
 - one orients Claude when it starts;
 - one stops an autonomous run from ending on a red gate;
+- one stops an autonomous run from pushing to `main`, or merging into it while the merge dial is on learning, which matters most where GitHub's free plan can't protect `main`;
 - one nudges when a file grows past about 500 lines.
 
 ## Works with
