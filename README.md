@@ -1,128 +1,175 @@
 # Ways of working
 
-How I run software projects with Claude Code, packaged as a plugin: Matt Pocock's skills for the engineering disciplines, and on top of them the operating model a team needs to agree once. Specs in the repo, status in GitHub, interactive and autonomous modes with a gate that holds, merge policy by risk, and the PR body as the report.
+**A Claude Code plugin that gives a team one agreed way to take work from an issue to a merged PR. Claude does the building. People make the decisions.**
+
+It sits on top of [Matt Pocock's skills](https://github.com/mattpocock/skills), which cover the engineering disciplines (grilling a plan, writing a spec, cutting tickets, test-driven development, code review). Ways adds what a team has to agree on once: where specs live, how big work is planned, when Claude works on its own, what has to pass before anything merges, and who approves what.
+
+## Why
+
+Coding agents are fast. What goes wrong is everything around the code:
+
+- **Nobody agreed what to build**, so the agent guesses, and the guess ships.
+- **Work isn't checked the same way twice**, so "done" means whatever this session decided.
+- **PRs are hard to review**: big, unexplained, and missing how to check them.
+- **It over-builds.** Every step adds a little, and a modest feature ends up five times the size it needed to be.
+
+Ways answers each of those with a step a person can see, and a check that holds when nobody is watching.
+
+## What you get
+
+| | |
+|---|---|
+| 🧭 **One flow** | Four commands cover discovery, planning, building and small fixes. Each one tells you where you are and what comes next. |
+| 📄 **Specs in the repo** | Requirements and design go in a PRD file, agreed in one PR. Status lives in GitHub issues, not in a chat. |
+| 🤖 **Interactive or autonomous** | Work alongside Claude, or let it build a whole spec on its own while the **gate** (your tests, lint and checks, as one command) holds every step. |
+| ✅ **Merge by risk** | Low-risk changes can merge themselves once CI is green. High-risk ones need a code owner. A dial in each repo sets how much people review ([the policy](plugins/ways/reference/REVIEW-AND-MERGE.md)). |
+| 📏 **Built in proportion** | Plans recommend the minimal answer, state the expected size up front, and the build is checked against it. |
+| 📝 **The PR is the report** | Every PR says what changed, what was checked, and how a person can check it. |
+| 💻 **Any platform** | Windows, macOS and Linux, in the same team. |
 
 ## Install
 
 ```bash
-claude plugin marketplace add anthropics/claude-plugins-official   # if you haven't already
+claude plugin marketplace add anthropics/claude-plugins-official
 claude plugin marketplace add rattling/ways-of-working
 claude plugin install ways@ways-of-working
 ```
 
-Installing `ways` also installs [`mattpocock-skills`](https://github.com/mattpocock/skills) from Anthropic's official marketplace, at the version that marketplace currently lists.
+Then, in a repo, run **`/ways:setup`**. It adds the files, labels and CI check the method needs, never overwrites what's already there, and opens a PR for you to review. Run it again after an update to bring the repo up to date.
 
-Then, in a repo, run `/ways:setup`. It also writes Pocock's per-repo config (`docs/agents/` and the `## Agent skills` section), with the answers the method fixes, so there's no separate `/setup-matt-pocock-skills` step; a repo that already has that config keeps it. It seeds the files and labels below, never overwrites what's there, and opens a PR. Run it again later to pick up a newer version; the repo is stamped with the version it was set up at.
+You'll also need [`gh`](https://cli.github.com/), signed in. Installing `ways` installs Pocock's skills with it, and a repo set up with ways offers the same plugins to anyone who opens it in Claude Code.
 
-A repo set up this way declares both marketplaces and plugins in `.claude/settings.json`, so anyone who opens it in Claude Code is offered the same setup.
+## How work flows
 
-### Platforms
-
-Windows, macOS and Linux, and a team can mix them. Claude Code runs hooks in bash everywhere: on Windows that's Git Bash, which Claude Code needs anyway. So ways' hooks, and the `ways-band` mod's `/gate`, are bash scripts that find Git Bash on Windows rather than WSL's `bash`. A repo's own gate needs the same care when a person types it in PowerShell, where `bash` is often WSL's: setup records a bash-script gate as `git -c alias.gate='!bash scripts/check.sh' gate`, which finds Git's bash everywhere. You'll also need `gh`, signed in.
-
-Ways is built for Claude Code. Another agent (Codex, say) can work in a repo set up with it: the files, conventions, CI and gate hold for any agent, and the `AGENTS.md` template says what to adapt from the skills and to say so in the PR. The hooks and the band are Claude Code only.
-
-Commands written for a repo (the gate, scripts, examples in the skills) have to run on every platform the team uses. That means no `&&` and no shell-only syntax, and no program that one platform lacks. `make` is the usual trap, because Windows doesn't have it. `docs/standards/delivery.md` has the rule.
-
-## The flow
-
-```
-New and unsorted, or a pile of them   →  /triage            (optional: the commands below size an issue themselves)
-Problem not understood                →  /ways:discover, then /ways:plan
-Known to be big                       →  /ways:plan #n, then /ways:build #n
-Known to be small                     →  /ways:work #n      (one or several, one at a time by default)
-
-/ways:discover   → the brief                person merges the discovery PR    documents in specs/brief/inbox/
-/ways:plan #n    → the PRD, what and how    person merges the spec PR          requirements (prototype, grill or both), then design
-/ways:build #n   → tickets, then code       person merges the integration PR   resumes a build under way
-/ways:work #n    → one reviewed PR          sizes, reproduces and briefs a raw issue, then waits for go
-
-Any time         prototype (explore options) · /ways:explain (learn a repo) · /ways:arch-review (health check)
+```mermaid
+flowchart TD
+    I([An issue]) --> Q{What do we know?}
+    Q -->|Problem unclear| D["/ways:discover"]
+    Q -->|Big| P["/ways:plan #n"]
+    Q -->|Small| W["/ways:work #n"]
+    D --> P
+    P -->|you merge the spec| B["/ways:build #n"]
+    B -->|you merge| S([Shipped])
+    W -->|you merge| S
 ```
 
-Each command is typed by a person: Claude doesn't start them itself, because each is a point where someone decides to move on. Each one looks for its own output before starting, so it never redoes a step, opens by saying where you are ("Planning the allergen chart (#12)"), and ends with the one PR to merge, what merging it means, and the next command.
+| Command | Use it when | You end up with |
+|---|---|---|
+| `/ways:discover` | The ask is a wish list, an idea or a half-built app, and nobody can say what problem it solves | A one-page brief and an issue to plan from |
+| `/ways:plan #n` | The work is big: more than one ticket, or it changes a rule or a contract | One spec PR: what it does, how the system changes, and how big it should be |
+| `/ways:build #n` | The spec is merged | Tickets, the code on one branch, a review, and one PR to ship it |
+| `/ways:work #n` | The work is small: a bug, an enhancement | One reviewed PR, from a raw issue if need be |
 
-A plan is one sitting: requirements then design, with one merge at the end. When different people do the halves (a product person grills, an engineer designs), `/ways:requirements` and `/ways:design` run them separately, with the PRD file as the hand-off.
+**A person types each command.** Claude never starts the next step itself, because each one is a point where someone decides to move on. Every command checks what's already done, so running it twice never repeats work, and ends by naming the one PR to merge and the next command.
 
-Pocock's skills run underneath and can still be typed on their own: `/ways:plan` runs `grilling`, `domain-modeling` and `/to-spec`; `/ways:build` runs `/to-tickets`, `/implement-spec` and `code-review`. These commands call them and add this repo's conventions; they don't copy them.
+The full routing table, with what counts as big and the only two shortcuts allowed, is [How work goes](plugins/ways/templates/AGENTS.md#how-work-goes). Setup copies it into every repo.
 
-The full table, with what counts as big work and the only two skips, is [How work goes](plugins/ways/templates/AGENTS.md#how-work-goes). It's written once: `/ways:setup` copies it into every repo's `AGENTS.md`, the SessionStart hook reads it from there, and `/triage` sizes against it.
+### Also useful
+
+| Command | What it does |
+|---|---|
+| `/ways:setup` | Sets a repo up, or brings it up to date |
+| `/ways:mock` | A clickable mock of a page, printout or chart, with real data, kept as the picture the build must match |
+| `/ways:explain` | A visual explainer of how a repo works, for someone new to it |
+| `/ways:arch-review` | A guided architecture review, ending in a critique to turn into tickets |
+| `/ways:requirements`, `/ways:design` | The two halves of a plan, for when different people do them |
+| `/ways:feedback` | Tells this repo how ways worked for you, as an issue |
+
+<details>
+<summary><b>More about each command</b></summary>
+
+- **`/ways:setup`** seeds the files below, the standards, the labels, a `pr-hygiene` CI check and Pocock's per-repo config, and stamps the repo with the version. On an update it replaces the sections the plugin owns and adds new standards sections, leaving the rest alone.
+- **`/ways:discover`** works from interviews, notes, data and whatever's been built (put them in `specs/brief/inbox/`) to who hurts, how we'd know it's fixed, the workflows and an MVP. Sources that name people stay in a git-ignored `private/` folder. Quick mode stops three times; deep mode checks every quote. Built on Ofer Regev's [discovery-to-mvp](https://github.com/oferregev81pt/discovery-to-mvp) (MIT). [`examples/discovery/`](examples/discovery/) is a case to practise on, with an answer key.
+- **`/ways:plan`** works out the requirements by prototyping, grilling or both, recommending the minimal answer each time and putting what's declined on a Later list. Then it designs at system level (parts, contracts, data, seams, and NFRs where they apply) and estimates the size beside the closest feature already in the repo. Everything goes into one PRD and one spec PR.
+- **`/ways:build`** cuts a few tickets, each with an expected size, a human check, and a model chosen by what it changes (Sonnet for what follows a pattern, Opus for what changes a rule). It builds them one at a time on an integration branch, reviews the whole branch, walks the result in the running app, and compares the size with the estimate. It resumes a build under way.
+- **`/ways:work`** takes one small issue (or a batch) interactively or autonomously: branch, plan, draft PR, test-driven build, Pocock's code review with every finding answered, a risk tier, and the PR body. From a raw issue it sizes it, reproduces a bug first, and waits for your go.
+- **`/ways:mock`** is for anything people look at. Mocks come after the decisions, look like the finished product, and carry a guided tour. [`examples/mocks/`](examples/mocks/) has three.
+- **`/ways:arch-review`** walks the pillars of a Well-Architected Review (reliability, security, cost, operations, performance) and ends with what holds, the one thing that would sink it, and the gaps.
+- **`/ways:feedback`** drafts from the session, strips client and repo detail, shows you the text, and opens the issue only after a yes. The other commands note what could be better as they go and offer it at the end.
+
+Pocock's skills run underneath and can still be typed on their own. `/ways:plan` uses `grilling`, `domain-modeling` and `to-spec`; `/ways:build` uses `to-tickets`, `implement-spec` and `code-review`. Ways calls them and adds its conventions; it doesn't copy them.
+
+</details>
+
+## What it looks like in practice
+
+The same request (a menu's allergen chart, printable for the wall, that says when the printed copy is out of date) was built three ways on the same app:
+
+| | Plain Claude Code | Ways before proportion | **Ways today** |
+|---|---|---|---|
+| Lines | 837 | 4,984 | **1,038** |
+| Files | 14 | 52 | **14** |
+| Tickets | – | 6 | **2** |
+| Time | 7 min | 1 h 34 m | **45 min** |
+| Spec, design, review, checked in the app | No | Yes | **Yes** |
+
+Ways now comes in about a quarter bigger than the plain build, and that buys an agreed spec, a code review and a walk through the running app, none of which the plain build had. The extras (a history of printed copies, warnings on every page) went on a Later list instead of into the code.
 
 ## What a repo holds
 
 | Where | What | Who owns it |
 |---|---|---|
-| `specs/` | `charter.md`, `roadmap.md`, `operating-context.md`, `prd/` | People |
+| `specs/` | The charter, roadmap, operating context, and the PRDs | People |
 | `GLOSSARY.md`, `docs/adr/`, `docs/ARCHITECTURE.md` | Language, decisions, shape | People decide; Claude drafts |
-| `docs/agents/` | Where Pocock's skills find the tracker, labels and domain docs, plus this repo's conventions | Setup writes it |
-| `docs/standards/` | Engineering standards: architecture, code, testing, security, delivery, the stack, and what checks each rule | Starts as the plugin's; the team makes it its own |
-| Everything else | `AGENTS.md`, `CODING_STANDARDS.md`, `REVIEW.md`, `.github/`, `.claude/`, issues, PR bodies, tests | Claude builds; people review |
+| `docs/standards/` | Architecture, code, testing, security, delivery and the stack, each rule with what checks it | Starts as the plugin's; the team makes it its own |
+| `docs/agents/` | Where the skills find the tracker, labels and conventions | Setup writes it |
+| Everything else | `AGENTS.md`, `REVIEW.md`, `.github/`, issues, PRs, tests | Claude builds; people review |
 
-## What `ways` adds to Pocock's skills
+Three hooks keep it honest in every session:
+- one orients Claude when it starts;
+- one stops an autonomous run from ending on a red gate;
+- one nudges when a file grows past about 500 lines.
 
-- **`/ways:setup`:** the files above, including the standards, labels, a `pr-hygiene` CI check, settings, and this repo's conventions appended to Pocock's tracker config: PRDs as files, closing work through PRs.
-- **`/ways:work`:** one small issue (or several, one at a time by default) in interactive or autonomous mode: branch, plan comment, early draft PR, `tdd`, Pocock's `code-review` with every finding answered, risk tier, PR body, merge policy. From a raw issue it sizes it first (big work goes to `/ways:plan`), reproduces a bug before anything else, and posts the brief it will work to before you say go.
-- **The flow commands** (`/ways:discover`, `/ways:plan`, `/ways:build`, and `/ways:requirements` and `/ways:design` for split planning) share three rules in `plugins/ways/reference/PARTS.md`: look for the output before starting, open with where you are, end with the one merge and the next command.
-- **`/ways:plan`:** requirements and design in one sitting. Sizes an untriaged issue first, asks whether written requirements should go in as they are or be grilled, runs Pocock's grill (`grilling` and `domain-modeling`) from the issue and its discovery brief, recommending the minimal answer each time and keeping what's declined on a Later list, offers a mock when the result is visual, writes the PRD's what to disk before designing (so a compaction loses nothing), then designs: C4 context and containers, parts, contracts, data, seams, NFRs, and the size beside the closest existing feature, into the PRD, `docs/ARCHITECTURE.md` and ADRs. One spec PR, merged once.
-- **`/ways:requirements` and `/ways:design`:** the two halves of a plan, for when different people do them.
-- **`/ways:build`:** with no tickets yet, asks once whether to go straight from cutting them into the build, then `/to-tickets` (few tickets, each with a Human verification line, an expected size and a model chosen by what it changes) and `/implement-spec` on `integration/<feature>`, with the autonomous marker set for you. The hand-over puts the actual size beside the estimate. With tickets, it starts; with a build under way, it resumes.
-- **`/ways:discover`:** before a plan, for the work that arrives as a list of solutions or a half-built app. It works from interviews, notes, data and whatever's been built (your documents in `specs/brief/inbox/`) to a one-page brief and an intake issue. Sources that name people go to a git-ignored `private/` folder; the rest are committed with the brief. Quick mode stops three times; deep mode stops after every step and checks every quote. Built on Ofer Regev's [discovery-to-mvp](https://github.com/oferregev81pt/discovery-to-mvp) (MIT), with ways adding the workflows, cost and benefit, the order of work and the hand-off. [`examples/discovery/`](examples/discovery/) is a sample case to practise on, with an answer key.
-- **`/ways:mock`:** for work whose result people look at (a page, a flow, a printout, a chart): one clickable HTML page with the repo's real data, iterated with a person two or three times, then kept beside the PRD as the picture the build must match. A ticket's human check becomes "matches the mock". `/ways:discover`'s test prototype is built the same way but used the other way round: run with users against a kill signal, not iterated until someone likes it. If it passes, it's the mock's first draft. Mocks come after the decisions, look like the finished product, and carry a guided tour (a step per decision, an architecture toggle, a reset): [`examples/mocks/`](examples/mocks/) has three.
-- **`/ways:feedback`:** sends how ways worked in a session back to this repo as an issue: drafted from the session, with client and repo detail stripped, shown in full, and opened only after a yes. Without `gh`, it writes the text to a file to paste into a new issue. The other commands note what's worth improving as it happens, in the repo they're working in or in ways, and at the end offer those specific findings: repo ones as issues in that repo, ways ones as feedback here, each to accept, drop or add to. With nothing noted, they don't ask.
-- **`/ways:arch-review`:** a guided architecture walkthrough, pillar by pillar in the shape of a Well-Architected Review (reliability, security, cost, operational excellence, performance), at the start of a repo, before a big change or at intervals. It ends in a critique for people to turn into tickets: what holds, the one that would sink it, the gaps by pillar, smaller questions.
-- **Hooks:** a SessionStart hook that orients Claude in an opted-in repo, a Stop hook that won't let an autonomous run end on a red gate, and a nudge when the agent grows a file past about 500 lines.
-- **Proportion:** every step leans small. The grill recommends the minimal answer, the design states the feature's size against the closest one already in the repo, and review fixes don't add structure. It's a section in the seeded `docs/standards/architecture.md`.
-- **Reference:** risk tiers, branching and merge policy, in `plugins/ways/reference/`.
+## Works with
 
-## `ways-band`: a mod
+- **Windows, macOS and Linux.** Hooks run in bash everywhere (Git Bash on Windows). A repo's gate is one command that runs as it is in PowerShell and bash, so `make` and `&&` are out.
+- **Any stack.** Ways says what the gate *is* (one command, the same locally, in CI and for the agent), not what's in it: an npm script, `uv run`, `dotnet test`, Composer or Docker Compose. Setup picks the CI runner and toolchain for the stack, including Windows for .NET Framework ([CI by stack](plugins/ways/templates/docs/standards/delivery.md)).
+- **Other agents.** Codex or another agent can work in a repo set up with ways: the files, conventions, CI and gate hold for anyone, and `AGENTS.md` says what to adapt. The hooks and the band are Claude Code only.
 
-An optional second plugin, and a small worked example of a [mod](https://code.claude.com/docs/en/plugins/mods/overview): JavaScript that runs inside Claude Code and can draw in its interface.
+## `ways-band`: the status band
 
-- **A band above the prompt** in an opted-in repo: `ways · repo 0.7.0 · autonomous #9 · 2 of 9 · gate ✔ 2m ago · dial default · feature/3-walking-skeleton · context 42% · usage 5h 34% · wk 9%`.
-- **`/gate`** runs the repo's gate at once, without a Claude turn or any tokens, and records the result for the band.
-- **A `usage` tool for the agent** (`mcp__ways-band__usage`): this session's plan usage windows (five-hour and weekly), which the agent can't read itself, so an autonomous run can report them in its integration PR. It answers for its own session; up to 0.3.0 the mod wrote them to `.claude/ways/usage`, which every session in the repo overwrote. Where Claude Code has no reading (off a subscription, and possibly some plan types), the band leaves usage out.
+An optional second plugin that draws a line above the prompt in a ways repo:
 
-`claude plugin install ways-band@ways-of-working`. Its code is one file, `plugins/ways-band/hooks/register.js`, with tests beside it (`claude plugin test` in that directory). Mods run unsandboxed with your permissions; this one reads `.claude/ways.json`, a few files under `.ways/` and `AGENTS.md`, writes `.ways/last-gate`, offers the agent its `usage` tool, runs `git branch` and, on `/gate`, the gate.
+```
+ways · repo 0.30.0 · autonomous #9 · 2 of 9 · gate ✔ 2m ago · dial default · feature/3-walking-skeleton · context 42% · usage 5h 34% · wk 9%
+```
 
-[`WORKING-CONTRACT.md`](WORKING-CONTRACT.md) is the reasoning behind it: who owns what, and why.
+- **`/gate`** runs the repo's gate at once, with no Claude turn and no tokens.
+- **A `usage` tool** lets an autonomous run report what it cost in its PR.
+
+```bash
+claude plugin install ways-band@ways-of-working
+```
+
+It's also a small worked example of a [mod](https://code.claude.com/docs/en/plugins/mods/overview): one file, [`register.js`](plugins/ways-band/hooks/register.js), with tests beside it. Mods run with your permissions. This one reads `.claude/ways.json`, `.ways/` and `AGENTS.md`, writes `.ways/last-gate`, runs `git branch` and, on `/gate`, the gate.
 
 ## Make it yours
 
-The standards are a starting point, and a team should end up owning its own. Pick one:
+The standards are a starting point. A team should end up owning its own:
 
 - **Edit the repo's copy.** `docs/standards/` belongs to the repo once setup has copied it. Enough for one repo or a small team.
-- **Fork this repo.** Rewrite the standards and templates, point your repos' `.claude/settings.json` at your fork, and change it by PR with a version bump.
-- **Add your own plugin on top.** Keep `ways` as it is and add a plugin for what's yours: your standards, and skills for your deploys, environments and internal services, loaded when needed. Distribute both through managed settings on a Teams or Enterprise plan.
+- **Fork this repo**, rewrite the standards and templates, and point your repos at your fork.
+- **Add your own plugin on top** for your standards, deploys and internal services, and keep `ways` as it is.
 
-Whichever you choose, keep the rule from `docs/standards/README.md`: a rule nothing checks is advice, so every rule you add says what enforces it.
+Whichever you choose, keep one rule: a rule nothing checks is advice, so every rule you add says what enforces it. [`WORKING-CONTRACT.md`](WORKING-CONTRACT.md) has the reasoning behind who owns what.
 
 ## Where it came from
 
-About 14 projects and 550 work items run this way, including a delivery tool built specifically
-to enforce it. That tool is now parked. The practices did not need it.
+About 14 projects and 550 work items have been run this way, including a delivery tool built to enforce it, now parked: the practices didn't need it.
 
-Four things I got wrong the first time:
+<details>
+<summary><b>Four things I got wrong the first time</b></summary>
 
-I put enforcement in the tracker. It refused to mark work done until the PR was merged and the
-checklist ticked, which sounds strict but achieves very little, because the PR merges whenever
-it likes. The tracker's opinion arrives after the only irreversible step. A required CI check on
-the PR is harder to skip and does not care which tool produced the diff.
+- **Enforcement in the tracker.** It refused to mark work done until the PR merged, but the PR merges whenever it likes, so the tracker's opinion arrives after the only irreversible step. A required CI check on the PR is harder to skip, and doesn't care which tool produced the diff.
+- **A list of documents a project ought to have.** Nobody wrote them, me included. Each optional document now says when it's worth having, and that gets used, because the trigger arrives when the document would help.
+- **Distributing by local path.** Repos read from a folder in my home directory, which worked for exactly one person and quietly rotted for everyone else.
+- **Rules instead of reports.** An agent skips work it can skip invisibly, and so does a person. What holds is having to say what you did and didn't do, at the moment someone decides whether to accept it.
 
-I listed the documents a project ought to have. Nobody wrote them, including me. Each optional
-document now says when it is worth having, and that version gets used, because the trigger
-arrives at the moment the document would help.
-
-I distributed the pack by local path. Repos were told to read from a directory in my home
-folder, which worked for exactly one person and silently rotted for everyone else.
-
-I relied on rules rather than reports. An agent will skip work it can skip invisibly, and so
-will a person. The obligation that actually holds is to say what you did and did not do, at the
-moment someone is deciding whether to accept it.
+</details>
 
 ## Related
 
-[**lore**](https://github.com/rattling/lore) is the technical counterpart: patterns, gotchas and
-architectural lessons that outlive the project that taught them.
+[**lore**](https://github.com/rattling/lore): patterns, gotchas and architectural lessons that outlive the project that taught them.
 
 ## Licence
 
