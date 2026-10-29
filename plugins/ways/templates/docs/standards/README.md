@@ -4,7 +4,7 @@ Copied in by `/ways:setup`. Just enough to be useful. This repo's copy is the on
 
 | File | Covers |
 |---|---|
-| [architecture.md](architecture.md) | Diagrams, contracts, decoupling, decisions, the NFR walkthrough |
+| [architecture.md](architecture.md) | Diagrams, contracts, decoupling, proportion, decisions, the NFR walkthrough |
 | [code.md](code.md) | Writing code: size, errors, config, linting |
 | [testing.md](testing.md) | What to test, where, and with what |
 | [security.md](security.md) | Secrets, data, checks at each stage |
@@ -28,5 +28,6 @@ A rule nothing checks is advice. This is the list of what's enforced and by what
 | Public contracts change by addition only, unless a PRD says otherwise | A contract test in the gate; `CODEOWNERS` on the contract | PR |
 | High-risk paths get a second person and `/security-review` | `CODEOWNERS`; the risk tier in `REVIEW.md` | PR |
 | A new service, integration or data-store change gets an NFR walkthrough | The architecture owner reviews the spec PR | Spec |
+| A feature is in proportion: its size is estimated against the closest feature, and the build compared with the estimate | The PRD's **Size**, agreed with the spec; `/ways:build`'s hand-over; review | Spec; integration PR |
 
 Required checks and code-owner review need branch protection. GitHub only offers that on private repos with a paid plan; without it, those rows hold by agreement.

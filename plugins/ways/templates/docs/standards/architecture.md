@@ -20,6 +20,17 @@ Stop at level 2. Component and code diagrams go stale faster than they help; the
 - **Explicit over clever.** Visible wiring beats a container or a factory graph. Someone joining in six months should be able to follow it.
 - **No abstraction until the second use.** Duplication is cheaper than the wrong abstraction.
 
+## Proportion
+
+Build the minimum that delivers the request well now. Every step of the flow leans this way, because each one, left alone, adds a little: a thorough option accepted here, a class per concept there, a test file per class. Together they made one rehearsed feature six times the size a plain build needed.
+
+- **Future-proofing only for a need that's known.** "If we ever…" is a reason to keep the design open to it, not to build it. What's declined goes on the issue's **Later** list, not into the spec.
+- **Follow the closest existing feature:** the same kinds of files, the same seams, a similar size. A new feature much bigger than its nearest neighbour needs a stated reason.
+- **A class earns its place with behaviour of its own.** Not one per row, value, difference or check: those are arrays, records or a function in the part that uses them.
+- **Each behaviour is tested once, through the highest seam that reaches it.** Not a test file per class. A pure part with many cases gets its own tests; everything else is tested through the interface pages call.
+- **Every design states its size:** the closest feature and its size, the files and classes added or changed with rough lines, the ticket count, and a rough build time. Over about twice the closest feature, the design says so and proposes cuts, so the size is agreed with the spec, not discovered in review.
+- **Safeguards sized to the change.** The NFR walkthrough answers the rows the change touches, review fixes don't add structure, and a model is chosen by what a ticket changes, not the path it's on.
+
 ## Decisions
 
 Hard-to-reverse choices get an ADR in `docs/adr/`: the context, the options considered, the choice, and what would make us revisit it. Datastores, frameworks, hosting, contracts, auth. An inherited decision whose reason nobody knows gets an ADR that says so.
@@ -28,7 +39,7 @@ Hard-to-reverse choices get an ADR in `docs/adr/`: the context, the options cons
 
 A lightweight architecture review, in the spirit of an architecture board without the board. Triggered by a spec (PRD) for a new service, a new integration, a change to a data store or public contract, or anything at the high risk tier.
 
-The author walks the architecture owner through the spec for 30 minutes, against this list:
+The author walks the architecture owner through the spec against this list. Answer the rows the change touches; the rest are one line, "unchanged", not a paragraph each. A small feature on a high-risk path usually touches two or three.
 
 | | Question |
 |---|---|
