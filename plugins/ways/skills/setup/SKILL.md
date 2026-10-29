@@ -21,7 +21,7 @@ As you go, note anything that pops out worth improving, in this repo or in ways,
 
 ## 2. Propose, then act
 
-Tell the person, in one short list, what you will add, what you will move, and what you will leave alone. Wait for a yes. Then work on a branch, `chore/ways-setup`.
+Tell the person, in one short list, what you will add, what you will move, and what you will leave alone. Wait for a yes. Then work on a branch named after the version it sets up, `chore/ways-<version>` (for example `chore/ways-0.30.0`), so a later run never trips over an earlier run's branch. If that branch already exists, an earlier run of this same version was cut short: carry on from it rather than starting again.
 
 ## 3. Seed from the templates
 
