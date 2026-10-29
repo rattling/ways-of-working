@@ -37,6 +37,7 @@ A revert or an incident in an area moves that area up a tier, and can move the r
 - Every finding gets an answer: **fixed**, or **not a problem because…**. Verify a finding before acting on it.
 - At most three review rounds. After the first, re-review only the new diff.
 - Flag a class of bug once, not every instance.
+- **In proportion.** An abstraction nothing needs yet, a class per value or row, a test file per class, or code well past the PRD's **Size** or the closest feature is a finding (`docs/standards/architecture.md`, "Proportion"). The other way round too: **a fix doesn't add structure.** Fix the defect in place; a finding whose fix would add a class, a layer or a feature goes on the issue's Later list or a new issue, not into this PR.
 - **The docs match the change.** A PR that changes how the system runs, its parts, a contract or a term updates `docs/ARCHITECTURE.md`, the README, `GLOSSARY.md` or the standards' stack lines with it, or says it checked them. A reviewer who finds them now untrue treats it as a finding, not a follow-up.
 
 ## Branching

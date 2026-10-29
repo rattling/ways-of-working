@@ -21,3 +21,4 @@ Working with agents shifts the weight towards the top two. Writing and running t
 - **Untested legacy code gets characterisation tests before it changes**: pin what it does today, bugs included, and file the bugs as issues.
 - **A flaky test is a bug.** Fix it or delete it. Never retry until green.
 - **Each test creates the data it needs.** No dependence on shared data someone else changes.
+- **Each behaviour once, through the highest seam that reaches it.** Not a test file per class, and not the same rule again one layer down or through another adapter: a rule is tested at the service, and an adapter (a page, an API, an MCP tool) only for its own concerns, such as input, access and the shape of its output. Tests for a feature are about the size of the code they cover, rarely more.

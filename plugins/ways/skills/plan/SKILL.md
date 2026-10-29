@@ -24,6 +24,6 @@ Follow `${CLAUDE_PLUGIN_ROOT}/skills/design/SKILL.md`, steps 1 to 3, reading the
 
 ## 3. Hand on
 
-Mark the spec PR ready. Say in a few lines what the PRD settles (what, and how) and what's still open. Delete `.ways/part`. Then:
+Mark the spec PR ready. Say in a few lines what the PRD settles (what, and how), its size beside the closest feature, what went on the Later list, and what's still open. Delete `.ways/part`. Then:
 
 > To agree the spec, merge PR #<m>: that's what it should do and how the system changes. Next: `/ways:build #<n>`.

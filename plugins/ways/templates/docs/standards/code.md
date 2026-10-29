@@ -8,6 +8,7 @@
 - **Structured logs, no personal data.**
 - **One look, set once.** The default for an app with screens; the team can choose otherwise. It has one set of design tokens (colours, type, spacing, radius) in one shared stylesheet, with `color-scheme` declared and the page background set, and one styled shell (header, navigation, page frame) that every screen sits in. Screens use the tokens; they don't invent colours. Without this, every visual ticket makes up its own, and unstyled browser defaults show through: in dark mode, near-black form fields on a white page. **Light by default:** declare `color-scheme: light` so the operating system's dark mode can't half-style the controls. Build a dark theme, or a light/dark toggle, only when someone asks for one.
 - **Change what the work needs.** Tidy what you touch, within the change's scope. A refactor is its own PR.
+- **In proportion.** A feature looks like its closest neighbour in the code: the same kinds of files, a similar size. A class only when it has behaviour of its own. `architecture.md`, "Proportion", has the rest.
 
 ## Tooling
 
