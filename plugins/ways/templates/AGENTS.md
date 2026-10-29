@@ -59,6 +59,8 @@ Also: `/ways:explain` before working in code you don't know; `/ways:arch-review`
 
 ## Working an issue
 
+<!-- Owned by the ways plugin: /ways:setup replaces this section on every run. Put repo-specific rules under "Rules for this repo". -->
+
 Use `/ways:work #<n>`. It runs interactively for `ready-for-human` and autonomously for `ready-for-agent`. An untriaged issue is fine: it sizes it, reproduces a bug, and posts the brief it will work to before you say go. For a whole spec at once, `/ways:build #<parent>`: it sets the autonomous marker itself so the gate holds, and builds one ticket at a time unless you ask for parallel (`docs/agents/issue-tracker.md` says why).
 
 ## Merging

@@ -78,7 +78,7 @@ The full table, with what counts as big work and the only two skips, is [How wor
 
 An optional second plugin, and a small worked example of a [mod](https://code.claude.com/docs/en/plugins/mods/overview): JavaScript that runs inside Claude Code and can draw in its interface.
 
-- **A band above the prompt** in an opted-in repo: `ways 0.7.0 · autonomous #9 · 2 of 9 · gate ✔ 2m ago · dial default · feature/3-walking-skeleton · context 42% · usage 5h 34% · wk 9%`.
+- **A band above the prompt** in an opted-in repo: `ways · repo 0.7.0 · autonomous #9 · 2 of 9 · gate ✔ 2m ago · dial default · feature/3-walking-skeleton · context 42% · usage 5h 34% · wk 9%`.
 - **`/gate`** runs the repo's gate at once, without a Claude turn or any tokens, and records the result for the band.
 - **A `usage` tool for the agent** (`mcp__ways-band__usage`): this session's plan usage windows (five-hour and weekly), which the agent can't read itself, so an autonomous run can report them in its integration PR. It answers for its own session; up to 0.3.0 the mod wrote them to `.claude/ways/usage`, which every session in the repo overwrote. Where Claude Code has no reading (off a subscription, and possibly some plan types), the band leaves usage out.
 

@@ -1,7 +1,7 @@
 {
   "name": "ways-band",
   "displayName": "Ways band",
-  "version": "0.5.0",
+  "version": "0.5.1",
   "description": "A mod: a status band above the prompt showing the ways mode, the issue being worked, the last gate result, the merge dial and context use, plus /gate to run the gate instantly without a Claude turn.",
   "author": {
     "name": "John Curry"
