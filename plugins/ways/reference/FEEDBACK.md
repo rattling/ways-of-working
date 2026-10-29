@@ -34,14 +34,14 @@ The bar is high: something you'd want fixed, noticed in passing, outside what th
 
 Not a note: an ordinary choice a skill left open, or a step that went as written.
 
-Write each as one line, appended to `.claude/ways/feedback.md` as it happens, tagged with where it goes:
+Write each as one line, appended to `.ways/feedback.md` as it happens, tagged with where it goes:
 
 ```
 - [repo] gate: tests need Postgres from Docker Desktop, and nothing says to start it. Cost two failed turns.
 - [ways] setup, step 1: stopped to send the person to /setup-matt-pocock-skills, whose four answers ways already fixes.
 ```
 
-What happened, what it cost, and a suggestion if one is obvious. A `[ways]` line is said in ways' terms, not the repo's. Don't interrupt the work to mention it. `.claude/ways/` is gitignored once setup has run; never stage the file, even before then.
+What happened, what it cost, and a suggestion if one is obvious. A `[ways]` line is said in ways' terms, not the repo's. Don't interrupt the work to mention it. `.ways/` is gitignored once setup has run; never stage the file, even before then.
 
 ## Offer them at the end
 
@@ -56,4 +56,4 @@ Then, for the ones the person keeps:
 - **A line in `AGENTS.md`:** add it under `## Rules for this repo`, in the command's own PR if it has one still open, or as a `no-issue` PR of its own.
 - **For ways:** follow `${CLAUDE_PLUGIN_ROOT}/skills/feedback/SKILL.md` with those, from its step 1: it strips what's not to be shared, shows the issue text, and sends nothing without a yes.
 
-Once they're done or dropped, delete `.claude/ways/feedback.md`. If the person ends the session first, the file stays, and the next session offers them.
+Once they're done or dropped, delete `.ways/feedback.md`. If the person ends the session first, the file stays, and the next session offers them.

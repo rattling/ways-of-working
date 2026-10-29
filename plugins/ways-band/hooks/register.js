@@ -1,10 +1,10 @@
 // ways-band: a status band above the prompt for repos that work the ways-of-working way,
 // and a /gate command that runs the gate at once, without a Claude turn.
 //
-// It reads: .claude/ways.json (version, gate), .claude/ways/autonomous (the issue or
-// issues an autonomous run is on), .claude/ways/progress (a spec run's tickets done, of total),
-// .claude/ways/part (the big work under way and its command, written by the flow commands),
-// .claude/ways/last-gate (written by the ways Stop hook and by /gate),
+// It reads: .claude/ways.json (version, gate), .ways/autonomous (the issue or
+// issues an autonomous run is on), .ways/progress (a spec run's tickets done, of total),
+// .ways/part (the big work under way and its command, written by the flow commands),
+// .ways/last-gate (written by the ways Stop hook and by /gate),
 // the Dial line in AGENTS.md, and the current git branch. In a repo without .claude/ways.json
 // it draws nothing.
 //
@@ -62,13 +62,13 @@ async function refresh($) {
     view = null
     return
   }
-  const marker = await readText($, '.claude/ways/autonomous')
-  const lastGate = await readText($, '.claude/ways/last-gate')
+  const marker = await readText($, '.ways/autonomous')
+  const lastGate = await readText($, '.ways/last-gate')
   // `<done> <total>`, written by the lead of a spec run after each ticket merges.
-  const [done, total] = ((await readText($, '.claude/ways/progress')) || '').match(/\d+/g) || []
+  const [done, total] = ((await readText($, '.ways/progress')) || '').match(/\d+/g) || []
   const agents = await readText($, 'AGENTS.md')
   // `<feature> · <command>`, written by /ways:discover, plan, requirements, design and build.
-  const part = ((await readText($, '.claude/ways/part')) || '').split('\n')[0].trim() || null
+  const part = ((await readText($, '.ways/part')) || '').split('\n')[0].trim() || null
 
   let branch = null
   try {
@@ -122,7 +122,7 @@ async function runGate($) {
   try {
     const r = await $.process.run([await findBash($), '-c', gate], { timeoutMs: 600_000 })
     const result = r.exitCode === 0 ? 'pass' : 'fail'
-    await $.fs.write('.claude/ways/last-gate', result + ' ' + Math.round(Date.now() / 1000) + '\n')
+    await $.fs.write('.ways/last-gate', result + ' ' + Math.round(Date.now() / 1000) + '\n')
     // On a pass, the end of stdout is the useful part (test totals); on a fail, show stderr too.
     const lastLines = (text, n) => text.trim().split('\n').slice(-n).join('\n')
     const detail = result === 'pass' ? lastLines(r.stdout, 3) : lastLines(r.stdout, 8) + '\n' + lastLines(r.stderr, 8)

@@ -9,7 +9,7 @@ script="$root/scripts/session-start.sh"
 failures=0
 
 # Run the hook for a repo stamped $1 (empty: not opted in) under a plugin at $2.
-# The repo gets the AGENTS.md template unless $3 is "no-agents", and $4, if given, as .claude/ways/part. Sets out.
+# The repo gets the AGENTS.md template unless $3 is "no-agents", and $4, if given, as .ways/part. Sets out.
 start() {
   local repo plugin
   repo="$(mktemp -d)"; plugin="$(mktemp -d)"
@@ -19,20 +19,20 @@ start() {
     mkdir -p "$repo/.claude"
     echo "{\"version\": \"$1\", \"gate\": \"make check\"}" > "$repo/.claude/ways.json"
     [[ ${3:-} == no-agents ]] || cp "$root/templates/AGENTS.md" "$repo/AGENTS.md"
-    [[ -z ${4:-} ]] || { mkdir -p "$repo/.claude/ways"; echo "$4" > "$repo/.claude/ways/part"; }
+    [[ -z ${4:-} ]] || { mkdir -p "$repo/.ways"; echo "$4" > "$repo/.ways/part"; }
   fi
   out="$(echo '{}' | CLAUDE_PROJECT_DIR="$repo" CLAUDE_PLUGIN_ROOT="$plugin" bash "$script")"
   rm -rf "$repo" "$plugin"
 }
 
 # A git repo set up for ways, with a worktree beside it. Sets main and wt.
-# .claude/ways/ isn't committed, so each checkout has its own markers, as in a real repo.
+# .ways/ isn't committed, so each checkout has its own markers, as in a real repo.
 pair() {
   main="$(mktemp -d)"; wt="$main-wt"
   git -C "$main" init -q
   mkdir -p "$main/.claude"
   echo '{"version": "0.5.0", "gate": "true"}' > "$main/.claude/ways.json"
-  echo '.claude/ways/' > "$main/.gitignore"
+  echo '.ways/' > "$main/.gitignore"
   git -C "$main" -c core.autocrlf=false add -A
   git -C "$main" -c user.name=t -c user.email=t@t commit -qm init
   git -C "$main" worktree add -q --detach "$wt"
@@ -79,10 +79,10 @@ check "a major release nudges setup" '[[ $out == *"Suggest running /ways:setup"*
 
 # Claude Desktop sets CLAUDE_PROJECT_DIR to the main checkout even for a session in a worktree.
 pair
-mkdir -p "$main/.claude/ways"; echo 7 > "$main/.claude/ways/autonomous"
+mkdir -p "$main/.ways"; echo 7 > "$main/.ways/autonomous"
 start_in "$wt"
 check "a worktree session ignores the main checkout's autonomous marker" '[[ $out == *"ways"* && $out != *"Autonomous mode is ON"* ]]'
-mkdir -p "$wt/.claude/ways"; echo 9 > "$wt/.claude/ways/autonomous"
+mkdir -p "$wt/.ways"; echo 9 > "$wt/.ways/autonomous"
 start_in "$wt"
 check "and reports its own" '[[ $out == *"Autonomous mode is ON"* && $out == *"#9"* && $out != *"#7"* ]]'
 start_in "$main"
@@ -92,9 +92,22 @@ git -C "$main" worktree remove --force "$wt"; rm -rf "$main"
 pair
 start_in "$main"
 check "points at the notes, with none left over" '[[ $out == *FEEDBACK.md* && $out != *"notes from an earlier session"* ]]'
-mkdir -p "$main/.claude/ways"; echo "- setup, step 1: a note" > "$main/.claude/ways/feedback.md"
+mkdir -p "$main/.ways"; echo "- setup, step 1: a note" > "$main/.ways/feedback.md"
 start_in "$main"
 check "leftover notes get offered" '[[ $out == *"notes from an earlier session"* ]]'
+git -C "$main" worktree remove --force "$wt"; rm -rf "$main"
+
+# State an older version left under .claude/ways/, in a repo whose .gitignore doesn't name .ways/.
+pair
+git -C "$main" rm -q .gitignore
+mkdir -p "$main/.claude/ways"; echo 4 > "$main/.claude/ways/autonomous"; echo "- a note" > "$main/.claude/ways/feedback.md"
+start_in "$main"
+check "old state moves to .ways/, and the old folder goes" '[[ $(cat "$main/.ways/autonomous") == 4 && -f $main/.ways/feedback.md && ! -e $main/.claude/ways ]]'
+check "and is read from there" '[[ $out == *"#4"* && $out == *"notes from an earlier session"* ]]'
+check ".ways/ ignores itself, with no .gitignore line" '[[ -z $(git -C "$main" status --porcelain --untracked-files=all -- .ways) ]]'
+echo 6 > "$main/.ways/autonomous"; mkdir -p "$main/.claude/ways"; echo 5 > "$main/.claude/ways/autonomous"
+start_in "$main"
+check "a newer marker in .ways/ isn't overwritten by an old one" '[[ $(cat "$main/.ways/autonomous") == 6 ]]'
 git -C "$main" worktree remove --force "$wt"; rm -rf "$main"
 
 echo

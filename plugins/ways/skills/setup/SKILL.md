@@ -102,13 +102,13 @@ Leave other labels alone.
 - `.claude/ways.json`: write the plugin version and the gate command, for example `{"version": "0.2.0", "gate": "npm run check"}`. Use a runner the repo already depends on (an npm or Composer script, `dotnet test`, `uv run`). If the gate is a bash script, record it as `git -c alias.gate='!bash scripts/check.sh' gate`, not `bash scripts/check.sh`: on Windows, `bash` in PowerShell or cmd is often WSL's, not Git's, and fails there while hooks and CI pass (`docs/standards/delivery.md`). The same goes for an npm or Composer script that calls `bash`: point it at the git form. Where the repo already records a bare `bash …` gate, switch it and say why in the report. Avoid `make` unless every machine the team uses has it: Windows doesn't, in PowerShell or Git Bash. **Run the gate once before recording it**, and on Windows once more through PowerShell (`powershell -NoProfile -Command "<gate>"`), since that's where a person types it. If a program it calls isn't installed here ("command not found"), list it as `needs-human` with the install command (for example `winget install ezwinports.make`), or pick a runner this machine has. The Stop hook runs this command in autonomous mode, so it must be the same command CI runs. It must also run as it is in PowerShell and bash (no `&&`), and on its own fresh state, not the running app's database (`docs/standards/delivery.md`). Where tests use the app's database today, list that as a gap in the report and suggest the fix as an issue: tests build a throwaway database from the schema each run. In a repo with no code yet, use a gate that passes trivially and list it as `needs-human`.
 - `.gitignore`: add each of these lines that's missing, and nothing twice:
   ```
-  .claude/ways/
+  .ways/
   .claude/settings.local.json
   specs/brief/inbox/*
   !specs/brief/inbox/README.md
   specs/brief/*/private/
   ```
-  The first is where the autonomous-mode marker lives. The last three keep `/ways:discover`'s sources out of git: the inbox is ignored except its README (seeded from the template, so the folder exists in every clone), and each brief's `private/` holds the personal ones.
+  The first is this checkout's state: the autonomous-mode marker, notes, the last gate. It's at the root, not under `.claude/`, because Claude Code asks before the agent writes there, which would stop an autonomous run. The SessionStart hook also gives it its own `.gitignore`, and moves anything an older version left in `.claude/ways/`. The last three keep `/ways:discover`'s sources out of git: the inbox is ignored except its README (seeded from the template, so the folder exists in every clone), and each brief's `private/` holds the personal ones.
 
 ## 7. Open the PR and report
 
@@ -144,4 +144,4 @@ Leave out what the repo already has. With no remote yet, list them in the report
 
 ## 9. Notes
 
-After the report and the backfill, offer the notes, if there are any (`${CLAUDE_PLUGIN_ROOT}/reference/FEEDBACK.md`). `.claude/ways/feedback.md` may exist before this run's `.gitignore` line does: keep it out of the setup PR. A repo finding that's already a backfill sub-issue is covered: drop the note.
+After the report and the backfill, offer the notes, if there are any (`${CLAUDE_PLUGIN_ROOT}/reference/FEEDBACK.md`). `.ways/feedback.md` may exist before this run's `.gitignore` line does: keep it out of the setup PR. A repo finding that's already a backfill sub-issue is covered: drop the note.
