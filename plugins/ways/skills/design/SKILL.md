@@ -55,4 +55,4 @@ Commit to the spec's branch, so the spec PR carries requirements and design toge
 
 ## 4. Hand on
 
-Mark the spec PR ready. Say what changed in a few lines (the PRD sections, the diagram, the ADRs) and what's still open. Delete `.claude/ways/part`. Then the merge sentence: "To agree the spec, merge PR #<m>: that's what it should do and how the system changes." Next: `/ways:build #<n>`, which cuts slices along the seams decided here.
+Mark the spec PR ready. Say what changed in a few lines (the PRD sections, the diagram, the ADRs) and what's still open. Delete `.ways/part`. Then the merge sentence: "To agree the spec, merge PR #<m>: that's what it should do and how the system changes." Next: `/ways:build #<n>`, which cuts slices along the seams decided here.

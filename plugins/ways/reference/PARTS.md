@@ -42,7 +42,7 @@ The first line says the command, the feature and its issue, and what's done:
 
 > Planning the allergen chart (#12). Discovery is done: `specs/brief/allergen-chart/README.md`.
 
-Then write the same to `.claude/ways/part` as one line, `<feature> · <command>` (for example `allergen chart · plan`, or `allergen chart · build`), so the `ways-band` mod can show it and the SessionStart hook can name it after a compaction. Delete the file when the command hands over.
+Then write the same to `.ways/part` as one line, `<feature> · <command>` (for example `allergen chart · plan`, or `allergen chart · build`), so the `ways-band` mod can show it and the SessionStart hook can name it after a compaction. Delete the file when the command hands over.
 
 ## 3. End with one merge sentence, then the next command
 
@@ -54,4 +54,4 @@ Ask for no other merges: the command's own PR is the only one a person merges, a
 
 ## 4. Note what's worth improving, as it happens
 
-Throughout the command, note anything that pops out worth improving, in this repo or in ways, in `.claude/ways/feedback.md`, and after the merge sentence offer the person those specific findings, as `reference/FEEDBACK.md` says. No notes, nothing said about them.
+Throughout the command, note anything that pops out worth improving, in this repo or in ways, in `.ways/feedback.md`, and after the merge sentence offer the person those specific findings, as `reference/FEEDBACK.md` says. No notes, nothing said about them.

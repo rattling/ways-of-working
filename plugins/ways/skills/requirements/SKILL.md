@@ -57,4 +57,4 @@ Two checks after it:
 
 ## 5. Hand on
 
-Say in a few lines what the PRD settles and what's still open. Delete `.claude/ways/part`. Then: "Nothing to merge yet: design goes into the same draft spec PR (#<m>). Next: `/ways:design #<n>`."
+Say in a few lines what the PRD settles and what's still open. Delete `.ways/part`. Then: "Nothing to merge yet: design goes into the same draft spec PR (#<m>). Next: `/ways:design #<n>`."

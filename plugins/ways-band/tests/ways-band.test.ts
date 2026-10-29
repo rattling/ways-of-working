@@ -1,9 +1,9 @@
 import { expect, mock, test } from 'claude-code/testing'
 
 // Paths reach the stubs resolved against the working directory, with `\` on Windows;
-// compare them repo-relative, with `/`. The last `.claude/` is the repo's: a checkout
+// compare them repo-relative, with `/`. The last `.claude/` or `.ways/` is the repo's: a checkout
 // can itself sit under one (a worktree in `.claude/worktrees/`).
-const rel = (p: string) => p.replace(/\\/g, '/').replace(/^.*(?=(\.claude\/|AGENTS\.md$))/, '')
+const rel = (p: string) => p.replace(/\\/g, '/').replace(/^.*(?=(\.claude\/|\.ways\/|AGENTS\.md$))/, '')
 
 // A repo mid-way through an autonomous run on #3, whose last gate passed.
 // `runs` collects the argv of every command the mod starts; `env` is the environment it sees.
@@ -54,8 +54,8 @@ const BAND = {
 
 const REPO = {
   '.claude/ways.json': '{"version":"0.3.0","gate":"make check"}',
-  '.claude/ways/autonomous': '3\n',
-  '.claude/ways/last-gate': `pass ${Math.round(Date.now() / 1000) - 120}\n`,
+  '.ways/autonomous': '3\n',
+  '.ways/last-gate': `pass ${Math.round(Date.now() / 1000) - 120}\n`,
   'AGENTS.md': '## Merging\n\n**Dial:** default <!-- … -->\n',
 }
 
@@ -73,7 +73,7 @@ test('the band shows mode, issue, gate, dial, branch and context', async ($, on)
 })
 
 test('the band shows the part of big work under way', async ($, on) => {
-  stubRepo(on, { ...REPO, '.claude/ways/part': 'allergen chart · plan\n' })
+  stubRepo(on, { ...REPO, '.ways/part': 'allergen chart · plan\n' })
   await $.session.start({ cwd: '/repo' })
   const ui = await $.ui.mount(BAND as any)
   expect(await ui.find({ type: 'Text', text: 'allergen chart · plan' })).toBeDefined()
@@ -89,7 +89,7 @@ test('without a part file, no part is shown', async ($, on) => {
 })
 
 test("a gate that can't run on this machine says so", async ($, on) => {
-  stubRepo(on, { ...REPO, '.claude/ways/last-gate': `unrunnable ${Math.round(Date.now() / 1000)}
+  stubRepo(on, { ...REPO, '.ways/last-gate': `unrunnable ${Math.round(Date.now() / 1000)}
 ` })
   await $.session.start({ cwd: '/repo' })
   const ui = await $.ui.mount(BAND as any)
@@ -98,7 +98,7 @@ test("a gate that can't run on this machine says so", async ($, on) => {
 })
 
 test('a batch shows every issue the lead is running, in merge order', async ($, on) => {
-  stubRepo(on, { ...REPO, '.claude/ways/autonomous': '12 14 17\n' })
+  stubRepo(on, { ...REPO, '.ways/autonomous': '12 14 17\n' })
   await $.session.start({ cwd: '/repo' })
   const ui = await $.ui.mount(BAND as any)
   expect(await ui.find({ type: 'Text', text: 'autonomous batch #12 #14 #17' })).toBeDefined()
@@ -118,11 +118,11 @@ test('the band shows the usage windows, and writes no shared file', async ($, on
   await $.session.start({ cwd: '/repo' })
   const ui = await $.ui.mount(BAND as any)
   expect(await ui.find({ type: 'Text', text: 'usage 5h 34% · wk 9%' })).toBeDefined()
-  expect(written['.claude/ways/usage']).toBeUndefined()
+  expect(written['.ways/usage']).toBeUndefined()
   await ui.unmount()
 })
 
-// Every session open in a repo wrote the one .claude/ways/usage file, so an agent could read
+// Every session open in a repo wrote the one .ways/usage file, so an agent could read
 // another session's numbers (76% and 98% while its own was 30%). The tool answers for its own.
 test("the usage tool gives the agent this session's own windows", async ($, on) => {
   const tools: string[] = []
@@ -149,12 +149,12 @@ test('with no usage reading, the band leaves usage out and writes nothing', asyn
   await $.session.start({ cwd: '/repo' })
   const ui = await $.ui.mount(BAND as any)
   expect(await ui.find({ type: 'Text', text: /^usage/ })).toBeUndefined()
-  expect(written['.claude/ways/usage']).toBeUndefined()
+  expect(written['.ways/usage']).toBeUndefined()
   await ui.unmount()
 })
 
 test('a spec run shows how many of its tickets are done', async ($, on) => {
-  stubRepo(on, { ...REPO, '.claude/ways/autonomous': '9\n', '.claude/ways/progress': '2 9\n' })
+  stubRepo(on, { ...REPO, '.ways/autonomous': '9\n', '.ways/progress': '2 9\n' })
   await $.session.start({ cwd: '/repo' })
   const ui = await $.ui.mount(BAND as any)
   expect(await ui.find({ type: 'Text', text: 'autonomous #9 · 2 of 9' })).toBeDefined()
@@ -176,7 +176,7 @@ test('/gate runs the gate and records the result', async ($, on) => {
   await $.session.start({ cwd: '/repo' })
   const answer = await $.command.run({ command: 'gate', args: '' })
   expect(answer.text).toContain('✔ gate passed (make check)')
-  expect(written['.claude/ways/last-gate']).toMatch(/^pass \d+\n$/)
+  expect(written['.ways/last-gate']).toMatch(/^pass \d+\n$/)
   expect(gateRun(runs)).toEqual(['bash', '-c', 'make check'])
 })
 

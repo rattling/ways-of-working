@@ -11,9 +11,9 @@ failures=0
 repo() {
   local dir
   dir="$(mktemp -d)"
-  mkdir -p "$dir/.claude/ways"
+  mkdir -p "$dir/.claude" "$dir/.ways"
   echo "{\"version\": \"0.4.0\", \"gate\": \"$1\"}" > "$dir/.claude/ways.json"
-  echo 3 > "$dir/.claude/ways/autonomous"
+  echo 3 > "$dir/.ways/autonomous"
   echo "$dir"
 }
 
@@ -29,13 +29,13 @@ stop() {
 }
 
 # A git repo with ways set up and a gate of $1, with a worktree beside it. Sets main and wt.
-# .claude/ways/ isn't committed, so each checkout has its own markers, as in a real repo.
+# .ways/ isn't committed, so each checkout has its own markers, as in a real repo.
 pair() {
   main="$(mktemp -d)"; wt="$main-wt"
   git -C "$main" init -q
   mkdir -p "$main/.claude"
   echo "{\"version\": \"0.4.0\", \"gate\": \"$1\"}" > "$main/.claude/ways.json"
-  echo '.claude/ways/' > "$main/.gitignore"
+  echo '.ways/' > "$main/.gitignore"
   git -C "$main" -c core.autocrlf=false add -A
   git -C "$main" -c user.name=t -c user.email=t@t commit -qm init
   git -C "$main" worktree add -q --detach "$wt"
@@ -57,14 +57,14 @@ check() { # description, then a test expression
   if eval "$2"; then echo "ok    $1"; else echo "FAIL  $1"; failures=$((failures + 1)); fi
 }
 
-r="$(repo false)"; rm "$r/.claude/ways/autonomous"
+r="$(repo false)"; rm "$r/.ways/autonomous"
 stop "$r" false
 check "interactive (no marker): the turn ends" '[[ $code == 0 ]]'
 
 r="$(repo true)"
 stop "$r" false
 check "green gate: the turn ends" '[[ $code == 0 ]]'
-check "green gate: recorded as a pass" '[[ $(cat "$r/.claude/ways/last-gate") == pass* ]]'
+check "green gate: recorded as a pass" '[[ $(cat "$r/.ways/last-gate") == pass* ]]'
 
 r="$(repo false)"
 stop "$r" false
@@ -78,7 +78,7 @@ check "third block in a row: blocked, and told to hand over now" '[[ $code == 2 
 stop "$r" true
 check "fourth stop in a row: let through" '[[ $code == 0 ]]'
 check "fourth stop: the person is told the gate is still red on #3" '[[ $out == *systemMessage* && $out == *"#3"* && $out == *"still red"* ]]'
-check "fourth stop: the marker stays, so the state is visible" '[[ -f "$r/.claude/ways/autonomous" ]]'
+check "fourth stop: the marker stays, so the state is visible" '[[ -f "$r/.ways/autonomous" ]]'
 
 r="$(repo false)"
 stop "$r" false; stop "$r" true; stop "$r" true
@@ -97,28 +97,28 @@ r="$(repo no-such-gate-program-xyz)"
 stop "$r" false
 check "a gate whose program isn't installed lets the turn end" '[[ $code == 0 ]]'
 check "and says it can't run here, naming the program" '[[ $out == *"can'"'"'t run on this machine"* && $out == *no-such-gate-program-xyz* ]]'
-check "and records it as unrunnable, not failed" '[[ $(cut -d" " -f1 "$r/.claude/ways/last-gate") == unrunnable ]]'
+check "and records it as unrunnable, not failed" '[[ $(cut -d" " -f1 "$r/.ways/last-gate") == unrunnable ]]'
 
 # Worktrees. Claude Desktop sets CLAUDE_PROJECT_DIR to the main checkout even for a session
 # in a worktree, so the hook takes the project from the session's cwd instead.
 pair false
-mkdir -p "$main/.claude/ways"; echo 3 > "$main/.claude/ways/autonomous"
+mkdir -p "$main/.ways"; echo 3 > "$main/.ways/autonomous"
 stop_in "$wt"
-check "a worktree session isn't held by the main checkout's autonomous run" '[[ $code == 0 && ! -f $main/.claude/ways/last-gate ]]'
+check "a worktree session isn't held by the main checkout's autonomous run" '[[ $code == 0 && ! -f $main/.ways/last-gate ]]'
 
-mkdir -p "$wt/.claude/ways"; echo 5 > "$wt/.claude/ways/autonomous"
+mkdir -p "$wt/.ways"; echo 5 > "$wt/.ways/autonomous"
 stop_in "$wt"
 check "a worktree's own run is held by its own gate" '[[ $code == 2 ]]'
-check "and its state is written in the worktree, not the main checkout" '[[ -f $wt/.claude/ways/last-gate && -f $wt/.claude/ways/stop-blocks && ! -f $main/.claude/ways/stop-blocks ]]'
+check "and its state is written in the worktree, not the main checkout" '[[ -f $wt/.ways/last-gate && -f $wt/.ways/stop-blocks && ! -f $main/.ways/stop-blocks ]]'
 
 stop_in "$main"
-check "the main checkout behaves as before" '[[ $code == 2 && -f $main/.claude/ways/last-gate ]]'
+check "the main checkout behaves as before" '[[ $code == 2 && -f $main/.ways/last-gate ]]'
 
 if command -v cygpath >/dev/null; then
-  rm -f "$wt/.claude/ways/last-gate" "$wt/.claude/ways/stop-blocks"
+  rm -f "$wt/.ways/last-gate" "$wt/.ways/stop-blocks"
   win="$(cygpath -w "$wt")"
   stop_in "${win//\\/\\\\}"
-  check "a Windows cwd, backslashes escaped as in the hook's JSON, resolves" '[[ $code == 2 && -f $wt/.claude/ways/last-gate ]]'
+  check "a Windows cwd, backslashes escaped as in the hook's JSON, resolves" '[[ $code == 2 && -f $wt/.ways/last-gate ]]'
 else
   echo "skip  a Windows cwd (no cygpath here)"
 fi

@@ -81,7 +81,7 @@ An optional second plugin, and a small worked example of a [mod](https://code.cl
 - **`/gate`** runs the repo's gate at once, without a Claude turn or any tokens, and records the result for the band.
 - **A `usage` tool for the agent** (`mcp__ways-band__usage`): this session's plan usage windows (five-hour and weekly), which the agent can't read itself, so an autonomous run can report them in its integration PR. It answers for its own session; up to 0.3.0 the mod wrote them to `.claude/ways/usage`, which every session in the repo overwrote. Where Claude Code has no reading (off a subscription, and possibly some plan types), the band leaves usage out.
 
-`claude plugin install ways-band@ways-of-working`. Its code is one file, `plugins/ways-band/hooks/register.js`, with tests beside it (`claude plugin test` in that directory). Mods run unsandboxed with your permissions; this one reads a few files under `.claude/` and `AGENTS.md`, writes `.claude/ways/last-gate`, offers the agent its `usage` tool, runs `git branch` and, on `/gate`, the gate.
+`claude plugin install ways-band@ways-of-working`. Its code is one file, `plugins/ways-band/hooks/register.js`, with tests beside it (`claude plugin test` in that directory). Mods run unsandboxed with your permissions; this one reads `.claude/ways.json`, a few files under `.ways/` and `AGENTS.md`, writes `.ways/last-gate`, offers the agent its `usage` tool, runs `git branch` and, on `/gate`, the gate.
 
 [`WORKING-CONTRACT.md`](WORKING-CONTRACT.md) is the reasoning behind it: who owns what, and why.
 
