@@ -4,6 +4,15 @@
 
 It sits on top of [Matt Pocock's skills](https://github.com/mattpocock/skills), which cover the engineering disciplines (grilling a plan, writing a spec, cutting tickets, test-driven development, code review). Ways adds what a team has to agree on once: where specs live, how big work is planned, when Claude works on its own, what has to pass before anything merges, and who approves what.
 
+| | |
+|---|---|
+| **Borrowed** | Matt Pocock's skills, used as they are: the grill, domain modelling, `to-spec`, `to-tickets`, `implement-spec`, TDD, code review, triage, diagnosing bugs, prototypes. And Ofer Regev's [discovery-to-mvp](https://github.com/oferregev81pt/discovery-to-mvp), inside `/ways:discover` (MIT; the changes are in its notice). |
+| **Joined up** | `/ways:plan`, `/ways:build` and `/ways:work` run those pieces in the right order, resume where they left off, and keep their state in GitHub. |
+| **Added** | What was missing: technical design (C4, parts, contracts, ADRs), mocks with a guided tour, setup, the hooks that hold the gate, the status band, proportion. |
+| **Opinionated** | Standards that say what checks them, routing by kind of work, review sized to risk, a model chosen per ticket. |
+
+The best building blocks, joined up, with what was missing added, and opinionated enough for a team to rely on. Pocock's skills do the heavy lifting; ways is the operating model around them.
+
 ## Why
 
 Coding agents are fast. What goes wrong is everything around the code:
@@ -11,7 +20,7 @@ Coding agents are fast. What goes wrong is everything around the code:
 - **Nobody agreed what to build**, so the agent guesses, and the guess ships.
 - **Work isn't checked the same way twice**, so "done" means whatever this session decided.
 - **PRs are hard to review**: big, unexplained, and missing how to check them.
-- **It over-builds.** Every step adds a little, and a modest feature ends up five times the size it needed to be.
+- **It over-builds.** Every step adds a little, and a modest feature ends up five times the size it needed to be ([measured](#measured)).
 
 Ways answers each of those with a step a person can see, and a check that holds when nobody is watching.
 
@@ -91,19 +100,29 @@ Pocock's skills run underneath and can still be typed on their own. `/ways:plan`
 
 </details>
 
-## What it looks like in practice
+## Measured
 
-The same request (a menu's allergen chart, printable for the wall, that says when the printed copy is out of date) was built three ways on the same app:
+The same request (an allergen chart for a café's menus, printable for the wall, that says when the printed copy is out of date), on the same app:
 
-| | Plain Claude Code | Ways before proportion | **Ways today** |
+| | Plain prompt | ways 0.27: every gold-plated option accepted | **ways 0.29: proportion** |
 |---|---|---|---|
-| Lines | 837 | 4,984 | **1,038** |
+| Lines | ~840 | ~4,980 | **~1,040** |
 | Files | 14 | 52 | **14** |
-| Tickets | – | 6 | **2** |
-| Time | 7 min | 1 h 34 m | **45 min** |
-| Spec, design, review, checked in the app | No | Yes | **Yes** |
+| Build time | 7 min | 1 h 34 m | **29 min** |
+| Tickets | none | 6, all Opus | **2** (Sonnet, Opus) |
 
-Ways now comes in about a quarter bigger than the plain build, and that buys an agreed spec, a code review and a walk through the running app, none of which the plain build had. The extras (a history of printed copies, warnings on every page) went on a Later list instead of into the code.
+A blind review of the plain and 0.29 builds (the reviewer didn't know which was which), out of 5:
+
+| | Correctness | Fit with the codebase | Design | Security | Tests | Readability |
+|---|---|---|---|---|---|---|
+| Plain prompt | 3 | 3.5 | 3 | 5 | 3 | 3.5 |
+| **ways 0.29** | **4** | **4** | **4** | **5** | **4.5** | **4** |
+
+The plain build told staff a dish "no longer contains" allergens it couldn't work out; the ways build guarded that case and tested it. The plain build had the best single idea: a version code printed on each sheet.
+
+A little more code buys an agreed spec, a review, and safer, better-tested code. The 0.27 column is what happens when a method oversteers, and it's why proportion is now built in: the extras (a history of printed copies, warnings on every page) went on a Later list instead of into the code.
+
+*One feature and one review, so indicative, not proof. Build times leave out planning, and ways' 29 minutes includes a code review, a security review and a walk through the running app that the plain run didn't do.*
 
 ## What a repo holds
 
