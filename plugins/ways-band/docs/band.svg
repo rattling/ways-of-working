@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 926 150" width="926" height="150" role="img" aria-label="The ways status band above the Claude Code prompt: repo 0.31.0, autonomous on #9 with 2 of 9 tickets done, gate passed 2 minutes ago, merge dial default, usage 34% of the 5-hour window and 9% of the week">
+<style>text{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace;font-size:14px}</style>
+<rect width="926" height="150" rx="10" fill="#1e2127"/>
+<circle cx="22" cy="20" r="5.5" fill="#e06c75"/><circle cx="40" cy="20" r="5.5" fill="#e5c07b"/><circle cx="58" cy="20" r="5.5" fill="#98c379"/>
+<text x="20" y="60" fill="#7f848e">● Ticket 2 of 9 merged into the integration branch. Starting ticket 3.</text>
+<text x="20" y="95" xml:space="preserve"><tspan fill="#d4d4d4" font-weight="bold">ways · repo 0.31.0</tspan><tspan fill="#7f848e">  ·  </tspan><tspan fill="#e5c07b" font-weight="bold">autonomous #9 · 2 of 9</tspan><tspan fill="#7f848e">  ·  </tspan><tspan fill="#98c379">gate ✔ 2m ago</tspan><tspan fill="#7f848e">  ·  </tspan><tspan fill="#d4d4d4">dial default</tspan><tspan fill="#7f848e">  ·  </tspan><tspan fill="#7f848e">usage 5h 34% · wk 9%</tspan></text>
+<rect x="14" y="108" width="898" height="30" rx="6" fill="none" stroke="#5c6370"/>
+<text x="24" y="128" fill="#d4d4d4">&gt; <tspan fill="#d4d4d4">▌</tspan></text>
+</svg>

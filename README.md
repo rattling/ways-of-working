@@ -168,11 +168,9 @@ We'll write up the patterns once they've settled ([#43](https://github.com/rattl
 
 ## `ways-band`: the status band
 
-An optional second plugin that draws a line above the prompt in a ways repo:
+An optional second plugin that draws a line above the prompt in a ways repo: the mode and the issue, progress through a build, the gate, the merge dial, the branch, context and usage.
 
-```
-ways · repo 0.30.0 · autonomous #9 · 2 of 9 · gate ✔ 2m ago · dial default · feature/3-walking-skeleton · context 42% · usage 5h 34% · wk 9%
-```
+<img src="plugins/ways-band/docs/band.svg" alt="The ways status band above the Claude Code prompt, during an autonomous build: ways · repo 0.31.0 · autonomous #9 · 2 of 9 · gate ✔ 2m ago · dial default · usage 5h 34% · wk 9%" width="100%">
 
 - **`/gate`** runs the repo's gate at once, with no Claude turn and no tokens.
 - **A `usage` tool** lets an autonomous run report what it cost in its PR.
