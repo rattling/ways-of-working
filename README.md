@@ -30,7 +30,7 @@ Ways answers each of those with a step a person can see, and a check that holds 
 |---|---|
 | 🧭 **One flow** | Four commands cover discovery, planning, building and small fixes. Each one tells you where you are and what comes next. |
 | 📄 **Specs in the repo** | Requirements and design go in a PRD file, agreed in one PR. Status lives in GitHub issues, not in a chat. |
-| 🤖 **Interactive or autonomous** | Work alongside Claude, or let it build a whole spec on its own while the **gate** (your tests, lint and checks, as one command) holds every step. |
+| 🤖 **Interactive or autonomous** | Work alongside Claude, or let it build a whole spec on its own while the **gate** (your tests, lint and checks, as one command) holds every step. Or on a schedule, overnight ([Scheduled runs](#scheduled-runs)). |
 | ✅ **Merge by risk** | Low-risk changes can merge themselves once CI is green. High-risk ones need a code owner. A dial in each repo sets how much people review ([the policy](plugins/ways/reference/REVIEW-AND-MERGE.md)). |
 | 📏 **Built in proportion** | Plans recommend the minimal answer, state the expected size up front, and the build is checked against it. |
 | 📝 **The PR is the report** | Every PR says what changed, what was checked, and how a person can check it. |
@@ -145,6 +145,26 @@ Four hooks keep it honest in every session:
 - **Windows, macOS and Linux.** Hooks run in bash everywhere (Git Bash on Windows). A repo's gate is one command that runs as it is in PowerShell and bash, so `make` and `&&` are out.
 - **Any stack.** Ways says what the gate *is* (one command, the same locally, in CI and for the agent), not what's in it: an npm script, `uv run`, `dotnet test`, Composer or Docker Compose. Setup picks the CI runner and toolchain for the stack, including Windows for .NET Framework ([CI by stack](plugins/ways/templates/docs/standards/delivery.md)).
 - **Other agents.** Codex or another agent can work in a repo set up with ways: the files, conventions, CI and gate hold for anyone, and `AGENTS.md` says what to adapt. The hooks and the band are Claude Code only.
+
+## Scheduled runs
+
+ways doesn't schedule anything itself, but its autonomous runs work well on a schedule. We run one as a Claude Code routine on a private repo, firing hourly overnight. It does two things:
+- triages new issues and works the small ones into PRs;
+- finishes planned work: `/ways:build` on a spec whose tickets were approved during the day.
+
+In the morning there are PRs to review. The usage window also gets spread across the day, so the hours you're at the keyboard stay yours.
+
+It takes some setup:
+- **A cloud environment for the routine.** It needs the ways plugin installed and network access to the domains your build needs.
+- **A gate that runs there.** A cloud session has no Docker daemon, so the gate installs and starts what it needs (Postgres, MySQL) instead of relying on Compose.
+- **Limits you choose.** Decide what it may do, and on which repos.
+
+Some things to weigh:
+- **Issue text is input to an agent.** Anyone who can open an issue can try to steer it. We only run on private repos, and screen issues for instructions aimed at the agent before it reads them.
+- **`main` should be protected.** Merging and deploying stay with people. Where GitHub's free plan can't protect `main`, ways' hook refuses pushes to it in autonomous runs, and [`delivery.md`](plugins/ways/templates/docs/standards/delivery.md) has a deploy check.
+- **The security posture is yours.** What it can reach, which secrets it holds, and what it may merge are your call.
+
+We'll write up the patterns once they've settled ([#43](https://github.com/rattling/ways-of-working/issues/43)).
 
 ## `ways-band`: the status band
 
