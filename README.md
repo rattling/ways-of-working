@@ -62,6 +62,8 @@ flowchart TD
     W -->|you merge| S
 ```
 
+To try it, open **[Issue to Merge](https://rattling.github.io/ways-of-working/)**. You run example issues down this flow, and each one stops at every merge until you click it through. It also has short exercises on routing, the brief, who decides, merging by risk and the context window.
+
 | Command | Use it when | You end up with |
 |---|---|---|
 | `/ways:discover` | The ask is a wish list, an idea or a half-built app, and nobody can say what problem it solves | A one-page brief and an issue to plan from |
