@@ -46,7 +46,7 @@ claude plugin install ways@ways-of-working
 
 Then, in a repo, run **`/ways:setup`**. It adds the files, labels and CI check the method needs, never overwrites what's already there, and opens a PR for you to review. Run it again after an update to bring the repo up to date.
 
-You'll also need [`gh`](https://cli.github.com/), signed in. Installing `ways` installs Pocock's skills with it, and a repo set up with ways offers the same plugins to anyone who opens it in Claude Code.
+You'll also need [`gh`](https://cli.github.com/), signed in. The build commands (`/ways:work`, `/ways:build`) need the repo in git and on GitHub, for its issues and PRs. The ones that don't build (`/ways:discover`, `/ways:mock`, `/ways:explain`, `/ways:arch-review`) work without either. Installing `ways` installs Pocock's skills with it, and a repo set up with ways offers the same plugins to anyone who opens it in Claude Code.
 
 ## How work flows
 

@@ -48,6 +48,6 @@ Every ticket gets a **Human verification** line, which `to-tickets`' template la
 
 **Compare the size with the estimate.** Count the `main...integration/<feature-slug>` diff as the PRD's **Size** table does (files, new classes, lines of code and of tests, leaving out specs, docs and the mock) and put the actual beside the estimate in the integration PR. More than about a third over: say so at the top of the PR, with where the extra went, so the reviewer can ask for cuts rather than find them.
 
-Delete `.ways/autonomous`, `.ways/progress` and `.ways/part`, and stop the integration worktree's containers. Mark the integration PR ready. Say what was built and what's left in a few lines, with anything labelled `needs-human` and why.
+Delete `.ways/autonomous`, `.ways/progress` and `.ways/part`, and stop what the integration worktree started (containers, a dev server). Mark the integration PR ready. Say what was built and what's left in a few lines, with anything labelled `needs-human` and why.
 
 Then the merge sentence: "To ship it, merge PR #<m>: that's every ticket and the review, and merging closes them." Next: nothing in this feature; follow-ups are new issues: `/ways:work` for small ones, `/triage` for a pile. Then log the run, and offer the repo notes if there are any (`${CLAUDE_PLUGIN_ROOT}/reference/FEEDBACK.md`).
