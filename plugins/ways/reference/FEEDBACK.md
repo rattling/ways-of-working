@@ -50,13 +50,15 @@ When the command hands over, after its last sentence (the merge sentence, where 
 **1. Log the run, always, even with no notes.** Append it to the ways log, `~/.ways/log.md` (create the folder and file if they aren't there). It's outside every repo, so it outlives worktrees and gathers every repo's runs in one place, and it stays on this machine. One line for the run, then the run's `[ways]` notes under it, without the tag:
 
 ```
-- 2026-11-05 · ways 0.32.0 · acme-api · /ways:work · autonomous · fine
-- 2026-11-05 · ways 0.32.0 · acme-api · /ways:plan · interactive · notes
-  - heavy: plan, step 1: grilled on requirements the issue already answered. (person)
+- 2026-11-05 · ways 0.33.0 · acme-api · /ways:work · autonomous · 35m · gate 3× 4m · fine
+- 2026-11-05 · ways 0.33.0 · acme-api · /ways:build · autonomous · 1h50m · gate 14× 21m · notes
+  - heavy: build, step 4: each implementer reran the full gate after every review fix. (person)
   - missing: plan, step 2: nothing on a change that only adds a column.
 ```
 
-The fields: the date, the ways version (`${CLAUDE_PLUGIN_ROOT}/.claude-plugin/plugin.json`), the repo's name, the command, the mode (`interactive`, `autonomous`, or `batch`), and `fine` when there are no notes or `notes` when there are. The `fine` lines matter as much as the notes: they're what says how often something goes wrong. Then remove the `[ways]` lines from `.ways/feedback.md`.
+The fields: the date, the ways version (`${CLAUDE_PLUGIN_ROOT}/.claude-plugin/plugin.json`), the repo's name, the command, the mode (`interactive`, `autonomous`, or `batch`), how long the run took, roughly, from the command's start to its handover, the gate (how many times it ran, and the total time), and `fine` when there are no notes or `notes` when there are. The `fine` lines matter as much as the notes: they're what says how often something goes wrong. Then remove the `[ways]` lines from `.ways/feedback.md`.
+
+**The gate count** is every full gate run in the run, wherever it ran: the Stop hook adds a line to `.ways/gate-runs` each time (`pass|fail <unix time> <seconds>`); when you run the gate yourself, add a line there the same way, timed; and builders and implementers report theirs (how many, total time), which you add to it. Leave out the targeted test runs of TDD: they're part of building, not the gate. Delete `.ways/gate-runs` once it's logged. If the gate never ran (a plan, say), leave the field out.
 
 Don't ask the person about it. If there were notes, name them in one line ("Logged for ways: plan felt heavy at step 1.") so they can correct it; with none, say nothing.
 
