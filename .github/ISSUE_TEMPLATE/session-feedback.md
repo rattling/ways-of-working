@@ -1,19 +1,19 @@
 ---
-name: Session feedback
-about: How ways worked in a real session: what worked, and where it got in the way
+name: Feedback from the ways log
+about: Something that kept coming up across real runs of ways: where it got in the way, what was missing, or what worked
 labels: enhancement
 ---
 
-<!-- /ways:feedback drafts this from a session. This repo is public: no client, company or people's names, repo links, code or data from the repo it happened in. -->
+<!-- /ways:feedback drafts this from a review of the ways log. This repo is public: no client, company or people's names, repo links, code or data from the repos it happened in. -->
 
-## What was run
+## How often
 
-<!-- The commands (/ways:plan #n, /ways:build #n...), the ways version, how long, roughly what it cost if known. -->
+<!-- Runs and repos it came up in, out of how many runs of that command, and the ways versions. -->
 
-## What worked
+## What happens
 
-## Friction, worst first
+<!-- The notes behind it, worst first: what happened, what it cost, which ways skill and step it's about. -->
 
-### 1. <What got in the way>
+## Suggestion
 
-<!-- What happened, what it cost, which ways skill or file it's about, and a suggestion if there is one. -->
+<!-- If the notes point to one. Taking a step away beats adding one. -->

@@ -58,9 +58,9 @@ if [[ -f "$part" ]]; then
   echo "- Big work in progress: $(head -1 "$part"). If you don't remember it, look for its output as PARTS.md says before suggesting anything."
 fi
 echo "- Merge policy and risk tiers: ${root}/reference/REVIEW-AND-MERGE.md"
-echo "- When something worth improving pops out, in this repo or in ways, note it in .ways/feedback.md as it happens, and offer the findings at the end: ${root}/reference/FEEDBACK.md"
+echo "- When something worth improving pops out, in this repo or in ways, note it in .ways/feedback.md as it happens. At the end, log the run to ~/.ways/log.md, fine or not, and offer the repo findings: ${root}/reference/FEEDBACK.md"
 if [[ -s "$project/.ways/feedback.md" ]]; then
-  echo "- There are notes from an earlier session in .ways/feedback.md. Offer them at the end of this one."
+  echo "- There are notes from an earlier session in .ways/feedback.md. At the end of this one, offer the repo ones and log the ways ones."
 fi
 echo "- Gate: ${gate:-not set in .claude/ways.json}"
 marker="$project/.ways/autonomous"

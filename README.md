@@ -84,7 +84,7 @@ The full routing table, with what counts as big and the only two shortcuts allow
 | `/ways:explain` | A visual explainer of how a repo works, for someone new to it |
 | `/ways:arch-review` | A guided architecture review, ending in a critique to turn into tickets |
 | `/ways:requirements`, `/ways:design` | The two halves of a plan, for when different people do them |
-| `/ways:feedback` | Tells this repo how ways worked for you, as an issue |
+| `/ways:feedback` | Reviews how ways has worked across your runs, and sends what keeps coming up back here as issues |
 
 <details>
 <summary><b>More about each command</b></summary>
@@ -96,7 +96,7 @@ The full routing table, with what counts as big and the only two shortcuts allow
 - **`/ways:work`** takes one small issue (or a batch) interactively or autonomously: branch, plan, draft PR, test-driven build, Pocock's code review with every finding answered, a risk tier, and the PR body. From a raw issue it sizes it, reproduces a bug first, and waits for your go.
 - **`/ways:mock`** is for anything people look at. Mocks come after the decisions, look like the finished product, and carry a guided tour. [`examples/mocks/`](examples/mocks/) has three.
 - **`/ways:arch-review`** walks the pillars of a Well-Architected Review (reliability, security, cost, operations, performance) and ends with what holds, the one thing that would sink it, and the gaps.
-- **`/ways:feedback`** drafts from the session, strips client and repo detail, shows you the text, and opens the issue only after a yes. The other commands note what could be better as they go and offer it at the end.
+- **`/ways:feedback`** reviews the ways log every so often. Every command logs its run to `~/.ways/log.md` on your machine, fine or not, with a note for each step that felt heavy, missing or broken. The review counts them across runs and repos and brings back only what recurs, so one awkward session doesn't steer the method. For each theme you keep, it strips client and repo detail, shows you the text, and opens the issue only after a yes.
 
 Pocock's skills run underneath and can still be typed on their own. `/ways:plan` uses `grilling`, `domain-modeling` and `to-spec`; `/ways:build` uses `to-tickets`, `implement-spec` and `code-review`. Ways calls them and adds its conventions; it doesn't copy them.
 

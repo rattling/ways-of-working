@@ -54,4 +54,4 @@ Ask for no other merges: the command's own PR is the only one a person merges, a
 
 ## 4. Note what's worth improving, as it happens
 
-Throughout the command, note anything that pops out worth improving, in this repo or in ways, in `.ways/feedback.md`, and after the merge sentence offer the person those specific findings, as `reference/FEEDBACK.md` says. No notes, nothing said about them.
+Throughout the command, note anything that pops out worth improving, in this repo or in ways, in `.ways/feedback.md`. After the merge sentence, log the run to the ways log, fine or not, and offer the person the repo findings, as `reference/FEEDBACK.md` says. No repo notes, nothing said about them.
