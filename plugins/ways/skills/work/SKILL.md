@@ -8,7 +8,7 @@ disable-model-invocation: true
 
 Input: an issue number, and optionally a mode (`interactive` or `autonomous`). Without a mode, take it from the issue's label (`ready-for-agent` is autonomous, `ready-for-human` is interactive) and say which you're using. An untriaged issue gets its label in step 0.
 
-Read first: `docs/agents/issue-tracker.md` (how this repo publishes, links and closes work), `${CLAUDE_PLUGIN_ROOT}/reference/REVIEW-AND-MERGE.md`, and `docs/standards/architecture.md`, "Proportion": build the minimum that delivers the issue, in the shape of the closest code already here. The gate command is in `.claude/ways.json`. As you go, note anything that pops out worth improving, in this repo or in ways, and offer those findings when you hand over: `${CLAUDE_PLUGIN_ROOT}/reference/FEEDBACK.md`.
+Read first: `docs/agents/issue-tracker.md` (how this repo publishes, links and closes work), `${CLAUDE_PLUGIN_ROOT}/reference/REVIEW-AND-MERGE.md`, and `docs/standards/architecture.md`, "Proportion": build the minimum that delivers the issue, in the shape of the closest code already here. The gate command is in `.claude/ways.json`. As you go, note anything that pops out worth improving, in this repo or in ways, and when you hand over, log the run and offer the repo findings: `${CLAUDE_PLUGIN_ROOT}/reference/FEEDBACK.md`.
 
 For a whole spec with several tickets, this isn't the skill: use `/ways:build #<parent>`. For several **unrelated** issues at once (a batch of bugs), see **Batch** at the end.
 
