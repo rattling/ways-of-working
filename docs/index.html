@@ -15,7 +15,7 @@
 
 <nav class="bar" aria-label="Areas">
   <div class="bar-in">
-    <a class="brand" href="#top">ways</a>
+    <a class="brand" href="#" title="All areas">ways</a>
     <ol class="mini" id="mini"></ol>
     <span class="here" id="here"></span>
     <a class="out" href="issue-to-merge/">Issue to Merge</a>
@@ -24,30 +24,14 @@
 
 <div class="wrap" id="top">
 
+<div class="landing" id="landing">
 <header class="hero">
   <div class="eyebrow"><span class="ring"></span>The method behind the ways plugin</div>
   <h1>Building software with Claude</h1>
   <p class="thesis">You work like a tech lead with a very fast team. Your attention goes on the two ends, design and checking. The middle goes to Claude.</p>
 
-  <div class="numbers" aria-label="What we've seen">
-    <div class="num"><b>18<small>min</small></b><span>for a new screen plus the logic moved out of a 300-line controller, estimated at 3 hours of agent time</span></div>
-    <div class="num"><b>8<small>min</small></b><span>for one ticket: built test-first, checked and reviewed, 80k to 140k tokens</span></div>
-    <div class="num"><b>30<small>lines</small></b><span>to move a .NET app to Framework 4.8: configuration only, no code, every test green</span></div>
-    <div class="num"><b>1<small>session</small></b><span>to design a whole time-allocation app, from prototypes and questions</span></div>
-  </div>
-
-  <div class="intro-text prose"><p>This is how we build software with Claude, written down so a team can use it with or without our plugin. It starts with what working with an AI coding agent is like: what it can do, what goes wrong, and how to get the most from it. The rest is the structure that lets it work well on its own, one area at a time.</p>
-<p>Every area after the first two has the same three parts:</p>
-<ul>
-<li><strong>What good looks like.</strong> Plain engineering, no AI. The team's standard, written once.</li>
-<li><strong>With an AI assistant.</strong> How you hold that standard when Claude writes most of the code.</li>
-<li><strong>Putting it in place.</strong> Writing it down so nobody repeats it each time. We use ways, a plugin we built; you can use it, fork it, or write your own from the first two parts.</li>
-</ul>
-<p>The examples come from a demo app we use in workshops: recipes, allergens and menus for Larder &amp; Co., a made-up café group, in PHP 7.4 with no framework and MySQL. Its one rule that must never break is that allergens never disappear, at any depth of recipe.</p>
-<hr /></div>
-
   <div class="line-wrap">
-    <div class="eyebrow">The line: ten areas, then adopting it</div>
+    <div class="eyebrow">Ten areas, then adopting it. Pick one</div>
     <ol class="line" id="line">
 <li><a href="#area-1" data-station="1"><span class="dot"></span><span class="num">1</span><span class="name">The agent</span></a></li>
 <li><a href="#area-2" data-station="2"><span class="dot"></span><span class="num">2</span><span class="name">Standards</span></a></li>
@@ -64,7 +48,35 @@
   </div>
 </header>
 
-<main>
+<section class="cards" aria-label="The areas">
+<a class="card" href="#area-1" data-station="1"><span class="badge" aria-hidden="true">1</span><span class="card-text"><b>Working with the agent</b><span>You work like a tech lead with a very fast team: your attention on design and checking, the building in between to Claude.</span></span></a>
+<a class="card" href="#area-2" data-station="2"><span class="badge" aria-hidden="true">2</span><span class="card-text"><b>Standards and the repo</b><span>One standard per area, owned by the team, copied into each repo.</span></span></a>
+<a class="card" href="#area-3" data-station="3"><span class="badge" aria-hidden="true">3</span><span class="card-text"><b>Architecture</b><span>One architecture page per repo: C4 context and containers, the boundary that matters, and what each part must not do.</span></span></a>
+<a class="card" href="#area-4" data-station="4"><span class="badge" aria-hidden="true">4</span><span class="card-text"><b>How work flows</b><span>Process sized to the work: small, big, or not yet understood.</span></span></a>
+<a class="card" href="#area-5" data-station="5"><span class="badge" aria-hidden="true">5</span><span class="card-text"><b>Testing and the gate</b><span>Most of the weight on integration tests against a real database, each behaviour tested once.</span></span></a>
+<a class="card" href="#area-6" data-station="6"><span class="badge" aria-hidden="true">6</span><span class="card-text"><b>Bugs</b><span>Triage turns a raw report into something a fix can be checked against, or a decision that it isn't a bug.</span></span></a>
+<a class="card" href="#area-7" data-station="7"><span class="badge" aria-hidden="true">7</span><span class="card-text"><b>Features</b><span>Unclear? Discover first. Then agree what it does, what must not exist yet, and how the system changes.</span></span></a>
+<a class="card" href="#area-8" data-station="8"><span class="badge" aria-hidden="true">8</span><span class="card-text"><b>Legacy code</b><span>Pin today's behaviour before changing anything, bugs included.</span></span></a>
+<a class="card" href="#area-9" data-station="9"><span class="badge" aria-hidden="true">9</span><span class="card-text"><b>Deployment</b><span>Infrastructure as code, in the repo, reviewed like any other change.</span></span></a>
+<a class="card" href="#area-10" data-station="10"><span class="badge" aria-hidden="true">10</span><span class="card-text"><b>Security</b><span>The usual rules still apply, with checks at each stage.</span></span></a>
+<a class="card" href="#area-adopt" data-station="adopt"><span class="badge" aria-hidden="true">→</span><span class="card-text"><b>Adopting it</b><span>The method comes first. The tooling is how you hold it, and it can differ by team.</span></span></a>
+</section>
+
+<details class="howto">
+  <summary>How each area is built, and where the examples come from</summary>
+  <div class="prose"><p>This is how we build software with Claude, written down so a team can use it with or without our plugin. It starts with what working with an AI coding agent is like: what it can do, what goes wrong, and how to get the most from it. The rest is the structure that lets it work well on its own, one area at a time.</p>
+<p>Every area after the first two has the same three parts:</p>
+<ul>
+<li><strong>What good looks like.</strong> Plain engineering, no AI. The team's standard, written once.</li>
+<li><strong>With an AI assistant.</strong> How you hold that standard when Claude writes most of the code.</li>
+<li><strong>Putting it in place.</strong> Writing it down so nobody repeats it each time. We use ways, a plugin we built; you can use it, fork it, or write your own from the first two parts.</li>
+</ul>
+<p>The examples come from a demo app we use in workshops: recipes, allergens and menus for Larder &amp; Co., a made-up café group, in PHP 7.4 with no framework and MySQL. Its one rule that must never break is that allergens never disappear, at any depth of recipe.</p>
+<hr /></div>
+</details>
+</div>
+
+<main id="areas">
 <section class="area" id="area-1" data-area="1">
 <header class="area-head">
 <span class="badge" aria-hidden="true">1</span>
@@ -1483,6 +1495,12 @@ gh auth refresh -s workflow
 </section>
 </main>
 
+<nav class="pager" id="pager" aria-label="Areas" hidden>
+  <a class="prev" id="prev" href="#"></a>
+  <a class="all" href="#">All areas</a>
+  <a class="next" id="next" href="#"></a>
+</nav>
+
 <footer class="foot">
   <p><b>Read it all in one place:</b> <a href="https://github.com/rattling/ways-of-working/blob/main/docs/method.md">the method as one document</a>. <b>Try the flow:</b> <a href="issue-to-merge/">Issue to Merge</a> runs example issues down the line.</p>
   <p>The engineering disciplines underneath are <a href="https://github.com/mattpocock/skills">Matt Pocock's skills</a>; discovery builds on Ofer Regev's <a href="https://github.com/oferregev81pt/discovery-to-mvp">discovery-to-mvp</a>. Examples come from demo apps: Larder &amp; Co. is a made-up café group. Measurements are one run each: indicative, not proof.</p>
@@ -1497,7 +1515,7 @@ gh auth refresh -s workflow
   const dark = matchMedia('(prefers-color-scheme: dark)').matches;
   mermaid.initialize({ startOnLoad: false, theme: dark ? 'dark' : 'neutral', fontFamily: 'Overpass, sans-serif' });
   window.drawMermaid = (root) => mermaid.run({ nodes: [...root.querySelectorAll('pre.mermaid:not([data-processed])')] });
-  document.querySelectorAll('.panel:not([hidden])').forEach(p => window.drawMermaid(p));
+  document.querySelectorAll('.area.current .panel:not([hidden])').forEach(p => window.drawMermaid(p));
 </script>
 </body>
 </html>

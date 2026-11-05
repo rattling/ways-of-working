@@ -117,7 +117,9 @@ def main():
         else:
             key, num, title = "adopt", "", heading
         areas.append(render_area(key, num, title, body))
-        stations.append({"key": key, "num": num, "name": SHORT.get(key, title)})
+        short, _, tabs = split_area(body)
+        stations.append({"key": key, "num": num, "name": SHORT.get(key, title), "title": title,
+                         "lead": short[0] if short else "", "parts": [t for t, _ in tabs]})
 
     # The intro: the paragraphs after the title and subtitle.
     intro_md = "\n".join(l for l in head.split("\n") if not l.startswith("# ") and not l.startswith("*The method"))
@@ -126,8 +128,17 @@ def main():
         f'<span class="num">{s["num"] or "→"}</span><span class="name">{s["name"]}</span></a></li>'
         for s in stations)
 
+    # A card per area: its name and the first line of its In short.
+    cards_html = "\n".join(
+        f'<a class="card" href="#area-{s["key"]}" data-station="{s["key"]}">'
+        f'<span class="badge" aria-hidden="true">{s["num"] or "→"}</span>'
+        f'<span class="card-text"><b>{htmllib.escape(s["title"])}</b>'
+        f'<span>{markdown.markdown(s["lead"])[3:-4]}</span></span></a>'
+        for s in stations)
+
     page = TEMPLATE.read_text(encoding="utf-8")
     page = page.replace("{{INTRO}}", md(intro_md)).replace("{{STATIONS}}", station_html)
+    page = page.replace("{{CARDS}}", cards_html)
     page = page.replace("{{AREAS}}", "\n\n".join(areas))
     OUT.write_text(page, encoding="utf-8")
     print(f"wrote {OUT} ({OUT.stat().st_size // 1024} KB, {len(areas)} sections)")
