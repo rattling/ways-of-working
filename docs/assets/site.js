@@ -19,15 +19,41 @@
     mini.appendChild(li);
   });
   const miniLinks = $$('a', mini);
-  const io = new IntersectionObserver(entries => {
-    entries.forEach(e => {
-      if (!e.isIntersecting) return;
-      const i = $$('.area').indexOf(e.target);
-      miniLinks.forEach((l, j) => l.classList.toggle('on', i === j));
-      here.textContent = $('h2', e.target).textContent;
-    });
-  }, { rootMargin: '-45% 0px -50% 0px' });
-  $$('.area').forEach(a => io.observe(a));
+  $$('.card').forEach(c => c.style.setProperty('--c', colour(c.dataset.station)));
+
+  /* ---------- one area at a time ---------- */
+  // No hash, or an unknown one: the line and the cards. #area-<key>: that area alone, with a pager.
+  const areas = $$('.area');
+  const pager = $('#pager'), prev = $('#prev'), next = $('#next');
+  const label = a => `${a.dataset.area === 'adopt' ? '' : a.dataset.area + ' · '}${$('h2', a).textContent}`;
+  const link = (el, a, dir) => {
+    if (!a) { el.hidden = true; return; }
+    el.hidden = false; el.href = '#' + a.id; el.style.setProperty('--c', colour(a.dataset.area));
+    el.innerHTML = `<small>${dir}</small><b>${esc(label(a))}</b>`;
+  };
+  function route() {
+    const i = areas.findIndex(a => '#' + a.id === location.hash);
+    document.body.dataset.view = i < 0 ? 'home' : 'area';
+    areas.forEach((a, j) => a.classList.toggle('current', i === j));
+    miniLinks.forEach((l, j) => { l.classList.toggle('on', i === j); l.setAttribute('aria-current', i === j ? 'page' : 'false'); });
+    if (i < 0) { here.textContent = ''; pager.hidden = true; document.title = 'Building Software with Claude'; return; }
+    const a = areas[i];
+    here.textContent = label(a);
+    pager.hidden = false; pager.style.setProperty('--c', colour(a.dataset.area));
+    link(prev, areas[i - 1], '← Previous'); link(next, areas[i + 1], 'Next →');
+    document.title = $('h2', a).textContent + ' · Building Software with Claude';
+    window.scrollTo(0, 0);
+    if (window.drawMermaid) $$('.panel:not([hidden])', a).forEach(pn => window.drawMermaid(pn));
+  }
+  window.addEventListener('hashchange', route);
+  route();
+  // Left and right arrow keys move between areas, unless you're in the tabs or a control.
+  document.addEventListener('keydown', e => {
+    if (document.body.dataset.view !== 'area' || e.altKey || e.ctrlKey || e.metaKey) return;
+    if (e.target.closest && e.target.closest('[role=tablist], input, select, textarea, .lever')) return;
+    const target = e.key === 'ArrowRight' ? next : e.key === 'ArrowLeft' ? prev : null;
+    if (target && !target.hidden) location.hash = target.getAttribute('href');
+  });
 
   /* ---------- tabs ---------- */
   $$('.tabs').forEach(list => {

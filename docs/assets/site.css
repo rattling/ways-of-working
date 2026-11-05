@@ -59,12 +59,6 @@ a { color: inherit; }
 /* hero */
 .hero { padding-block: 48px 24px; display: grid; gap: 22px; }
 .thesis { font-size: clamp(19px, 2.4vw, 23px); max-width: 40ch; margin: 0; line-height: 1.45; }
-.numbers { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; }
-.num { background: var(--panel); border: 1px solid var(--rule); border-top: 5px solid var(--a5); border-radius: 6px; padding: 14px 16px; display: grid; gap: 6px; align-content: start; }
-.num b { font-family: var(--display); font-size: 52px; font-weight: 900; line-height: .9; font-variant-numeric: tabular-nums; }
-.num small { font-size: 20px; font-weight: 800; margin-left: 4px; text-transform: uppercase; }
-.num span { font-size: 14px; color: var(--ink-2); line-height: 1.45; }
-.intro-text { max-width: 66ch; }
 
 /* the line */
 .line-wrap { display: grid; gap: 12px; margin-top: 8px; }
@@ -136,14 +130,14 @@ a { color: inherit; }
 .chips { display: flex; flex-wrap: wrap; gap: 8px; }
 .chip { border: 1.5px solid var(--rule); background: var(--paper); color: var(--ink); border-radius: 999px; padding: 6px 13px 4px; font: 14px var(--body); cursor: pointer; text-align: left; }
 .chip[aria-pressed="true"] { border-color: var(--ink); background: var(--ink); color: var(--paper); }
-.lever { display: inline-grid; grid-auto-flow: column; border: 1.5px solid var(--ink); border-radius: 5px; overflow: hidden; justify-self: start; }
+.lever { display: inline-flex; flex-wrap: wrap; max-width: 100%; border: 1.5px solid var(--ink); border-radius: 5px; overflow: hidden; justify-self: start; }
 .lever button { background: var(--panel); color: var(--ink); border: 0; padding: 8px 14px 6px; font: 14px var(--mono); cursor: pointer; border-left: 1.5px solid var(--ink); }
 .lever button:first-child { border-left: 0; }
 .lever button[aria-pressed="true"] { background: var(--ink); color: var(--paper); }
 .term { background: var(--term); color: var(--term-fg); font: 13px/1.6 var(--mono); border-radius: 6px; padding: 12px 14px; min-height: 110px; overflow-x: auto; }
 .term div { white-space: pre-wrap; overflow-wrap: anywhere; }
 .term .ok { color: #5FD394; } .term .bad { color: #FF7a7a; } .term .ask { color: #F2BE54; } .term .p { color: #7FA7E8; }
-.two { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 14px; align-items: start; }
+.two { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(260px, 100%), 1fr)); gap: 14px; align-items: start; }
 .answer { border-left: 5px solid var(--c); padding: 6px 0 6px 14px; display: grid; gap: 6px; }
 .answer b.big { font-family: var(--display); font-size: 24px; text-transform: uppercase; font-weight: 800; }
 .answer a { font-family: var(--mono); font-size: 13px; }
@@ -190,3 +184,38 @@ a { color: inherit; }
 .foot p { margin: 0; max-width: 80ch; }
 
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } html { scroll-behavior: auto; } }
+
+/* views: the line and cards, or one area at a time */
+body[data-view="home"] #areas, body[data-view="home"] .pager { display: none; }
+body[data-view="area"] .landing { display: none; }
+body[data-view="area"] .area { display: none; }
+body[data-view="area"] .area.current { display: grid; border-top: 0; margin-top: 0; padding-top: 28px; }
+
+.cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(290px, 100%), 1fr)); gap: 12px; margin-top: 8px; }
+.card { display: flex; gap: 14px; align-items: flex-start; text-decoration: none; background: var(--panel); border: 1px solid var(--rule); border-radius: 8px; padding: 14px 16px; transition: border-color .15s, transform .15s; }
+.card:hover, .card:focus-visible { border-color: var(--c); transform: translateY(-2px); }
+.card .badge { width: 40px; height: 40px; border-width: 6px; font-size: 18px; }
+.card-text { display: grid; gap: 4px; min-width: 0; }
+.card-text b { font-family: var(--display); font-size: 22px; font-weight: 800; text-transform: uppercase; line-height: 1.05; }
+.card-text span { font-size: 14.5px; color: var(--ink-2); line-height: 1.45; }
+.howto { margin-top: 28px; background: var(--panel); border: 1px solid var(--rule); border-radius: 8px; padding: 12px 16px; }
+.howto summary { cursor: pointer; font: 600 14px var(--mono); color: var(--ink-2); }
+.howto .prose { margin-top: 10px; }
+
+.pager { display: grid; grid-template-columns: 1fr auto 1fr; gap: 10px; align-items: stretch; margin-top: 40px; padding-top: 18px; border-top: 1px solid var(--rule); }
+.pager a { text-decoration: none; border: 1.5px solid var(--rule); border-radius: 8px; padding: 10px 14px; background: var(--panel); display: grid; gap: 2px; align-content: center; }
+.pager a:hover, .pager a:focus-visible { border-color: var(--c, var(--ink)); }
+.pager a small { font: 11px var(--mono); text-transform: uppercase; letter-spacing: .12em; color: var(--ink-2); }
+.pager a b { font-family: var(--display); font-size: 20px; text-transform: uppercase; line-height: 1.05; }
+.pager .next { text-align: right; } .pager .all { font: 600 13px var(--mono); }
+.pager a[hidden] { visibility: hidden; display: grid; }
+@media (max-width: 560px) { .pager { grid-template-columns: 1fr 1fr; } .pager .all { grid-column: 1 / -1; grid-row: 2; text-align: center; } }
+.mini a { cursor: pointer; }
+.keys { font: 12px var(--mono); color: var(--ink-2); }
+
+/* On a phone the cards are the list: the line would repeat them. */
+@media (max-width: 760px) { .landing .line-wrap { display: none; } }
+
+/* Let grid children shrink, and long file names wrap, so nothing pushes a narrow screen sideways. */
+.area > *, .two > *, .try > * { min-width: 0; }
+.files label { overflow-wrap: anywhere; }
