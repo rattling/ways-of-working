@@ -32,7 +32,7 @@
   | PHP, outside Docker | `ubuntu-latest` | `shivammathur/setup-php@v2` (the version the stack file names), then `composer install` |
 
   Windows minutes bill at twice the rate on private repos, so on `windows-latest` the draft skip and the cancelling matter twice as much. A repo with two stacks puts both toolchains in the one job when they share a runner; when they don't (a .NET Framework API and a Node front end), it's two jobs, each running the part of the gate it can, and both required.
-- **Local development runs in containers** where the stack allows, so a new starter, CI and the agent all have the same environment.
+- **Local development runs the same way for everyone**, so a new starter, CI and the agent all have the same environment: in containers, or on native services (a local Postgres or MySQL) that one setup script installs and checks. Either is fine. Containers make the environment easy to copy; native services start faster and make a lighter gate (in one repo, moving the gate's database from Docker to a native Postgres took it from 150 seconds to 90). Pick one and write it in the README.
 - **A dev seed from early on, grown with every feature:** realistic demo data that lets a person try every user story by hand, with the awkward rows (the longest name, the empty list, the missing value, the one with fifty children). People judge screens, mocks and style choices far better against data that looks real, and builders can screenshot the same thing every time. Its rules:
   - **One command loads it, and the same command resets it,** so everyone starts from the same state.
   - **Made-up data only,** never a copy of production, and nothing personal.
@@ -40,7 +40,11 @@
   - **Local and test environments only.** It never runs against production.
   - **A test account for each role**, with a made-up password, and `AGENTS.md` says how an agent signs in locally as each, so screenshots behind sign-in need no improvising.
   - **Records worth naming have stable names** ("Harbour Lettings: three engagements, one overdue"), so a ticket can say which one to open.
-- **Every worktree runs its own containers.** Agents build in worktrees (`.claude/worktrees/`), beside the main checkout, so the stack has to run more than once on one machine:
+- **Every worktree runs its own copy of the stack.** Agents build in worktrees (`.claude/worktrees/`), beside the main checkout, so the stack has to run more than once on one machine.
+- **On native services**, one database server serves every worktree, and each worktree keeps its own databases on it:
+  - **Database names come from the worktree**, like `app_<folder>` for the app and a name of the gate's own for each run, so one worktree's gate never touches another's data or the app someone is looking at. The connection settings come from environment variables with defaults, which agents pass on the command.
+  - **Whatever starts a dev server or watcher stops it** before reporting done. The database server stays up; the gate drops its throwaway databases itself.
+- **In containers**:
   - **No fixed project name.** Leave `name:` out of `docker-compose.yml` (and don't pass a fixed `-p`), so each worktree gets its own Compose project, named after its folder. A shared project lets one worktree's gate rebuild the database under another, or under the app someone is looking at.
   - **Published ports come from a variable with a default**, like `"${APP_PORT:-8080}:80"`. The main checkout keeps the default; a builder that needs the app in a browser runs on another port (`APP_PORT=8081`), so it never fights the main checkout for 8080. Agents pass these as environment variables on the command, not through `.env` files, which they can't read.
   - **The gate needs no host port.** It reaches the app and the database inside the Compose network, so two gates can run at once.
