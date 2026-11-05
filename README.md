@@ -62,7 +62,7 @@ flowchart TD
     W -->|you merge| S
 ```
 
-To try it, open **[Issue to Merge](https://rattling.github.io/ways-of-working/)**. You run example issues down this flow, and each one stops at every merge until you click it through. It also has short exercises on routing, the brief, who decides, merging by risk and the context window.
+The method behind it, area by area, is at **[Building software with Claude](https://rattling.github.io/ways-of-working/)**: what working with an agent is like, then architecture, how work flows, testing, bugs, features, legacy code, deployment and security, each with a small interactive. It's also [one document](docs/method.md). To try the flow itself, **[Issue to Merge](https://rattling.github.io/ways-of-working/issue-to-merge/)** runs example issues down it, stopping at every merge until you click it through.
 
 | Command | Use it when | You end up with |
 |---|---|---|
