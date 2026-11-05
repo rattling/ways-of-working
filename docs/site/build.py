@@ -6,6 +6,7 @@ Each "## N. Area" in method.md becomes a station on the line and a section on th
 box, any text before the first "###", then one tab per "###" part. A small interactive goes at the top of
 an area where WIDGETS names one; the interactives themselves are in docs/assets/site.js.
 """
+import hashlib
 import html as htmllib
 import pathlib
 import re
@@ -139,6 +140,9 @@ def main():
     page = TEMPLATE.read_text(encoding="utf-8")
     page = page.replace("{{INTRO}}", md(intro_md)).replace("{{STATIONS}}", station_html)
     page = page.replace("{{CARDS}}", cards_html)
+    # A version from the assets' contents, so a browser fetches new ones as soon as they change.
+    assets = b"".join((DOCS / "assets" / f).read_bytes() for f in ("site.css", "site.js"))
+    page = page.replace("{{V}}", hashlib.sha1(assets).hexdigest()[:8])
     page = page.replace("{{AREAS}}", "\n\n".join(areas))
     OUT.write_text(page, encoding="utf-8")
     print(f"wrote {OUT} ({OUT.stat().st_size // 1024} KB, {len(areas)} sections)")
