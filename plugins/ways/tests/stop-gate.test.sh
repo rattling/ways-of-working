@@ -65,6 +65,9 @@ r="$(repo true)"
 stop "$r" false
 check "green gate: the turn ends" '[[ $code == 0 ]]'
 check "green gate: recorded as a pass" '[[ $(cat "$r/.ways/last-gate") == pass* ]]'
+check "and added to the run list, with its seconds" '[[ $(cat "$r/.ways/gate-runs") =~ ^pass\ [0-9]+\ [0-9]+$ ]]'
+stop "$r" false
+check "each run adds a line" '[[ $(wc -l < "$r/.ways/gate-runs") -eq 2 ]]'
 
 r="$(repo false)"
 stop "$r" false

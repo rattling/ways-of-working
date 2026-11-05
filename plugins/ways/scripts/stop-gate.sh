@@ -33,8 +33,15 @@ fi
 
 cd "$project" || exit 0
 log="$(mktemp)"
-# Record the result for anything that shows gate state, such as the ways-band mod.
-record() { echo "$1 $(date +%s)" > "$project/.ways/last-gate"; }
+# Record the result for anything that shows gate state, such as the ways-band mod,
+# and add the run, with how long it took, to .ways/gate-runs, which the run's line
+# in the ways log totals at handover (reference/FEEDBACK.md).
+started=$(date +%s)
+record() {
+  local now; now=$(date +%s)
+  echo "$1 $now" > "$project/.ways/last-gate"
+  echo "$1 $now $((now - started))" >> "$project/.ways/gate-runs"
+}
 bash -c "$gate" >"$log" 2>&1
 status=$?
 if (( status == 0 )); then

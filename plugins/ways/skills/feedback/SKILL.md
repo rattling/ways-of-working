@@ -19,6 +19,7 @@ If the log isn't there, or has fewer than about ten runs since the last review, 
 ## 2. Group it
 
 - **Runs:** how many of each command, in how many repos, and how many were `fine`.
+- **Gate time:** for each command and repo with gate fields, the median gate runs per run and the gate's share of the run's time ("build in one repo: 14 gate runs, 20% of the time"). A share that's high in several runs is a theme of its own, even with no note saying so.
 - **Notes:** grouped by skill and step, then by kind (heavy, missing, broken, good). Notes in different words about the same thing are one theme: say which you merged.
 
 A **recurring theme** is one that came up in three or more runs, or in two or more repos. Fewer than that is a one-off. A `(person)` note counts double. A theme that's mostly about one repo's quirks is that repo's, not ways'.
