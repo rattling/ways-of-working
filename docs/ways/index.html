@@ -218,6 +218,7 @@
 <div class="tabs" role="tablist" aria-label="Getting started">
 <button role="tab" id="area-getting-started-everyone-the-method-first-tab" aria-controls="area-getting-started-everyone-the-method-first" aria-selected="true" tabindex="0">Everyone: the method first</button>
 <button role="tab" id="area-getting-started-on-git-and-github-use-ways-tab" aria-controls="area-getting-started-on-git-and-github-use-ways" aria-selected="false" tabindex="-1">On git and GitHub: use ways</button>
+<button role="tab" id="area-getting-started-qa-teams-ways-qa-tab" aria-controls="area-getting-started-qa-teams-ways-qa" aria-selected="false" tabindex="-1">QA teams: ways-qa</button>
 <button role="tab" id="area-getting-started-moving-trackers-tab" aria-controls="area-getting-started-moving-trackers" aria-selected="false" tabindex="-1">Moving trackers</button>
 <button role="tab" id="area-getting-started-not-on-git-yet-your-own-plugin-for-now-tab" aria-controls="area-getting-started-not-on-git-yet-your-own-plugin-for-now" aria-selected="false" tabindex="-1">Not on git yet: your own plugin, for now</button>
 <button role="tab" id="area-getting-started-making-it-yours-tab" aria-controls="area-getting-started-making-it-yours" aria-selected="false" tabindex="-1">Making it yours</button>
@@ -241,6 +242,14 @@ gh auth refresh -s workflow
 </code></pre>
 <p>It adds the documents, standards, templates, labels and CI check, never overwrites what's already there, and opens one PR for you to review. Its report says what's left and who can finish it. Run it again after an update to bring the repo up to date. For a whole team, the Claude admin can add the marketplace and plugins to managed settings instead.</p>
 <p><strong>Let ways keep its working state in GitHub issues.</strong> The briefs, plan comments, specs, tickets and PRs all live there, and that's what lets a fresh session pick up where the last one stopped. If your team's main tickets live in another system, they can stay there: when one becomes work, open a GitHub issue for it and link the two. It's a little double-handling, and fine to start with.</p></div>
+<div class="panel prose" role="tabpanel" id="area-getting-started-qa-teams-ways-qa" aria-labelledby="area-getting-started-qa-teams-ways-qa-tab" hidden><p>A QA team that tests a running app, without its code, installs <code>ways-qa</code> instead. It brings ways and the Playwright plugin with it, and adds two commands for a repo that holds a Playwright suite:</p>
+<pre><code>claude plugin install ways-qa@ways-of-working
+</code></pre>
+<ul>
+<li><strong><code>/ways-qa:triage</code></strong> sorts reports: possible duplicates and regressions from open and closed issues, bug or request or working as designed, severity, the team it goes to, evidence from the browser, and a confidence for each call. Calls below the agreed threshold go to a person, and a third bug of the same kind gets an improvement issue drafted for engineering.</li>
+<li><strong><code>/ways-qa:reproduce #n</code></strong> turns one report into a Playwright test that fails for the right reason, written from what should happen rather than what the app does now.</li>
+</ul>
+<p>The rules (severity, routing, the confidence threshold, the app's own domain rules) live in the QA repo's <code>docs/standards/qa.md</code>, not in the plugin. Its <a href="https://github.com/rattling/ways-of-working/tree/main/plugins/ways-qa">README</a> has the detail.</p></div>
 <div class="panel prose" role="tabpanel" id="area-getting-started-moving-trackers" aria-labelledby="area-getting-started-moving-trackers-tab" hidden><p>If you're about to move to another tracker (Linear, say), don't build a bridge to the old one. When the move happens, decide whether the new tracker holds the plan and GitHub the technical work, or the new tracker holds everything. Ways is adding support for other trackers, built against a real team's setup when one moves.</p></div>
 <div class="panel prose" role="tabpanel" id="area-getting-started-not-on-git-yet-your-own-plugin-for-now" aria-labelledby="area-getting-started-not-on-git-yet-your-own-plugin-for-now-tab" hidden><p>The build side of ways needs git: branches, worktrees, one PR per change. If your code is in another version control system, don't wait, and don't bolt a sync onto it. Have Claude build you a small, temporary plugin that follows this method as closely as your setup allows. A starting prompt:</p>
 <blockquote>
