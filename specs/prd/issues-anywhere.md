@@ -90,11 +90,35 @@ Every ways convention that's written in GitHub terms today (the parent issue, su
 
 ## Implementation Decisions
 
-To follow from design.
+- **One file knows the tracker.** The ways overlay becomes tracker-neutral. It opens with a table of tracker operations: read an issue, comment on it, set its state, create a child ticket, list open issues by state, and close work through a PR. The conventions below the table are written in those terms. Setup appends one of three short sections that give the operations for this repo: GitHub (today's `gh` commands), local markdown (the `.scratch/` rules in the user stories) or other (map each operation onto the described tracker). Nothing else names the tracker.
+- **The commands use the operations.** Work, build, plan, requirements, design, discover's hand-off, explain, arch-review, setup's backfill and the feedback notes' "an issue here" stop naming `gh issue`, sub-issues and labels. They name the operation and point at `docs/agents/issue-tracker.md`. `/ways:feedback` keeps `gh issue create`, because it files to ways' own repo.
+- **The ID is the one contract** between the commands, the scripts and the PR check. An ID is a GitHub number (`12` or `#12`), a local `<slug>` or `<slug>/<NN>`, or a tracker key (`ENG-123`). It's written the same way in the marker, in commands, in branch names (`/` becomes `-`) and in PR bodies. It changes by addition: numeric markers and `#12` keep working.
+- **The marker** `.ways/autonomous` holds IDs as written, space-separated, in merge order. The SessionStart hook and the band split it on whitespace instead of keeping digits, and add `#` only to bare numbers. The hook's resume line and its "where status lives" line name the repo's tracker. It reads which tracker from the section setup appended.
+- **`pr-hygiene`** accepts `Closes`, `Fixes`, `Resolves` or `Refs` followed by any ID form. `no-issue` is unchanged.
+- **Setup** asks where issues live (GitHub by default when the remote is GitHub), and asks only on a first run: a re-run reads the existing section. For local and other it skips `gh issue` checks and label creation, and writes the PR template's first line (`Closes `) and `AGENTS.md`'s tracker line to suit. For other it tries one read and records the result (user stories 6 and 7). The GitHub remote check stays, for PRs.
+- **Local issues live on branches** ([ADR 0001](../../docs/adr/0001-local-issues-live-on-branches.md)): nothing writes to `main`, and a status reaches it with the PR that changes it.
+- **Context and containers:** nothing new, except that "other" reaches the person's tracker through a CLI or connector they're already signed into. Nothing is stored. The look and the dev seed don't apply: there are no screens, and the throwaway repo is the demo.
 
 ## Testing Decisions
 
-To follow from design.
+- Test through the existing seams only, by what a person sees: what the SessionStart hook prints, and what the band shows.
+- `session-start.test.sh` gets a local marker (`billing/03`), a batch of local IDs and a Linear-style key beside the numeric cases, and checks the resume line names the tracker. `ways-band.test.ts` does the same for what the band shows: `#12`, `billing/03`, `ENG-123`.
+- `pr-hygiene` has no test today and gets none: the throwaway-repo run checks it, along with the prose in the commands (Human verification).
+- The GitHub path is checked by the existing tests passing unchanged, and by a setup re-run on an existing repo.
+
+## Size
+
+| | Closest: guard `main` (#44) | This feature |
+|---|---|---|
+| Files added / changed | 7 | about 22 (1 ADR added) |
+| New classes (or modules) | 1 script | none |
+| Lines, code and prose | about 105 | about 200, a few lines in each command, about 60 in the overlay |
+| Lines, tests | about 88 | about 55 |
+| Tickets, rough build time | 1 | 4, about an afternoon |
+
+The tickets: (1) the neutral overlay, the three tracker sections, and the commands moved onto its operations; (2) setup asks, tries "other", and writes the PR template and `AGENTS.md` lines to suit; (3) IDs in the marker, the hook and the band, with tests; (4) `pr-hygiene` and the README. Then the throwaway-repo check.
+
+It's wider than #44 because it touches every command, not because it's deeper.
 
 ## Out of Scope
 
