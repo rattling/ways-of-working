@@ -8,7 +8,7 @@ disable-model-invocation: true
 
 How the system takes the PRD, at system level, before anything is sliced. `/ways:plan` runs requirements and then this in one sitting, and is what most people use. Run this on its own when the requirements were written by someone else with `/ways:requirements`: the PRD file is the hand-off. `/ways:build` then cuts tickets along the seams decided here.
 
-Input: the parent issue, `#<n>`, or the PRD's path. Without one, use the PRD written in this conversation; with none, stop and say `/ways:plan` (or `/ways:requirements`) comes first.
+Input: the parent issue's ID (`#12`, `billing`, `ENG-123`), or the PRD's path. Without one, use the PRD written in this conversation; with none, stop and say `/ways:plan` (or `/ways:requirements`) comes first.
 
 Follow `${CLAUDE_PLUGIN_ROOT}/reference/PARTS.md`: look for the output first, open with where you are, and end with the merge sentence. If the PRD's design sections are already filled, say so and offer to revise them, not to start again.
 
@@ -68,4 +68,4 @@ Commit to the spec's branch, so the spec PR carries requirements and design toge
 
 ## 4. Hand on
 
-Mark the spec PR ready. Say what changed in a few lines (the PRD sections, the diagram, the ADRs) and what's still open. Delete `.ways/part`. Then the merge sentence: "To agree the spec, merge PR #<m>: that's what it should do and how the system changes." Next: `/ways:build #<n>`, which cuts slices along the seams decided here.
+Mark the spec PR ready. Say what changed in a few lines (the PRD sections, the diagram, the ADRs) and what's still open. Delete `.ways/part`. Then the merge sentence: "To agree the spec, merge PR #<m>: that's what it should do and how the system changes." Next: `/ways:build <id>`, which cuts slices along the seams decided here.

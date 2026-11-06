@@ -31,7 +31,7 @@ Show the page in the chat, or its path and its opening paragraph if it's long, a
 ### 4. Commit and open the intake issue
 1. **Check what's committed** (changed by ways). Personal sources are already in `private/`, which is git-ignored: confirm with `git status` that nothing from `private/` or `specs/brief/inbox/` is staged. Then check two things: `raw/` holds nothing personal (move anything that is to `private/`), and quotes in `out/` and on the front page carry no names or details that shouldn't be in git (use the person's role or code instead, and say so in `decisions.md`). Ask about anything you're unsure of.
 2. On a branch `discovery/<slug>`, commit `specs/brief/<slug>/`.
-3. Open the intake issue, labelled `needs-triage`, titled with the problem (not a feature). The body is short:
+3. Create the intake issue (`docs/agents/issue-tracker.md` says how in this repo's tracker), in the state `needs-triage`, titled with the problem (not a feature). The body is short:
    ```
    <The problem statement.>
 
@@ -39,12 +39,12 @@ Show the page in the chat, or its path and its opening paragraph if it's long, a
 
    Brief: specs/brief/<slug>/README.md
    ```
-   If an issue already asks for this work (the request discovery started from), use it instead of a new one: put the lines above at the top of its body, keep the original below, and add `needs-triage`.
-4. Put the issue number in the page's **Intake** line, commit, and open a PR titled `discovery: <title>`, with `Refs #<n>` and a `## How to check` section: read the front page, and check its numbers against `out/`. A person merges it; that's the brief agreed.
-5. With no GitHub remote, skip the issue and the PR, write `not filed yet` on the **Intake** line, and give the person the issue text to file.
+   If an issue already asks for this work (the request discovery started from), use it instead of a new one: put the lines above at the top of its body, keep the original below, and set its state to `needs-triage`.
+4. Put the issue's ID in the page's **Intake** line, commit, and open a PR titled `discovery: <title>`, with `Refs <id>` and a `## How to check` section: read the front page, and check its numbers against `out/`. A person merges it; that's the brief agreed.
+5. With no GitHub remote, skip the PR. If issues live on GitHub too, skip the issue as well: write `not filed yet` on the **Intake** line, and give the person the issue text to file.
 
 ### 5. Say what's next
-End with the merge sentence (`${CLAUDE_PLUGIN_ROOT}/reference/PARTS.md`): "To agree the brief, merge PR #<m>: that's the discovery." Next: `/ways:plan #<n>`, which sizes it from the brief first and starts from it instead of from scratch, then `/ways:build #<n>`. If the brief shows it's small, `/ways:work #<n>` instead. If the first step in the order of work needs no code (candidate zero), say so: it's a change for the team to try, not a ticket.
+End with the merge sentence (`${CLAUDE_PLUGIN_ROOT}/reference/PARTS.md`): "To agree the brief, merge PR #<m>: that's the discovery." Next: `/ways:plan <id>`, which sizes it from the brief first and starts from it instead of from scratch, then `/ways:build <id>`. If the brief shows it's small, `/ways:work <id>` instead. If the first step in the order of work needs no code (candidate zero), say so: it's a change for the team to try, not a ticket.
 
 ## Output
 

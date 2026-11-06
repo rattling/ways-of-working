@@ -8,15 +8,15 @@ disable-model-invocation: true
 
 What to build and why, written as a PRD. `/ways:plan` runs this and then `/ways:design` in one sitting, and is what most people use. Run this on its own when someone else will do the design: the PRD file is the hand-off.
 
-Input: the issue, `#<n>`. Without one, use the issue the conversation is about, or ask for it once.
+Input: the issue's ID, in the tracker's own form (`#12`, `billing`, `ENG-123`). Without one, use the issue the conversation is about, or ask for it once.
 
 Follow `${CLAUDE_PLUGIN_ROOT}/reference/PARTS.md`: look for the output first, open with where you are, and end with the merge sentence.
 
 ## 1. Look first
 
 - **The PRD exists already** (a `Spec:` line, or `specs/prd/<feature-slug>.md`): say so, with its status, and offer to revise it: grill only what's open or changed, then update the file on its branch. Don't grill from scratch.
-- **Nobody has sized it** (no state label, or only `needs-triage`): size it first, as `/triage` would, by the sizing rules in `docs/agents/issue-tracker.md`. Big work: label it as triage would and carry on. One ticket: say so and offer `/ways:work #<n>` instead. The problem isn't understood: offer `/ways:discover`. Don't carry on for work that isn't big.
-- **The problem isn't understood** (labelled `needs-info` for discovery, or nobody can say who it's for): say `/ways:discover` comes first.
+- **Nobody has sized it** (no state, or only `needs-triage`): size it first, as `/triage` would, by the sizing rules in `docs/agents/issue-tracker.md`. Big work: set its state as triage would and carry on. One ticket: say so and offer `/ways:work <id>` instead. The problem isn't understood: offer `/ways:discover`. Don't carry on for work that isn't big.
+- **The problem isn't understood** (in the state `needs-info` for discovery, or nobody can say who it's for): say `/ways:discover` comes first.
 
 ## 2. Work them out: prototype, grill, or both
 
@@ -59,9 +59,9 @@ Run Pocock's `to-spec` steps (`${CLAUDE_PLUGIN_ROOT}/reference/POCOCK.md`: only 
 
 Two checks after it:
 
-- **The parent keeps one state label.** Don't add `ready-for-agent` beside triage's `ready-for-human`. If both are on it, remove `ready-for-agent`.
+- **The parent keeps one state.** Leave it at triage's `ready-for-human`, not `ready-for-agent`. If it has both, remove `ready-for-agent`.
 - **The PRD has Human verification and Must not exist yet**, as the tracker conventions say, and links the mock if there is one.
 
 ## 5. Hand on
 
-Say in a few lines what the PRD settles and what's still open. Delete `.ways/part`. Then: "Nothing to merge yet: design goes into the same draft spec PR (#<m>). Next: `/ways:design #<n>`."
+Say in a few lines what the PRD settles and what's still open. Delete `.ways/part`. Then: "Nothing to merge yet: design goes into the same draft spec PR (#<m>). Next: `/ways:design <id>`."
