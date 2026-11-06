@@ -275,27 +275,13 @@ footer { padding-block: 48px 40px; color: var(--ink-2); font-size: 13.5px; displ
   *, *::before, *::after { animation: none !important; transition: none !important; }
 }
 </style>
+<link rel="stylesheet" href="../assets/chrome.css?v=455871b8">
 </head>
-<body>
-<style>.siterow{display:flex;flex-wrap:wrap;gap:4px 16px;align-items:center;font:600 13px 'Overpass Mono',ui-monospace,Consolas,monospace;padding:10px 0;margin-bottom:12px;border-bottom:1px solid rgba(128,128,128,.35)}.siterow a{color:inherit;opacity:.72;text-decoration:none}.siterow a:hover{opacity:1}.siterow .home{font-weight:900;opacity:1;text-transform:uppercase;margin-right:auto;letter-spacing:.02em}.siterow a[aria-current]{opacity:1;text-decoration:underline;text-underline-offset:4px}</style><nav class="siterow" aria-label="Site"><a class="home" href="../">ways</a><a href="../">Why</a><a href="../method/">The method</a><a href="../ways/">Ways</a><a href="../basics/">New to this?</a><a href="../issue-to-merge/" aria-current="page">Issue to Merge</a></nav>
-<nav class="top">
-  <div class="wrap">
-    <span class="brand">Issue to Merge</span>
-    
-    <a href="#line">The line</a>
-    <a href="#route">Pick the route</a>
-    <a href="#brief">The brief</a>
-    <a href="#owns">Who decides</a>
-    <a href="#merge">Merging</a>
-    <a href="#context">Context</a>
-    <a href="#proportion">Proportion</a>
-    <a href="#security">Security</a>
-  </div>
-</nav>
+<body data-page="issue-to-merge/">
 
 <div class="wrap">
 
-<header class="hero" id="line">
+<header class="hero" id="line" data-toc="The line">
   <div class="eyebrow"><span class="bullet" style="color:var(--l-big)"></span>Software delivery with Claude Code and the ways plugin</div>
   <h1>Issue to merge</h1>
   <p class="lede">Every piece of work starts as a GitHub issue and ends as a merged PR. Claude does the building. People decide where the work goes and whether it ships, and every one of those decisions is a merge. Pick an issue below and run it down the line. The signals stay red until you merge.</p>
@@ -330,7 +316,7 @@ footer { padding-block: 48px 40px; color: var(--ink-2); font-size: 13.5px; displ
 </div>
 
 <!-- ROUTE QUIZ -->
-<section id="route">
+<section id="route" data-toc="Pick the route">
   <div class="eyebrow"><span class="bullet" style="color:var(--l-small)"></span>Routing</div>
   <h2>Pick the route</h2>
   <p>The commands size an issue themselves, but you should be able to do it in your head. The rule from every repo's <code>AGENTS.md</code>: big means more than one ticket, or it changes an invariant or a contract. If nobody can say what problem it solves, it isn't ready to plan.</p>
@@ -339,7 +325,7 @@ footer { padding-block: 48px 40px; color: var(--ink-2); font-size: 13.5px; displ
 </section>
 
 <!-- BRIEF -->
-<section id="brief">
+<section id="brief" data-toc="The brief">
   <div class="eyebrow"><span class="bullet" style="color:var(--l-small)"></span>/ways:work, before any code</div>
   <h2>The brief</h2>
   <p>A raw issue is usually one line. Before it builds anything, <code>/ways:work</code> rewrites it as a brief on the issue and waits for you to say go. The brief is finished when Claude could start from the issue alone, without the conversation that produced it.</p>
@@ -367,7 +353,7 @@ footer { padding-block: 48px 40px; color: var(--ink-2); font-size: 13.5px; displ
 </section>
 
 <!-- OWNERSHIP -->
-<section id="owns">
+<section id="owns" data-toc="Who decides">
   <div class="eyebrow"><span class="bullet" style="color:var(--caution)"></span>The working contract</div>
   <h2>Who decides</h2>
   <p>Most wasted turns are one of two mistakes: Claude asking permission for something it owns, or quietly deciding something it doesn't. Click each item to give it to a person or to Claude, then check.</p>
@@ -385,7 +371,7 @@ footer { padding-block: 48px 40px; color: var(--ink-2); font-size: 13.5px; displ
 </section>
 
 <!-- MERGE -->
-<section id="merge">
+<section id="merge" data-toc="Merging">
   <div class="eyebrow"><span class="bullet" style="color:var(--stop)"></span>Review and merge</div>
   <h2>Merging by risk</h2>
   <p>Risk is set by what a change touches, not by who wrote it. The engineering lead sets a dial per repo and moves it as trust builds. Choose the files a PR changes and where the dial sits.</p>
@@ -422,7 +408,7 @@ footer { padding-block: 48px 40px; color: var(--ink-2); font-size: 13.5px; displ
 </section>
 
 <!-- CONTEXT -->
-<section id="context">
+<section id="context" data-toc="Context">
   <div class="eyebrow"><span class="bullet" style="color:var(--l-big)"></span>The band and the context window</div>
   <h2>When to clear</h2>
   <p>A big context costs usage on every message, because the whole conversation is sent again, and it thins Claude's attention. Compaction loses detail. Everything that matters lives in files and GitHub, so a fresh session picks up from there. The band above the prompt shows where you are. Move the slider and pick what you're doing.</p>
@@ -452,7 +438,7 @@ footer { padding-block: 48px 40px; color: var(--ink-2); font-size: 13.5px; displ
 </section>
 
 <!-- PROPORTION -->
-<section id="proportion">
+<section id="proportion" data-toc="Proportion">
   <div class="eyebrow"><span class="bullet" style="color:var(--l-typo)"></span>Measured, once each</div>
   <h2>A method can oversteer</h2>
   <p>The same request, a printable allergen chart for each café's wall that says when the printed copy is out of date, on the same app, three ways. A version of ways that accepted every recommended extra built six times the code. The fix was proportion: the plan states the expected size against the nearest existing feature, the grill leans small, and extras go on a Later list.</p>
@@ -483,7 +469,7 @@ footer { padding-block: 48px 40px; color: var(--ink-2); font-size: 13.5px; displ
 </section>
 
 <!-- SECURITY -->
-<section id="security">
+<section id="security" data-toc="Security">
   <div class="eyebrow"><span class="bullet" style="color:var(--stop)"></span>Prompt injection</div>
   <h2>The agent reads things you didn't write</h2>
   <p>Issues, bug reports, review comments, a supplier's CSV, a dependency's README, a web page. Any of them can carry text that tries to give Claude orders. Simon Willison calls the risk the lethal trifecta. Switch on what a coding agent with your permissions has.</p>
@@ -532,7 +518,7 @@ footer { padding-block: 48px 40px; color: var(--ink-2); font-size: 13.5px; displ
 </section>
 
 <!-- COMMANDS -->
-<section id="commands">
+<section id="commands" data-toc="The four commands">
   <div class="eyebrow"><span class="bullet" style="color:var(--ink)"></span>On the desk</div>
   <h2>The four commands</h2>
   <p>A person types each one. Claude never starts the next step itself. Each command checks what's already done, so running it twice never repeats work, opens by saying where you are, and ends by naming the one PR to merge and the next command.</p>
@@ -1076,5 +1062,6 @@ footer { padding-block: 48px 40px; color: var(--ink-2); font-size: 13.5px; displ
   }));
 })();
 </script>
+<script src="../assets/chrome.js?v=455871b8"></script>
 </body>
 </html>

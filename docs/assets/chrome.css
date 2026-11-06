@@ -1,0 +1,47 @@
+/* The site bar and "On this page" panel for the hand-written pages (basics, Issue to Merge), so they
+   navigate like the built ones. Everything is prefixed wc- so it can't collide with a page's own styles. */
+:root {
+  --wc-paper: #EEF2F1; --wc-panel: #FFFFFF; --wc-ink: #13203A; --wc-ink-2: #4B5873; --wc-rule: #CFD8D7; --wc-accent: #1E58C2;
+}
+@media (prefers-color-scheme: dark) {
+  :root { --wc-paper: #0E1421; --wc-panel: #161F31; --wc-ink: #E5EBF4; --wc-ink-2: #9BA8BE; --wc-rule: #2B3851; --wc-accent: #5C90F2; }
+}
+html { scroll-padding-top: 72px; }
+body.wc { padding-top: 64px !important; }
+
+.wc-bar {
+  position: fixed; z-index: 30; top: 0; left: 0; right: 0;
+  background: color-mix(in srgb, var(--wc-paper) 92%, transparent); backdrop-filter: blur(6px);
+  border-bottom: 1px solid var(--wc-rule);
+  padding: calc(8px + env(safe-area-inset-top, 0px)) max(16px, env(safe-area-inset-right, 0px)) 8px max(16px, env(safe-area-inset-left, 0px));
+}
+.wc-in { max-width: 1240px; margin: 0 auto; display: flex; align-items: center; gap: 14px; flex-wrap: wrap; row-gap: 4px; }
+.wc-brand { font: 900 22px 'Big Shoulders Display', 'Arial Narrow', sans-serif; text-transform: uppercase; color: var(--wc-ink); text-decoration: none; }
+.wc-links { display: flex; gap: 4px 14px; flex-wrap: wrap; margin-left: auto; font: 600 13px 'Overpass Mono', 'JetBrains Mono', ui-monospace, Consolas, monospace; }
+.wc-links a { color: var(--wc-ink-2); text-decoration: none; border-bottom: 3px solid transparent; padding: 2px 0; }
+.wc-links a:hover { color: var(--wc-ink); }
+.wc-links a[aria-current="page"] { color: var(--wc-ink); border-bottom-color: var(--wc-accent); }
+.wc-toggle { display: none; font: 600 13px 'Overpass Mono', 'JetBrains Mono', ui-monospace, monospace; background: var(--wc-panel); color: var(--wc-ink);
+  border: 1.5px solid var(--wc-rule); border-radius: 6px; padding: 5px 10px 3px; cursor: pointer; }
+
+.wc-side { position: fixed; z-index: 25; top: 64px; bottom: 16px; left: max(16px, env(safe-area-inset-left, 0px)); width: 220px; overflow-y: auto; padding-top: 18px; }
+.wc-head { font: 600 11px 'Overpass Mono', 'JetBrains Mono', ui-monospace, monospace; letter-spacing: .14em; text-transform: uppercase; color: var(--wc-ink-2); margin: 0 0 8px 13px; }
+.wc-side ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 1px; }
+.wc-side a { display: block; text-decoration: none; color: var(--wc-ink-2); font: 14.5px/1.3 'Overpass', 'Atkinson Hyperlegible', system-ui, sans-serif; padding: 5px 10px; border-left: 3px solid var(--wc-rule); }
+.wc-side a:hover { color: var(--wc-ink); border-left-color: var(--wc-ink-2); }
+.wc-side a.on { color: var(--wc-ink); font-weight: 700; border-left-color: var(--wc-accent); background: var(--wc-panel); }
+
+/* Wide enough for the panel beside the page's own layout */
+@media (min-width: 1200px) { body.wc { padding-left: 260px !important; } }
+/* Below that, the panel is a drawer behind Contents */
+@media (max-width: 1199px) {
+  .wc-toggle { display: inline-block; }
+  .wc-side { top: 0; bottom: 0; left: 0; width: min(300px, 86vw); background: var(--wc-paper); border-right: 1px solid var(--wc-rule);
+    box-shadow: 0 0 40px rgba(0,0,0,.25); transform: translateX(-105%); transition: transform .2s; z-index: 40;
+    padding: calc(20px + env(safe-area-inset-top, 0px)) 14px 24px max(14px, env(safe-area-inset-left, 0px)); }
+  body.wc-open .wc-side { transform: none; }
+}
+@media (max-width: 640px) { .wc-links { margin-left: 0; font-size: 12px; gap: 4px 12px; } }
+@media (prefers-reduced-motion: reduce) { .wc-side { transition: none; } }
+/* On a phone the bar wraps to two lines: start the page below it */
+@media (max-width: 640px) { body.wc { padding-top: 108px !important; } html { scroll-padding-top: 116px; } }

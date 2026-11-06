@@ -93,11 +93,11 @@ ul.go { margin: 0; padding-left: 18px; display: grid; gap: 4px; font-size: 15.5p
 .end p { max-width: 70ch; }
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
 </style>
+<link rel="stylesheet" href="../assets/chrome.css?v=455871b8">
 </head>
-<body>
-<div class="wrap"><style>.siterow{display:flex;flex-wrap:wrap;gap:4px 16px;align-items:center;font:600 13px 'Overpass Mono',ui-monospace,Consolas,monospace;padding:10px 0;margin-bottom:12px;border-bottom:1px solid rgba(128,128,128,.35)}.siterow a{color:inherit;opacity:.72;text-decoration:none}.siterow a:hover{opacity:1}.siterow .home{font-weight:900;opacity:1;text-transform:uppercase;margin-right:auto;letter-spacing:.02em}.siterow a[aria-current]{opacity:1;text-decoration:underline;text-underline-offset:4px}</style><nav class="siterow" aria-label="Site"><a class="home" href="../">ways</a><a href="../">Why</a><a href="../method/">The method</a><a href="../ways/">Ways</a><a href="../basics/" aria-current="page">New to this?</a><a href="../issue-to-merge/">Issue to Merge</a></nav>
-
-<header style="display:grid;gap:14px">
+<body data-page="basics/">
+<div class="wrap">
+<header id="start" data-toc="Start here" style="display:grid;gap:14px">
   <div class="kicker">A field guide for people building with AI</div>
   <h1>Software engineering, in one page</h1>
   <p class="lede">You can get a long way building with Claude without any of this. Then something breaks, or a second person needs to use it, or a customer's data goes somewhere it shouldn't. <span class="hl">Software engineering is mostly about what happens after the first version works.</span></p>
@@ -110,7 +110,7 @@ ul.go { margin: 0; padding-left: 18px; display: grid; gap: 4px; font-size: 15.5p
 </div>
 
 <!-- 1 -->
-<section class="stop" id="problem" data-title="The problem" data-sub="Before any code">
+<section class="stop" id="problem" data-toc="The problem" data-title="The problem" data-sub="Before any code">
   <header><div class="kicker">Stop 1</div><h2>The problem, before the code</h2><span class="when">Bites: before you start</span></header>
   <div class="draw"><svg viewBox="0 0 640 170" role="img" aria-label="An idea leads to three questions: who has the problem, what it costs them, how you'd know it's fixed. Only then build.">
     <rect class="soft" x="10" y="55" width="120" height="56" rx="10"/><text x="70" y="80" text-anchor="middle">"Let's build</text><text x="70" y="98" text-anchor="middle">a dashboard"</text>
@@ -130,7 +130,7 @@ ul.go { margin: 0; padding-left: 18px; display: grid; gap: 4px; font-size: 15.5p
 </section>
 
 <!-- 2 -->
-<section class="stop" id="anatomy" data-title="How an app fits" data-sub="Front end, back end, database">
+<section class="stop" id="anatomy" data-toc="How an app fits" data-title="How an app fits" data-sub="Front end, back end, database">
   <header><div class="kicker">Stop 2</div><h2>How an app is put together</h2><span class="when">Bites: before you start</span></header>
   <div class="draw"><svg viewBox="0 0 640 250" role="img" aria-label="At runtime, a browser shows the front end, which talks to the back end, which reads and writes the database. At design time, you and Claude write code, kept in a repo, which is deployed to where the app runs.">
     <text class="small" x="10" y="20">RUNTIME: what your users touch, with no Claude in the loop</text>
@@ -156,7 +156,7 @@ ul.go { margin: 0; padding-left: 18px; display: grid; gap: 4px; font-size: 15.5p
 </section>
 
 <!-- 3 -->
-<section class="stop" id="data" data-title="Data" data-sub="Tables, and one source of truth">
+<section class="stop" id="data" data-toc="Data" data-title="Data" data-sub="Tables, and one source of truth">
   <header><div class="kicker">Stop 3</div><h2>Data</h2><span class="when">Bites: before you start</span></header>
   <div class="draw"><svg viewBox="0 0 640 190" role="img" aria-label="Two tables, Customers and Orders. Each order points at its customer by id, so a customer's email is stored once.">
     <rect class="box" x="10" y="20" width="260" height="150" rx="8"/><rect class="hot" x="10" y="20" width="260" height="32" rx="8"/><text x="22" y="41">Customers</text>
@@ -182,7 +182,7 @@ ul.go { margin: 0; padding-left: 18px; display: grid; gap: 4px; font-size: 15.5p
 </section>
 
 <!-- 4 -->
-<section class="stop" id="apis" data-title="APIs and MCP" data-sub="How systems talk">
+<section class="stop" id="apis" data-toc="APIs and MCP" data-title="APIs and MCP" data-sub="How systems talk">
   <header><div class="kicker">Stop 4</div><h2>Talking to other systems: APIs, and MCP</h2><span class="when">Bites: when you connect things</span></header>
   <div class="draw"><svg viewBox="0 0 640 200" role="img" aria-label="Your app sends a request to a payment provider's API and gets a response. An AI agent uses an MCP server, which calls your app's API.">
     <rect class="box" x="10" y="20" width="160" height="60" rx="10"/><text x="90" y="56" text-anchor="middle">Your app</text>
@@ -205,7 +205,7 @@ ul.go { margin: 0; padding-left: 18px; display: grid; gap: 4px; font-size: 15.5p
 </section>
 
 <!-- 5 -->
-<section class="stop" id="auth" data-title="Who can use it" data-sub="Sign-in, permissions, secrets">
+<section class="stop" id="auth" data-toc="Who can use it" data-title="Who can use it" data-sub="Sign-in, permissions, secrets">
   <header><div class="kicker">Stop 5</div><h2>Who can use it</h2><span class="when">Bites: before anyone else uses it</span></header>
   <div class="draw"><svg viewBox="0 0 640 170" role="img" aria-label="A person passes two gates. First: who are you, answered by signing in. Second: what may you do, answered by their role. Only then do they reach the data.">
     <circle class="box" cx="45" cy="70" r="20"/><path class="box" d="M15 130 a30 30 0 0 1 60 0 z"/><text class="small" x="45" y="155" text-anchor="middle">a person</text>
@@ -226,7 +226,7 @@ ul.go { margin: 0; padding-left: 18px; display: grid; gap: 4px; font-size: 15.5p
 </section>
 
 <!-- 6 -->
-<section class="stop" id="hosting" data-title="Where it runs" data-sub="Hosting, deploying, environments">
+<section class="stop" id="hosting" data-toc="Where it runs" data-title="Where it runs" data-sub="Hosting, deploying, environments">
   <header><div class="kicker">Stop 6</div><h2>Where it runs</h2><span class="when">Bites: before anyone else uses it</span></header>
   <div class="draw"><svg viewBox="0 0 640 190" role="img" aria-label="Code moves from your laptop to a test environment to production through a pipeline. A file describing the servers, infrastructure as code, builds test and production the same way.">
     <rect class="box" x="10" y="30" width="150" height="70" rx="10"/><text x="85" y="60" text-anchor="middle">Your laptop</text><text class="small" x="85" y="80" text-anchor="middle">local: try anything</text>
@@ -248,7 +248,7 @@ ul.go { margin: 0; padding-left: 18px; display: grid; gap: 4px; font-size: 15.5p
 </section>
 
 <!-- 7 -->
-<section class="stop" id="git" data-title="Git and working together" data-sub="Branches, pull requests, review">
+<section class="stop" id="git" data-toc="Git and working together" data-title="Git and working together" data-sub="Branches, pull requests, review">
   <header><div class="kicker">Stop 7</div><h2>Keeping track, and working together</h2><span class="when">Bites: before you start</span></header>
   <div class="draw"><svg viewBox="0 0 640 170" role="img" aria-label="The main line of history. A short branch splits off for one change, gets reviewed in a pull request, and merges back.">
     <path class="wire" d="M20 110 H620"/>
@@ -269,7 +269,7 @@ ul.go { margin: 0; padding-left: 18px; display: grid; gap: 4px; font-size: 15.5p
 </section>
 
 <!-- 8 -->
-<section class="stop" id="habits" data-title="The engineer's habits" data-sub="Failure, tests, small steps">
+<section class="stop" id="habits" data-toc="The engineer's habits" data-title="The engineer's habits" data-sub="Failure, tests, small steps">
   <header><div class="kicker">Stop 8</div><h2>The engineer's habits</h2><span class="when">Bites: from the first day</span></header>
   <div class="draw"><svg viewBox="0 0 640 200" role="img" aria-label="A loop: a small change, tested, reviewed, released, then watched, which leads to the next small change.">
     <rect class="hot" x="245" y="10" width="150" height="40" rx="20"/><text x="320" y="35" text-anchor="middle">A small change</text>
@@ -292,7 +292,7 @@ ul.go { margin: 0; padding-left: 18px; display: grid; gap: 4px; font-size: 15.5p
   <button class="got-btn" type="button" aria-pressed="false">Got it</button>
 </section>
 
-<section class="end">
+<section class="end" id="next" data-toc="Next">
   <div class="kicker" style="color:var(--mark)">Next</div>
   <h2 style="color:var(--paper)">You don't have to know all of this to start</h2>
   <p>You need to know it's there. Build with Claude, and when one of these stops starts to bite, come back to it. Better still, work in a way that has the guardrails built in, so the checks happen whether or not you remember them. That's what <a href="../">the ways method</a> is for: it puts most of these stops into how the work is done.</p>
@@ -330,5 +330,6 @@ ul.go { margin: 0; padding-left: 18px; display: grid; gap: 4px; font-size: 15.5p
   render();
 })();
 </script>
+<script src="../assets/chrome.js?v=455871b8"></script>
 </body>
 </html>
