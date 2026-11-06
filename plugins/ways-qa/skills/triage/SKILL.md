@@ -91,7 +91,7 @@ To one row of the routing table in `qa.md`, by area. Say which row and why. If t
 
 ### 8. Patterns
 
-Search closed and open bugs in the same area with the same kind of failure (`qa.md` says what counts as a pattern; three is the default). If this report makes a pattern, draft an **improvement issue** for engineering: the kind of failure, each past bug linked with a line on what went wrong, what they have in common, and one suggestion of what would stop the next one (a check, a test, a validation, a design change). It's a proposal: show the draft, and file it only when the person says so. Label it `improvement` and route it like a bug.
+Search closed and open bugs in the same area with the same kind of failure (`qa.md` says what counts as a pattern; three is the default). A report you haven't reproduced doesn't count yet: say it would make a pattern once it's confirmed, and hold the draft until then. If this report makes a pattern, draft an **improvement issue** for engineering: the kind of failure, each past bug linked with a line on what went wrong, what they have in common, and one suggestion of what would stop the next one (a check, a test, a validation, a design change). It's a proposal: show the draft, and file it only when the person says so. Label it `improvement` and route it like a bug.
 
 ### 9. Confidence, then post
 
@@ -117,7 +117,7 @@ The state after triage, from Pocock's machine:
 
 - `needs-info`: waiting on the reporter.
 - `needs-triage`: at least one call is with a person.
-- `ready-for-agent`: a reproduced bug, routed, with a failing test from `/ways-qa:reproduce`, going to a team that takes agent work. The test and the evidence are the brief.
+- `ready-for-agent`: a reproduced bug, routed, with a failing test from `/ways-qa:reproduce`, going to a team whose row in the routing table says it takes agent work. The test and the evidence are the brief.
 - `ready-for-human`: a reproduced bug or an agreed request, routed, for a person to pick up.
 - `wontfix`: a person closed it.
 

@@ -34,9 +34,9 @@ How bad it is for the person using it. Separate from priority, which is when it 
 Who takes a confirmed bug or request, by area. Triage routes to one row, or to the triage owner if it can't tell.
 
 <!-- fill in -->
-| Area | Covers | Goes to | Label |
-|---|---|---|---|
-| | | | `team:` |
+| Area | Covers | Goes to | Label | Takes agent work |
+|---|---|---|---|---|
+| | | | `team:` | yes / no |
 
 **Triage owner** (gets anything below the threshold, and anything that doesn't fit a row): <!-- fill in: a GitHub handle or team -->
 
