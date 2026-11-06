@@ -7,53 +7,52 @@
   const wait = ms => new Promise(r => setTimeout(r, reduce ? 0 : ms));
   const colour = key => `var(--a${key})`;
 
-  /* ---------- colours, the line, the sticky bar ---------- */
-  $$('.area').forEach(a => a.style.setProperty('--c', colour(a.dataset.area)));
-  $$('#line a').forEach((a, i) => { a.style.setProperty('--c', colour(a.dataset.station)); a.style.setProperty('--i', i); });
-  const mini = $('#mini'), here = $('#here');
-  $$('.area').forEach(a => {
-    const li = document.createElement('li');
-    const name = $('h2', a).textContent;
-    li.innerHTML = `<a href="#${a.id}" title="${esc(name)}" aria-label="${esc(name)}"></a>`;
-    li.firstChild.style.setProperty('--c', colour(a.dataset.area));
-    mini.appendChild(li);
-  });
-  const miniLinks = $$('a', mini);
-  $$('.card').forEach(c => c.style.setProperty('--c', colour(c.dataset.station)));
+  const ROOT = document.body.dataset.root || '';
+  const colourOf = el => el.style.getPropertyValue('--c') || 'var(--ink)';
 
-  /* ---------- one area at a time ---------- */
-  // No hash, or an unknown one: the line and the cards. #area-<key>: that area alone, with a pager.
-  const areas = $$('.area');
-  const pager = $('#pager'), prev = $('#prev'), next = $('#next');
-  const label = a => `${a.dataset.area === 'adopt' ? '' : a.dataset.area + ' · '}${$('h2', a).textContent}`;
-  const link = (el, a, dir) => {
-    if (!a) { el.hidden = true; return; }
-    el.hidden = false; el.href = '#' + a.id; el.style.setProperty('--c', colour(a.dataset.area));
-    el.innerHTML = `<small>${dir}</small><b>${esc(label(a))}</b>`;
-  };
-  function route() {
-    const i = areas.findIndex(a => '#' + a.id === location.hash);
-    document.body.dataset.view = i < 0 ? 'home' : 'area';
-    areas.forEach((a, j) => a.classList.toggle('current', i === j));
-    miniLinks.forEach((l, j) => { l.classList.toggle('on', i === j); l.setAttribute('aria-current', i === j ? 'page' : 'false'); });
-    if (i < 0) { here.textContent = ''; pager.hidden = true; document.title = 'Building Software with Claude'; return; }
-    const a = areas[i];
-    here.textContent = label(a);
-    pager.hidden = false; pager.style.setProperty('--c', colour(a.dataset.area));
-    link(prev, areas[i - 1], '← Previous'); link(next, areas[i + 1], 'Next →');
-    document.title = $('h2', a).textContent + ' · Building Software with Claude';
-    window.scrollTo(0, 0);
-    if (window.drawMermaid) $$('.panel:not([hidden])', a).forEach(pn => window.drawMermaid(pn));
+  /* ---------- hubs: one area at a time ---------- */
+  // No hash: the groups and cards. #area-<key>: that area alone, with a pager and the dots in the bar lit.
+  if (document.body.dataset.kind === 'hub') {
+    const mini = $('#mini'), here = $('#here');
+    const areas = $$('.area');
+    areas.forEach(a => {
+      const li = document.createElement('li');
+      const name = $('h2', a).textContent;
+      li.innerHTML = `<a href="#${a.id}" title="${esc(name)}" aria-label="${esc(name)}"></a>`;
+      li.firstChild.style.setProperty('--c', colourOf(a));
+      mini.appendChild(li);
+    });
+    const miniLinks = $$('a', mini);
+    const pager = $('#pager'), prev = $('#prev'), next = $('#next');
+    const link = (el, a, dir) => {
+      if (!a) { el.hidden = true; return; }
+      el.hidden = false; el.href = '#' + a.id; el.style.setProperty('--c', colourOf(a));
+      el.innerHTML = `<small>${dir}</small><b>${esc($('h2', a).textContent)}</b>`;
+    };
+    const base = document.title;
+    const route = () => {
+      const i = areas.findIndex(a => '#' + a.id === location.hash);
+      document.body.dataset.view = i < 0 ? 'home' : 'area';
+      areas.forEach((a, j) => a.classList.toggle('current', i === j));
+      miniLinks.forEach((l, j) => { l.classList.toggle('on', i === j); l.setAttribute('aria-current', i === j ? 'page' : 'false'); });
+      if (i < 0) { here.textContent = ''; pager.hidden = true; document.title = base; return; }
+      const a = areas[i];
+      here.textContent = $('h2', a).textContent;
+      pager.hidden = false; pager.style.setProperty('--c', colourOf(a));
+      link(prev, areas[i - 1], '← Previous'); link(next, areas[i + 1], 'Next →');
+      document.title = $('h2', a).textContent + ' · ' + base;
+      window.scrollTo(0, 0);
+      if (window.drawMermaid) $$('.panel:not([hidden])', a).forEach(pn => window.drawMermaid(pn));
+    };
+    window.addEventListener('hashchange', route);
+    route();
+    document.addEventListener('keydown', e => {
+      if (document.body.dataset.view !== 'area' || e.altKey || e.ctrlKey || e.metaKey) return;
+      if (e.target.closest && e.target.closest('[role=tablist], input, select, textarea, .lever')) return;
+      const target = e.key === 'ArrowRight' ? next : e.key === 'ArrowLeft' ? prev : null;
+      if (target && !target.hidden) location.hash = target.getAttribute('href');
+    });
   }
-  window.addEventListener('hashchange', route);
-  route();
-  // Left and right arrow keys move between areas, unless you're in the tabs or a control.
-  document.addEventListener('keydown', e => {
-    if (document.body.dataset.view !== 'area' || e.altKey || e.ctrlKey || e.metaKey) return;
-    if (e.target.closest && e.target.closest('[role=tablist], input, select, textarea, .lever')) return;
-    const target = e.key === 'ArrowRight' ? next : e.key === 'ArrowLeft' ? prev : null;
-    if (target && !target.hidden) location.hash = target.getAttribute('href');
-  });
 
   /* ---------- tabs ---------- */
   $$('.tabs').forEach(list => {
@@ -121,23 +120,21 @@
   W.challenges = root => {
     head(root, 'Try it', 'What goes wrong, and what fixes it', 'Pick a problem you\'ve seen.');
     const C = [
-      ['It guesses', 'It fills gaps in the request with good guesses, which makes them hard to spot.', 'Plan first, with a mock, questions or both, then a spec you approve. When unsure, it asks.', '7'],
-      ['It over-builds', 'Each step adds a little, and a modest feature comes out at six times the size.', 'Decide the size at the plan, against the closest thing already built. Extras go on a Later list.', '7'],
-      ['It forgets', 'Every session starts from nothing, and long ones lose the thread.', 'The repo holds what it needs to know, and progress lives in the tracker, not the chat.', '2'],
-      ['The architecture erodes', 'One sensible-looking change at a time.', 'One architecture page, each part\'s limits written down, and review against it.', '3'],
-      ['It says "done"', 'And nothing proves it.', 'One gate, the same on your laptop, in CI, and before Claude may stop.', '5'],
-      ['It follows rules most of the time', 'Instructions are requests.', 'What must hold is held by a hook, a permission or CI, not by its judgement.', '2'],
-      ['A huge diff', 'No summary, no idea what\'s risky.', 'Small PRs, a description that says how to check it, and review sized to risk.', '4'],
-      ['It reads things you didn\'t write', 'And some of them try to give it orders.', 'Layers: permissions, review, and no live secrets where it runs.', '10'],
+      ['It guesses', 'It fills gaps in the request with good guesses, which makes them hard to spot.', 'Plan first, with a mock, questions or both, then a spec you approve. When unsure, it asks.', 'features', 'Features'],
+      ['It over-builds', 'Each step adds a little, and a modest feature comes out at six times the size.', 'Decide the size at the plan, against the closest thing already built. Extras go on a Later list.', 'features', 'Features'],
+      ['It forgets', 'Every session starts from nothing, and long ones lose the thread.', 'The repo holds what it needs to know, and progress lives in the tracker, not the chat.', 'working-with-the-agent', 'Working with the agent'],
+      ['The architecture erodes', 'One sensible-looking change at a time.', 'One architecture page, each part\'s limits written down, and review against it.', 'architecture', 'Architecture'],
+      ['It says "done"', 'And nothing proves it.', 'One gate, the same on your laptop, in CI, and before Claude may stop.', 'testing-and-the-gate', 'Testing and the gate'],
+      ['It follows rules most of the time', 'Instructions are requests.', 'What must hold is held by a hook, a permission or CI, not by its judgement.', 'standards-and-the-repo', 'Standards and the repo'],
+      ['A huge diff', 'No summary, no idea what\'s risky.', 'Small PRs, a description that says how to check it, and review sized to risk.', 'how-work-flows', 'How work flows'],
+      ['It reads things you didn\'t write', 'And some of them try to give it orders.', 'Layers: permissions, review, and no live secrets where it runs.', 'security', 'Security'],
     ];
     const chips = document.createElement('div'); chips.className = 'chips'; root.appendChild(chips);
     const ans = document.createElement('div'); ans.className = 'answer'; ans.setAttribute('aria-live', 'polite'); root.appendChild(ans);
     const show = i => {
       $$('.chip', chips).forEach((c, j) => c.setAttribute('aria-pressed', i === j));
-      const [t, p, fix, area] = C[i];
-      const name = $(`#area-${area} h2`).textContent;
-      ans.style.setProperty('--c', colour(area));
-      ans.innerHTML = `<b class="big">${esc(fix)}</b><span>${esc(p)}</span><a href="#area-${area}">Area ${area}: ${esc(name)} →</a>`;
+      const [t, p, fix, area, name] = C[i];
+      ans.innerHTML = `<b class="big">${esc(fix)}</b><span>${esc(p)}</span><a href="${ROOT}method/#area-${area}">In the method: ${esc(name)} →</a>`;
     };
     C.forEach((c, i) => {
       const b = document.createElement('button'); b.type = 'button'; b.className = 'chip'; b.textContent = c[0];

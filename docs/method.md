@@ -1,71 +1,15 @@
-# Building software with Claude: the method
+# The method
 
-*The method behind the [ways](https://github.com/rattling/ways-of-working) plugin. November 2026.*
+How to build software well with an AI assistant, area by area. Each area says what good looks like, with no AI involved, and then what changes when Claude writes most of the code: where it helps, and where it goes wrong. Nothing here depends on a particular tool. [Ways](../ways/) is our implementation of it, and you can build your own from these pages.
 
-This is how we build software with Claude, written down so a team can use it with or without our plugin. It starts with what working with an AI coding agent is like: what it can do, what goes wrong, and how to get the most from it. The rest is the structure that lets it work well on its own, one area at a time.
+<!-- group: Start here -->
 
-Every area after the first two has the same three parts:
-
-- **What good looks like.** Plain engineering, no AI. The team's standard, written once.
-- **With an AI assistant.** How you hold that standard when Claude writes most of the code.
-- **Putting it in place.** Writing it down so nobody repeats it each time. We use ways, a plugin we built; you can use it, fork it, or write your own from the first two parts.
-
-The examples come from a demo app we use in workshops: recipes, allergens and menus for Larder & Co., a made-up café group, in PHP 7.4 with no framework and MySQL. Its one rule that must never break is that allergens never disappear, at any depth of recipe.
-
----
-
-## 1. Working with the agent
+## Working with the agent
 
 > **In short**
-> - You work like a tech lead with a very fast team: your attention on design and checking, the building in between to Claude.
-> - The opportunity is far bigger than the risks: features in minutes, and the work nobody had time for becomes cheap.
-> - What goes wrong is known, and each problem has an answer in the areas that follow.
-> - Give it structure, and the structure carries the weight instead of the prompt.
-
-### Opportunities
-
-The way to think about it: you work like a tech lead with a very fast team. You and Claude work out what to build and how, with your engineering judgement in every decision. Claude builds it, one small piece at a time, tests first. Your attention goes on the two ends, design and checking. The middle goes to Claude.
-
-What that looked like in practice, on two demo apps (one PHP, one .NET Framework) and in rehearsal:
-
-| What | How long |
-|---|---|
-| A feature, planned with a person, then built autonomously over lunch | About 25 to 30 minutes of build, while people ate |
-| One ticket, built, tested and reviewed | About 8 minutes, 80k to 140k tokens |
-| A three-ticket change on the .NET app: a new screen, plus the logic moved out of a 300-line controller into a shared service, pinned by tests first | Estimated at 3 hours of agent time; it took 18 |
-| Moving the .NET app to Framework 4.8 | About 30 lines of configuration, no code changes, all tests green, 4 minutes of work after "go" |
-| Recipes and menus, a whole milestone: 9 tickets, from a one-line issue to a reviewed PR | 3 hours |
-| A clickable prototype of a new screen, with the app's real data | About 5 minutes a round |
-| A whole time-allocation app, designed more or less in full | One short session |
-
-Some of what changes is speed. More of it is what becomes cheap enough to do:
-
-- **The work teams never had time for.** Tests around legacy code, an architecture page that's actually true, an upgrade off an unsupported PHP, the docs updated in the same change, a proper description on every PR. These were always good ideas. Now they cost minutes.
-- **Planning with something in front of you.** A finished-looking screen with real data settles in minutes what pages of questions don't. Claude asks the questions you'd have missed, each with a recommended answer.
-- **Reading code nobody remembers.** Claude explains an unfamiliar codebase, maps it, and finds things. A cold read of the 900-line .NET app, with no hints, named all three bugs we had planted in it, including one in how a cache and a culture setting interact.
-- **Review with fresh eyes.** A reviewer with no stake in the code, checking it against your standards and against the spec, on every change.
-- **More of the job.** Developers taking on their own DevOps and deploys, because Claude writes and explains the infrastructure code.
-- **Your software, used by agents.** An app with an API or an MCP server beside its screens can be used by an agent as well as a person. A routine reads a calendar and offers the time entries; a person checks them. Five minutes, and now it gets done.
-
-At the far end, software that changes itself when its users ask. Patrick Collison has shown his own hobby apps working this way. That won't do for enterprise software (Stripe would go down), but the production version already works: feedback becomes a triaged issue and a ready PR, and a person decides what ships.
-
-
-### Challenges
-
-Prompting is fine for small things. These are what break as the work gets bigger or runs longer, and each has an answer later on:
-
-| What goes wrong | What fixes it | Where |
-|---|---|---|
-| **It guesses** instead of asking, and builds the wrong thing well | Plan first, with a mock, questions or both, then a spec you approve. When unsure, it asks | 7, 4 |
-| **It over-builds:** each step adds a little, and a modest feature comes out at six times the size | Decide the size at the plan, against the closest thing already built | 7 |
-| **It forgets:** every session starts from zero, and long sessions lose the thread | The repo holds what it needs to know. Progress lives in the tracker, not the chat | 2, below |
-| **The architecture erodes,** one sensible-looking change at a time | One architecture page, each part's limits written down, and review against it | 3 |
-| **It says "done"** and nothing proves it | One gate, the same on your laptop, in CI, and before Claude may stop | 5 |
-| **It follows rules most of the time,** not always | What must hold is held by something other than its judgement | 2, 5 |
-| **A huge diff,** with no idea what's risky | Small PRs, a description that says how to check it, review sized to risk | 4 |
-| **It reads things you didn't write,** and some of them try to give it orders | Layers: permissions, review, and no live secrets where it runs | 10 |
-
-None of these is a reason not to use it. They're the cost of getting the opportunities, and each one is solvable.
+> - Work with it all the way through, interactively or autonomously, chosen per piece of work.
+> - Keep the state outside the conversation, so a fresh session can pick up anywhere.
+> - You own outcomes and acceptance; it owns the building, and asks when a decision isn't its to make.
 
 ### Getting the most from it
 
@@ -97,17 +41,10 @@ None of these is a reason not to use it. They're the cost of getting the opportu
 
 **Measure your method.** Now and then, build the same thing with a plain prompt and compare. A little more code for a spec, a review and real checks is a good trade. Five times the code is not.
 
-### Where this leads
+<!-- group: Foundations -->
 
-Give it clear standards and a decent process, and the structure carries the weight instead of the prompt. You don't explain your architecture, your branching or your review rules every time. You say what you want, and it works to the team's way, confidently, interactively or on its own. The autonomy is safe because of what's around it: a precise spec, a check it can't argue with, and the merge stays yours.
+## Standards and the repo
 
-The rest of this is that structure.
-
----
-
-## 2. Standards and the repo
-
-> **In short**
 > - One standard per area, owned by the team, copied into each repo.
 > - Each standard starts with the rules that are enforced, and what enforces each. The rest is guidance.
 > - A few short documents per repo, each with one job. The agent reads one map file every session, and opens the rest when the work needs them.
@@ -168,9 +105,8 @@ For a large codebase (a question teams ask): a good top-level architecture page 
 
 ---
 
-## 3. Architecture
+## Architecture
 
-> **In short**
 > - One architecture page per repo: C4 context and containers, the boundary that matters, and what each part must not do.
 > - Decision records for what's hard to reverse. Contracts change by addition.
 > - A design step before anything big, and the page updated in the same PR whenever the shape changes.
@@ -272,22 +208,10 @@ An inherited decision whose reason nobody knows gets one too, saying so.
 - **Boundaries and contracts are high risk.** Changes to them need an owner's approval.
 - **An architecture review as a conversation.** Claude reads everything first, then asks about each pillar, a round of questions at a time, and writes a critique: what's solid, the one risk that would sink it, the gaps. You turn those into tickets.
 
+<!-- group: The work -->
 
-### Putting it in place
+## How work flows
 
-- **The standard and the template.** Setup copies `docs/standards/architecture.md` into the repo, and creates `docs/ARCHITECTURE.md` from a template with the sections above.
-- **In ways:** the design step runs inside `/ways:plan`, and `/ways:arch-review` runs the review. The heart of the review skill:
-
-  > Two or three lines before the pillars: does the shape still serve what the charter says this is for, and do the invariants still hold in the code? Drift here outranks anything a pillar finds. … For each pillar: say in two or three lines what you found, then ask about what's missing, unclear or drifted, in rounds: numbered questions, each with your recommended answer. … Don't file issues and don't write documents: the person turns the critique into tickets.
-
-- **Your own:** a template, a paragraph in the map file ("a change that alters the shape updates the page and adds a decision record"), a review rule, and a review skill built from the prompt above.
-- **Later:** a scheduled check that asks every week whether the architecture page is still true to the code, and opens an issue for a person to triage.
-
----
-
-## 4. How work flows
-
-> **In short**
 > - Process sized to the work: small, big, or not yet understood.
 > - Short-lived branches, small PRs, one PR template with a How to check, and CI on everything into main.
 > - You decide twice: when you approve the plan, and when you merge. Claude does the middle.
@@ -341,7 +265,7 @@ Closes #
 **Rollback:**
 ```
 
-**CI on every change into main,** running the same gate you run locally (area 5).
+**CI on every change into main,** running the same gate you run locally (see Testing and the gate).
 
 **Review sized to risk.** By the kind of change, not by who wrote it:
 
@@ -403,147 +327,8 @@ Not everyone agrees. On a large legacy codebase, many engineers feel people shou
 
 **People coordinate through the same things.** Two developers' Claudes can't talk to each other. The issue, the plan comment and the PR are the shared channel. With dozens of tasks a month: small changes merged often, merge rules by risk, and the architecture page and contracts pulled back in from main regularly so each agent works from the current picture.
 
-### Putting it in place
+## Features
 
-- **The templates and CI:** the PR and issue templates, a CI check that the PR links an issue and has a How to check (two checks only, because a gate that fails for six reasons gets disabled, and a `no-issue` label as the deliberate way round), the risk list in `REVIEW.md`, and owners in `CODEOWNERS`.
-- **In ways:** a routing table in every repo's `AGENTS.md`, and four commands that walk the lifecycle. Each ends by naming the one PR to merge and the next command:
-
-| Command | Use it when | You end up with |
-|---|---|---|
-| `/ways:discover` | The ask is a wish list, an idea or a half-built app | A one-page brief and an issue to plan from |
-| `/ways:plan #n` | The work is big | One spec PR: what it does, how the system changes, how big it should be |
-| `/ways:build #n` | The spec is merged | Tickets, the code on one branch, a review, and one PR to ship it |
-| `/ways:work #n` | The work is small | One reviewed PR |
-
-
-- **Your own:** the same templates and CI, plus a short "how work goes" section in the map file with your routing and your merge dial.
-
----
-
-## 5. Testing and the gate
-
-> **In short**
-> - Most of the weight on integration tests against a real database, each behaviour tested once.
-> - One gate command: the same on a laptop, in CI, and before Claude may stop.
-> - In an autonomous run, Claude can't finish on red. After three tries it hands over.
-
-"Done" has to mean something a machine can check. Otherwise it means "Claude says it's done".
-
-### What good looks like
-
-**The weight on integration tests.** What agents most often get wrong is how the pieces fit together, and only tests at that level catch it. So most tests exercise each boundary against its real dependencies: the real database, built fresh. A few end-to-end journeys that matter most to the business. Unit tests where there's pure logic with many cases. Mock only what you don't own (a third-party API, the clock); never your own database.
-
-**Each behaviour tested once,** through the highest seam that reaches it. Not a test file per class, and not the same rule again one layer down. Tests for a feature are about the size of the code they cover.
-
-**One gate:** one command that runs every check and gives one answer. Format, lint, static analysis, dependency audit, tests. On the demo app:
-
-```
-docker compose run --rm --build app composer check
-```
-
-It must:
-- be the same command on a laptop, before Claude finishes, and in CI;
-- run on fresh state: the tests build a throwaway database from the schema files and drop it, so the answer doesn't depend on what someone clicked in the browser;
-- run as written in PowerShell and bash, with programs every machine has;
-- stay under about ten minutes.
-
-**Static analysis with a baseline that only shrinks.** On legacy code, turning analysis on produces thousands of findings, so it never gets turned on. Record today's findings instead. New code meets the bar, old code improves as it's touched. For PHP: PHP-CS-Fixer for format, PHPStan at a level per repo with a baseline.
-
-**The invariants are named tests,** and a flaky test is a bug: fix it or delete it, never retry until green.
-
-### With an AI assistant
-
-- **It can't finish while the gate is red.** In an autonomous run, a hook runs the gate when Claude tries to stop. Red sends it back with the failure: fix the cause, not the symptom, and the cause may be the environment. After three reds in a row it stops trying, says in five lines what it needs from a person, and hands over.
-- **Tests first.** Agree the seams under test, then one failing test, then the code to pass it, one at a time.
-- **Expected values come from somewhere else.** A test that recomputes the answer the way the code does proves nothing.
-- **Read the tests against the spec.** The checks miss a test of the wrong thing.
-
-### Putting it in place
-
-- **The gate recorded once,** where the hook and CI both read it:
-
-  ```json
-  {"gate": "docker compose run --rm --build app composer check"}
-  ```
-
-- **In ways:** the Stop hook, active only during autonomous runs, and `/gate` in the status band, which runs the gate instantly without a Claude turn. Its message on the third red:
-
-  > This is the third block in a row. Stop trying: say in five lines or fewer what you need from a person, and label the issue needs-human.
-
-
-- **Your own:** one hook script and one CI file, both reading the same command.
-
----
-
-## 6. Bugs
-
-> **In short**
-> - Triage turns a raw report into something a fix can be checked against, or a decision that it isn't a bug.
-> - Reproduce first. A failing test that shows the bug, then the fix.
-> - A bug that can hurt someone gets a person in the loop. Small ones can go in a batch.
-
-### What good looks like
-
-**Triage: from raw to workable.** A raw report becomes either something a fix can be checked against, or a decision that it isn't a bug: working as designed, can't reproduce, already fixed, or rejected before. In one practice set, two of six staff reports are working as designed and one can't be reproduced.
-
-**A workable report** says what happened, what was expected, the steps, and where. Every new issue starts as "needs triage".
-
-**Reproduce it before anything else.** If it won't reproduce, say what was tried and ask for what would.
-
-**A failing test that shows the bug, then the fix.** The test stays as the regression test.
-
-**Risk decides how.** A bug that can hurt someone is fixed with a person in the loop.
-
-> **From a workshop: the slaw.** A customer with a fish allergy read "None." on the slaw and nearly ordered it. The menu had shown "not confirmed" as "none".
-
-**Small bugs in a batch,** checked for clashes, one at a time, each with its own branch and PR.
-
-### With an AI assistant
-
-**Triage one item at a time:** Claude reads the issue, the code and the glossary, checks it isn't already built or rejected, recommends a label, and waits for you. Then it reproduces, and writes a brief on the issue. A real one, trimmed:
-
-```markdown
-**Category:** bug
-**Summary:** The supplier import checks nutrition only against the column's size, so impossible values
-are accepted and a value that rounds past the column crashes the import instead of refusing the file.
-
-**Current behaviour:** Reproduced on main (2026-10-20): fat_g 9999.999 rounds to 10000.00 and MySQL
-rejects it. The page shows "Something went wrong"; the file is not refused with a reason.
-
-**Acceptance criteria:**
-- [ ] Importing a row with fat_g 9999.999 refuses the file with a reason naming the row and fat_g
-- [ ] energy_kcal_100g above 900 is refused; exactly 100 g and 900 kcal are accepted
-- [ ] The ingredient form's messages and behaviour are unchanged
-
-**Out of scope:** cross-field checks; changing the column types.
-
-**Human verification:** sign in, preview a one-row CSV with fat_g 9999.999, and see it refused
-with a reason, not "Something went wrong".
-```
-
-**Then the plan, and wait for go.** The approach, the seams under test, how each acceptance item will be proved ("a failing test first for 9999.999, today a PDOException"), and any assumption. Nothing is built until you say go.
-
-**Evidence that it failed first.** The fix's PR shows it: "Failing first: the new import test hit `PDOException: Out of range value for column 'fat_g'` before the fix." Ask of every bug fix: did you see it fail first?
-
-**For a hard bug:** first a command that goes red reliably, then three to five ranked hypotheses, each one falsifiable, then one change at a time.
-
-**Watched, or handed over.** In a workshop, the slaw was fixed interactively and the other two bugs went to an autonomous batch. Which did you trust more, and why?
-
-
-### Putting it in place
-
-- **Issue templates** that label every new issue for triage.
-- **In ways:** `/triage` for the queue, and `/ways:work #n` for one bug or several. The heart of it:
-
-  > A bug: reproduce it first, before anything else. If it won't reproduce, say what you tried and ask for what would, and stop. Write the brief yourself: the outcome, acceptance criteria, what's out of scope, and human verification. Post it, with the reproduction, so the person sees what you think the job is before they say go.
-
-- **Your own:** a triage paragraph and a "reproduce first, failing test first" rule in the map file.
-
----
-
-## 7. Features
-
-> **In short**
 > - Unclear? Discover first. Then agree what it does, what must not exist yet, and how the system changes.
 > - Prototype for shape, grill for rules. The agreed prototype becomes the mock the build must match.
 > - Decide the size at the plan, against the closest feature. Say "out" as often as "in".
@@ -565,7 +350,7 @@ For a feature, the hard part is agreeing what it should be. Any method that push
 - An API or JSON endpoint (milestone 3).
 ```
 
-**Agree how the system changes:** the design step from area 3.
+**Agree how the system changes:** the design step (see Architecture).
 
 **A mock for anything people look at,** agreed and kept beside the spec as the picture the build must match.
 
@@ -643,132 +428,100 @@ The plain build told staff a dish no longer contained allergens when it simply c
 
 **It's a conversation, not a form.** The thing to watch for is accepting every recommendation. Disagree, and say "out".
 
-### Putting it in place
+## Bugs
 
-- **In ways:** `/ways:discover`, `/ways:plan` (requirements by prototype, grill or both, then the design) and `/ways:build`.
-- **Your own:** a spec template with Must not exist yet, Human verification and Size; a paragraph telling the grill to lean small and keep a Later list; and the proportion rule in the architecture standard.
-
----
-
-## 8. Legacy code
-
-> **In short**
-> - Pin today's behaviour before changing anything, bugs included.
-> - Then make a seam, build on it, and remove the old path.
-> - No gate yet? That's the first job. Upgrades come after the safety net, with the gate as proof.
-
-Most of the code a team works on was written before anyone thought about an agent working on it. The work that makes it safe to change is the work that's always been put off, and it's now cheap.
+> - Triage turns a raw report into something a fix can be checked against, or a decision that it isn't a bug.
+> - Reproduce first. A failing test that shows the bug, then the fix.
+> - A bug that can hurt someone gets a person in the loop. Small ones can go in a batch.
 
 ### What good looks like
 
-**Pin it first.** Characterisation tests record what the code does today, bugs included, so any change is caught. Suspected bugs get filed, not fixed in passing. Without the pin, you can't prove a change changed nothing.
+**Triage: from raw to workable.** A raw report becomes either something a fix can be checked against, or a decision that it isn't a bug: working as designed, can't reproduce, already fixed, or rejected before. In one practice set, two of six staff reports are working as designed and one can't be reproduced.
 
-**Then four moves, in order:**
+**A workable report** says what happened, what was expected, the steps, and where. Every new issue starts as "needs triage".
 
-| | | |
-|---|---|---|
-| 1 · Pin it | Characterisation tests | Record what the code shows today, bugs included |
-| 2 · Make a seam | A service, or one interface | Move the logic out from where it's tangled. The tests stay green |
-| 3 · Build on it | The new feature | It uses the seam, not a copy of the old code |
-| 4 · Switch over | Remove the old path | One place for the rules, so two screens can't disagree |
+**Reproduce it before anything else.** If it won't reproduce, say what was tried and ask for what would.
 
-**No gate yet? Build one before anything else.** The app runs locally, the behaviour that matters most is pinned, and the gate runs locally and in CI. On the demo app, that was the first job: from a shop server set up by hand, where nothing could check a change, to Docker Compose running the same app and database anywhere.
+**A failing test that shows the bug, then the fix.** The test stays as the regression test.
 
-**Upgrades come after the safety net,** with the gate as the proof. PHP 7.4 is past end of life, and recent critical vulnerabilities are patched for 8.2 and later only. Out of date isn't old-fashioned. It's unpatched.
+**Risk decides how.** A bug that can hurt someone is fixed with a person in the loop.
 
-**The road to modern PHP:**
+> **From a workshop: the slaw.** A customer with a fish allergy read "None." on the slaw and nearly ordered it. The menu had shown "not confirmed" as "none".
 
-| | | |
-|---|---|---|
-| 1 · First | PHP 8, in place | The same code on a supported PHP. Containerised, it's one line in the Dockerfile, and the gate shows nothing broke |
-| 2 · Then | Structure behind seams | Composer autoloading, routing, a framework's pieces where they earn their place, each behind a seam |
-| 3 · Finally | Old pages retired | Page by page, with tests pinning what customers see before anything moves |
-
+**Small bugs in a batch,** checked for clashes, one at a time, each with its own branch and PR.
 
 ### With an AI assistant
 
-- **Don't give Claude these steps.** See if its plan includes them, and ask if it doesn't. It's a good test of whether it understood the job.
-- **An edited characterisation test means behaviour changed.** Catch it in review: on legacy code, the characterisation tests are the contract for every refactor.
-- **It's good at the dull parts.** Writing the pin, explaining code nobody remembers, mechanical upgrades one rule set at a time.
-- **A plan that pins today's behaviour pins the live bug too.** A good plan notices, and files it.
+**Triage one item at a time:** Claude reads the issue, the code and the glossary, checks it isn't already built or rejected, recommends a label, and waits for you. Then it reproduces, and writes a brief on the issue. A real one, trimmed:
 
-> **From the .NET demo.** The kiosk screen needed logic locked inside a 300-line controller. A golden-master test pinned every page the website returned over the whole demo data; the logic moved into one shared service; the kiosk was built on it. The move to Framework 4.8 afterwards changed about 30 lines of configuration and no code, and the golden master is what lets you say that with confidence.
+```markdown
+**Category:** bug
+**Summary:** The supplier import checks nutrition only against the column's size, so impossible values
+are accepted and a value that rounds past the column crashes the import instead of refusing the file.
 
-### Putting it in place
+**Current behaviour:** Reproduced on main (2026-10-20): fat_g 9999.999 rounds to 10000.00 and MySQL
+rejects it. The page shows "Something went wrong"; the file is not refused with a reason.
 
-- **In ways:** `/ways:explain` for a visual tour of an unfamiliar repo; setup proposes a gate skeleton as the first milestone on a repo with code but no gate; the PHP standard covers the upgrade path (Rector, one rule set per PR, with tests as the safety net).
-- **Your own:** a "pin before you change" rule in the map file, and a PHP standard that says where the stack is today and where it's going, so Claude knows the code it reads isn't the code to copy.
+**Acceptance criteria:**
+- [ ] Importing a row with fat_g 9999.999 refuses the file with a reason naming the row and fat_g
+- [ ] energy_kcal_100g above 900 is refused; exactly 100 g and 900 kcal are accepted
+- [ ] The ingredient form's messages and behaviour are unchanged
 
----
+**Out of scope:** cross-field checks; changing the column types.
 
-## 9. Deployment
+**Human verification:** sign in, preview a one-row CSV with fat_g 9999.999, and see it refused
+with a reason, not "Something went wrong".
+```
 
-> **In short**
-> - Infrastructure as code, in the repo, reviewed like any other change.
-> - Deploys from main by pipeline, only for commits that passed the gate, and every one can be rolled back.
-> - No production keys where the agent runs.
+**Then the plan, and wait for go.** The approach, the seams under test, how each acceptance item will be proved ("a failing test first for 9999.999, today a PDOException"), and any assumption. Nothing is built until you say go.
+
+**Evidence that it failed first.** The fix's PR shows it: "Failing first: the new import test hit `PDOException: Out of range value for column 'fat_g'` before the fix." Ask of every bug fix: did you see it fail first?
+
+**For a hard bug:** first a command that goes red reliably, then three to five ranked hypotheses, each one falsifiable, then one change at a time.
+
+**Watched, or handed over.** In a workshop, the slaw was fixed interactively and the other two bugs went to an autonomous batch. Which did you trust more, and why?
+
+<!-- group: Quality -->
+
+## Testing and the gate
+
+> - Most of the weight on integration tests against a real database, each behaviour tested once.
+> - One gate command: the same on a laptop, in CI, and before Claude may stop.
+> - In an autonomous run, Claude can't finish on red. After three tries it hands over.
+
+"Done" has to mean something a machine can check. Otherwise it means "Claude says it's done".
 
 ### What good looks like
 
-**Infrastructure as code.** The servers, databases and settings described in files in the repo (Bicep on Azure, Terraform elsewhere), reviewed like any other change. A web app and its database, trimmed:
+**The weight on integration tests.** What agents most often get wrong is how the pieces fit together, and only tests at that level catch it. So most tests exercise each boundary against its real dependencies: the real database, built fresh. A few end-to-end journeys that matter most to the business. Unit tests where there's pure logic with many cases. Mock only what you don't own (a third-party API, the clock); never your own database.
 
-```bicep
-param location string = 'northeurope'
-param nameSuffix string
-param appSku string = 'B1'
+**Each behaviour tested once,** through the highest seam that reaches it. Not a test file per class, and not the same rule again one layer down. Tests for a feature are about the size of the code they cover.
 
-var app = 'app-<name>-${nameSuffix}'
-var pg  = 'psql-<name>-${nameSuffix}'
+**One gate:** one command that runs every check and gives one answer. Format, lint, static analysis, dependency audit, tests. On the demo app:
 
-module web 'modules/app.bicep' = {
-  name: 'web'
-  params: { name: app, location: location, skuName: appSku, pgFqdn: '${pg}.postgres.database.azure.com' }
-}
-
-module postgres 'modules/postgres.bicep' = {
-  name: 'postgres'
-  params: { name: pg, location: location }
-}
+```
+docker compose run --rm --build app composer check
 ```
 
-Inside the modules, the database has password sign-in switched off, and the app reaches it with its own managed identity: no database password anywhere.
+It must:
+- be the same command on a laptop, before Claude finishes, and in CI;
+- run on fresh state: the tests build a throwaway database from the schema files and drop it, so the answer doesn't depend on what someone clicked in the browser;
+- run as written in PowerShell and bash, with programs every machine has;
+- stay under about ten minutes.
 
-**Deploys from main, by pipeline, never by hand.** Only a commit that's on main and has passed the gate can be deployed:
+**Static analysis with a baseline that only shrinks.** On legacy code, turning analysis on produces thousands of findings, so it never gets turned on. Record today's findings instead. New code meets the bar, old code improves as it's touched. For PHP: PHP-CS-Fixer for format, PHPStan at a level per repo with a baseline.
 
-```yaml
-- name: Only commits on main
-  run: git merge-base --is-ancestor HEAD origin/main
-
-# Nothing reaches production that the gate hasn't passed.
-- name: Gate passed for this commit
-  run: |
-    ok=$(gh run list --workflow gate.yml --commit "$full" --json conclusion --jq '[.[] | select(.conclusion == "success")] | length')
-    if [ "$ok" -lt 1 ]; then echo "Gate hasn't passed for $full; not deploying it."; exit 1; fi
-```
-
-**Every deploy can be rolled back,** and the PR says how. Database migrations go forward only, compatible with the previous release, so a rollback never needs a down-migration.
-
-**A deploy checks it worked.** A deploy that succeeds while the app can't start or reach its database is worse than one that fails, because nobody looks. The pipeline waits for the app to report the new version and a working database.
-
-**Named environments,** and who deploys to each: local; test or QA, with made-up data; production, with an approval. For QA: merge into a QA branch during the sprint, deployed to a QA environment on an agreed cadence, and later a short-lived environment per PR.
+**The invariants are named tests,** and a flaky test is a bug: fix it or delete it, never retry until green.
 
 ### With an AI assistant
 
-- **Infrastructure as code is what makes this AI-friendly.** Claude writes it, explains it, and keeps it in the repo beside the app.
-- **Deploy files and pipelines are high risk.** An owner approves every change to them.
-- **No production keys where the agent runs.** It can't deploy what it can't reach, and auto mode blocks production deploys anyway. A routine that merges or deploys on its own is a governance question, not a convenience.
-- **Every PR names its rollback.**
+- **It can't finish while the gate is red.** In an autonomous run, a hook runs the gate when Claude tries to stop. Red sends it back with the failure: fix the cause, not the symptom, and the cause may be the environment. After three reds in a row it stops trying, says in five lines what it needs from a person, and hands over.
+- **Tests first.** Agree the seams under test, then one failing test, then the code to pass it, one at a time.
+- **Expected values come from somewhere else.** A test that recomputes the answer the way the code does proves nothing.
+- **Read the tests against the spec.** The checks miss a test of the wrong thing.
 
-### Putting it in place
+## Security
 
-- **In ways:** the delivery standard's environments and deploy rules. This is the lightest area in ways, and the one where a team adds most of its own.
-- **Your own:** your Bicep or Terraform, a deploy pipeline with the two checks above, and the deploy paths in `CODEOWNERS`.
-
----
-
-## 10. Security
-
-> **In short**
 > - The usual rules still apply, with checks at each stage.
 > - The agent reads text you didn't write. Take away one leg of the lethal trifecta: usually the secrets.
 > - Layers, not one wall: permissions, auto mode, hooks, review, and the admin's settings.
@@ -828,97 +581,103 @@ Any two are fine. All three, and someone else's text can make the agent send you
 
 These are guardrails for mistakes and injected text, not a wall against someone with admin rights.
 
+<!-- group: Running it, and changing it -->
 
-### Putting it in place
+## Deployment
 
-- **The repo's settings file** with the secret-file denies, seeded by setup.
-- **A managed-settings baseline for the admin:** denies on secret files, skip-all-permissions mode off, approved MCP servers and marketplaces only, mods from the organisation only, reading outside the working folder blocked, web fetch set to ask.
-- **In ways:** the security standard (`docs/standards/security.md`) and the seeded permissions. A `/security-review` runs before every high-risk PR.
+> - Infrastructure as code, in the repo, reviewed like any other change.
+> - Deploys from main by pipeline, only for commits that passed the gate, and every one can be rolled back.
+> - No production keys where the agent runs.
 
----
+### What good looks like
 
-## Adopting it
+**Infrastructure as code.** The servers, databases and settings described in files in the repo (Bicep on Azure, Terraform elsewhere), reviewed like any other change. A web app and its database, trimmed:
 
-> **In short**
-> - The method comes first. The tooling is how you hold it, and it can differ by team.
-> - On git and GitHub: use ways now.
-> - Not on git yet: have Claude build a small plugin for your setup, and move when you're ready.
+```bicep
+param location string = 'northeurope'
+param nameSuffix string
+param appSku string = 'B1'
 
-Every team's setup is different, and we can't solve them all from here. What we can do is say where we'd start.
+var app = 'app-<name>-${nameSuffix}'
+var pg  = 'psql-<name>-${nameSuffix}'
 
-### Everyone: the method first
+module web 'modules/app.bicep' = {
+  name: 'web'
+  params: { name: app, location: location, skuName: appSku, pgFqdn: '${pg}.postgres.database.azure.com' }
+}
 
-The first two parts of each area are the method, and they don't depend on any tool. Agree them as a team, change what doesn't fit, and keep this document somewhere Claude can read it: in a shared repo, or in a Claude project. Then it's what you're evolving towards, and Claude can tell you how far a given repo is from it. Ask it: "Read the method. How far is this repo from it, and what would you do first?"
-
-### On git and GitHub: use ways
-
-If your code is in git on GitHub, ways works as it is.
-
-**Install it, once per person.** On Windows, from PowerShell (not the Git Bash window):
-
-```
-claude plugin marketplace add anthropics/claude-plugins-official
-claude plugin marketplace add rattling/ways-of-working
-claude plugin install ways@ways-of-working
-claude plugin install ways-band@ways-of-working
+module postgres 'modules/postgres.bicep' = {
+  name: 'postgres'
+  params: { name: pg, location: location }
+}
 ```
 
-Installing `ways` brings Matt Pocock's skills with it. `ways-band` is optional: the status strip above the prompt, and `/gate`. You also need git, and the GitHub CLI, signed in with permission to push workflow files:
+Inside the modules, the database has password sign-in switched off, and the app reaches it with its own managed identity: no database password anywhere.
 
+**Deploys from main, by pipeline, never by hand.** Only a commit that's on main and has passed the gate can be deployed:
+
+```yaml
+- name: Only commits on main
+  run: git merge-base --is-ancestor HEAD origin/main
+
+# Nothing reaches production that the gate hasn't passed.
+- name: Gate passed for this commit
+  run: |
+    ok=$(gh run list --workflow gate.yml --commit "$full" --json conclusion --jq '[.[] | select(.conclusion == "success")] | length')
+    if [ "$ok" -lt 1 ]; then echo "Gate hasn't passed for $full; not deploying it."; exit 1; fi
 ```
-winget install --id GitHub.cli
-gh auth login
-gh auth refresh -s workflow
-```
 
-Open a new terminal after installing `gh`, or it won't be found.
+**Every deploy can be rolled back,** and the PR says how. Database migrations go forward only, compatible with the previous release, so a rollback never needs a down-migration.
 
-**Set up each repo,** in a Claude session in that repo:
+**A deploy checks it worked.** A deploy that succeeds while the app can't start or reach its database is worse than one that fails, because nobody looks. The pipeline waits for the app to report the new version and a working database.
 
-```
-/ways:setup
-```
+**Named environments,** and who deploys to each: local; test or QA, with made-up data; production, with an approval. For QA: merge into a QA branch during the sprint, deployed to a QA environment on an agreed cadence, and later a short-lived environment per PR.
 
-It adds the documents, standards, templates, labels and CI check, never overwrites what's already there, and opens one PR for you to review. Its report says what's left and who can finish it. Run it again after an update to bring the repo up to date. For a whole team, the Claude admin can add the marketplace and plugins to managed settings instead.
+### With an AI assistant
 
-**Let ways keep its working state in GitHub issues.** The briefs, plan comments, specs, tickets and PRs all live there, and that's what lets a fresh session pick up where the last one stopped. If your team's main tickets live in another system, they can stay there: when one becomes work, open a GitHub issue for it and link the two. It's a little double-handling, and fine to start with.
+- **Infrastructure as code is what makes this AI-friendly.** Claude writes it, explains it, and keeps it in the repo beside the app.
+- **Deploy files and pipelines are high risk.** An owner approves every change to them.
+- **No production keys where the agent runs.** It can't deploy what it can't reach, and auto mode blocks production deploys anyway. A routine that merges or deploys on its own is a governance question, not a convenience.
+- **Every PR names its rollback.**
 
-### Moving trackers
+## Legacy code
 
-If you're about to move to another tracker (Linear, say), don't build a bridge to the old one. When the move happens, decide whether the new tracker holds the plan and GitHub the technical work, or the new tracker holds everything. Ways is adding support for other trackers, built against a real team's setup when one moves.
+> - Pin today's behaviour before changing anything, bugs included.
+> - Then make a seam, build on it, and remove the old path.
+> - No gate yet? That's the first job. Upgrades come after the safety net, with the gate as proof.
 
-### Not on git yet: your own plugin, for now
+Most of the code a team works on was written before anyone thought about an agent working on it. The work that makes it safe to change is the work that's always been put off, and it's now cheap.
 
-The build side of ways needs git: branches, worktrees, one PR per change. If your code is in another version control system, don't wait, and don't bolt a sync onto it. Have Claude build you a small, temporary plugin that follows this method as closely as your setup allows. A starting prompt:
+### What good looks like
 
-> Attached is the method we want to work to. We can't use the ways plugin yet, because our code isn't in git; we expect to move in [when].
->
-> Build us a small Claude Code plugin that follows the method as closely as our setup allows, until we move:
-> - Work items as markdown files in the repo, one per item, with a status line.
-> - Our version control is [name it, and how we check in and review changes today]. Work with it as it is.
-> - The gate is [our build and test command]. Hold it with a Stop hook, as the method describes.
-> - Keep the brief before work, human verification, the design step and the architecture page, and review sized to risk.
-> - Leave out anything that needs git, and tell us what you left out.
->
-> Show us the plan before you build it. Start with the smallest version that works.
+**Pin it first.** Characterisation tests record what the code does today, bugs included, so any change is caught. Suspected bugs get filed, not fixed in passing. Without the pin, you can't prove a change changed nothing.
 
-Much of the method doesn't need git at all: discovery, the requirements grill, mocks, the architecture page and reviews, explaining the code, triage and the brief. When you're on git, move to ways, or keep your own plugin if it suits you better.
+**Then four moves, in order:**
 
-### Making it yours
+| | | |
+|---|---|---|
+| 1 · Pin it | Characterisation tests | Record what the code shows today, bugs included |
+| 2 · Make a seam | A service, or one interface | Move the logic out from where it's tangled. The tests stay green |
+| 3 · Build on it | The new feature | It uses the seam, not a copy of the old code |
+| 4 · Switch over | Remove the old path | One place for the rules, so two screens can't disagree |
 
-A method is a set of decisions written down. Whichever tooling you start with, there are three ways to make it yours:
+**No gate yet? Build one before anything else.** The app runs locally, the behaviour that matters most is pinned, and the gate runs locally and in CI. On the demo app, that was the first job: from a shop server set up by hand, where nothing could check a change, to Docker Compose running the same app and database anywhere.
 
-| | |
-|---|---|
-| Edit the repo's copy | The standards belong to the repo once setup copies them. Enough for one repo or a small team |
-| Fork ways | Rewrite the standards and templates, and change them by PR with a version bump |
-| Add your own plugin | Keep ways as it is, and add your standards and skills for your deploys and services on top |
+**Upgrades come after the safety net,** with the gate as the proof. PHP 7.4 is past end of life, and recent critical vulnerabilities are patched for 8.2 and later only. Out of date isn't old-fashioned. It's unpatched.
 
-And whichever you pick:
+**The road to modern PHP:**
 
-- **Every rule you add says what enforces it.**
-- **Change the method only when something recurs.** One bad run is not a pattern. Log every run, the fine ones too, and look for what comes up again.
-- **Prefer taking a step away to adding one.** A method that says "heavy" is rarely fixed by a new rule.
-- **Check what Anthropic has added** before building it yourself. What it provides keeps moving up the stack.
+| | | |
+|---|---|---|
+| 1 · First | PHP 8, in place | The same code on a supported PHP. Containerised, it's one line in the Dockerfile, and the gate shows nothing broke |
+| 2 · Then | Structure behind seams | Composer autoloading, routing, a framework's pieces where they earn their place, each behind a seam |
+| 3 · Finally | Old pages retired | Page by page, with tests pinning what customers see before anything moves |
 
-What will you try first next week?
+### With an AI assistant
+
+- **Don't give Claude these steps.** See if its plan includes them, and ask if it doesn't. It's a good test of whether it understood the job.
+- **An edited characterisation test means behaviour changed.** Catch it in review: on legacy code, the characterisation tests are the contract for every refactor.
+- **It's good at the dull parts.** Writing the pin, explaining code nobody remembers, mechanical upgrades one rule set at a time.
+- **A plan that pins today's behaviour pins the live bug too.** A good plan notices, and files it.
+
+> **From the .NET demo.** The kiosk screen needed logic locked inside a 300-line controller. A golden-master test pinned every page the website returned over the whole demo data; the logic moved into one shared service; the kiosk was built on it. The move to Framework 4.8 afterwards changed about 30 lines of configuration and no code, and the golden master is what lets you say that with confidence.
