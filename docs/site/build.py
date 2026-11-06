@@ -139,6 +139,20 @@ def render_area(key, title, body, colour):
     return "\n".join(h), short
 
 
+def heading(title, default=""):
+    """'Building software with Claude: balancing speed and quality' -> eyebrow, then a short title."""
+    if ": " in title:
+        top, rest = title.split(": ", 1)
+        return top, rest[:1].upper() + rest[1:]
+    return default, title
+
+
+def hero(title, lead, default=""):
+    eyebrow, h1 = heading(title, default)
+    eb = f'<div class="eyebrow"><span class="ring"></span>{htmllib.escape(eyebrow)}</div>' if eyebrow else ""
+    return f'<header class="hero">{eb}<h1>{htmllib.escape(h1)}</h1><div class="lead prose">{md(lead)}</div></header>'
+
+
 def build_hub(text):
     head, secs = sections(text, 2)
     title, lead = title_and_lead(head)
@@ -167,13 +181,13 @@ def build_hub(text):
             for i in g["items"])
         name = f'<div class="group-name">{htmllib.escape(g["name"])}</div>' if g["name"] else ""
         hubs.append(f'<div class="group" style="--c:{g["colour"]}">{name}<div class="cards">{cards}</div></div>')
-    body = (f'<div class="landing" id="landing"><header class="hero"><h1>{htmllib.escape(title)}</h1>'
-            f'<div class="lead prose">{md(lead)}</div></header>'
+    body = (f'<div class="landing" id="landing">{hero(title, lead)}'
             f'<div class="groups">{"".join(hubs)}</div></div>'
             f'<main id="areas">{"".join(areas)}</main>'
             '<nav class="pager" id="pager" aria-label="Areas" hidden><a class="prev" id="prev" href="#"></a>'
             '<a class="all" href="#">All areas</a><a class="next" id="next" href="#"></a></nav>')
-    return title, body, True
+    toc = [(g['name'], [(i['title'], '#area-' + i['key']) for i in g['items']]) for g in groups]
+    return title, body, True, toc
 
 
 def build_prose(text):
@@ -185,9 +199,7 @@ def build_prose(text):
         ("New to software engineering?", "basics/", "Software engineering in one page: the ground, with a drawing for each part."),
     ]
     cards = "".join(f'<a class="part" href="{h}"><b>{t}</b><span>{d}</span></a>' for t, h, d in parts)
-    out = [f'<header class="hero"><div class="eyebrow"><span class="ring"></span>The method behind the ways plugin</div>'
-           f'<h1>{htmllib.escape(title)}</h1><div class="lead prose">{md(lead)}</div>'
-           f'<div class="parts">{cards}</div></header>', "<main>"]
+    out = [hero(title, lead, "The method behind the ways plugin"), "<main>"]
     for n, (t, body) in enumerate(secs):
         key = slug(t)
         out.append(f'<section class="psec" id="{key}" style="--c:{SPARE[n % len(SPARE)]}"><h2>{htmllib.escape(t)}</h2>'
@@ -195,25 +207,43 @@ def build_prose(text):
         for w in WIDGETS.get(key, []):
             out.append(f'<div class="try" data-widget="{w}"></div>')
         out.append("</section>")
-    out.append(f'<div class="parts parts-end">{cards}</div></main>')
-    return title, "\n".join(out), False
+    out.append(f'<section class="psec next-up" id="where-next"><h2>Where next</h2><div class="parts">{cards}</div></section></main>')
+    toc = [(None, [(t, '#' + slug(t)) for t, _ in secs] + [("Where next", "#where-next")])]
+    return title, "\n".join(out), False, toc
+
+
+def contents(built, page):
+    """The left panel: this page's own contents only. The bar at the top is the site; this is the page.
+    Links are bare hashes, so a hub's areas open without a reload."""
+    toc = next(toc for other, _, _, _, toc in built if other is page)
+    out = ['<nav class="toc" aria-label="On this page"><div class="toc-head">On this page</div><ul>']
+    for group, items in toc:
+        if group:
+            out.append(f'<li class="toc-group">{htmllib.escape(group)}</li>')
+        for name, anchor in items:
+            out.append(f'<li><a href="{anchor}">{htmllib.escape(name)}</a></li>')
+    out.append("</ul></nav>")
+    return "".join(out)
 
 
 def main():
     template = TEMPLATE.read_text(encoding="utf-8")
     assets = b"".join((DOCS / "assets" / f).read_bytes() for f in ("site.css", "site.js"))
     version = hashlib.sha1(assets).hexdigest()[:8]
+    built = []
     for page in PAGES:
         text = (DOCS / page["src"]).read_text(encoding="utf-8")
-        title, body, hub = build_hub(text) if page["kind"] == "hub" else build_prose(text)
+        built.append((page, *(build_hub(text) if page["kind"] == "hub" else build_prose(text))))
+    for page, title, body, hub, _ in built:
         root = "../" * page["out"].count("/")
+        side = contents(built, page)
         here = ' aria-current="page"'
         nav = "".join(f'<a href="{root}{href}"{here if key == page["nav"] else ""}>{label}</a>'
                       for key, label, href in NAV)
-        sub = ('<div class="sub" id="sub"><ol class="mini" id="mini"></ol><span class="here" id="here"></span></div>' if hub else "")
+        sub = ""  # the left panel does this job now
         html = (template.replace("{{TITLE}}", htmllib.escape(title)).replace("{{ROOT}}", root)
                 .replace("{{NAV}}", nav).replace("{{SUB}}", sub).replace("{{KIND}}", page["kind"])
-                .replace("{{BODY}}", body).replace("{{V}}", version))
+                .replace("{{BODY}}", body).replace("{{SIDE}}", side).replace("{{V}}", version))
         out = DOCS / page["out"]
         out.parent.mkdir(parents=True, exist_ok=True)
         out.write_text(html, encoding="utf-8")
