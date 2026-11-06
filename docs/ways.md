@@ -137,6 +137,7 @@ A person types each command. Claude never starts the next step itself, because e
 
 ## Getting started
 
+> **In short**
 > - The method comes first. The tooling is how you hold it, and it can differ by team.
 > - On git and GitHub: use ways now.
 > - Not on git yet: have Claude build a small plugin for your setup, and move when you're ready.

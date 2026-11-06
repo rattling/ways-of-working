@@ -45,6 +45,7 @@ How to build software well with an AI assistant, area by area. Each area says wh
 
 ## Standards and the repo
 
+> **In short**
 > - One standard per area, owned by the team, copied into each repo.
 > - Each standard starts with the rules that are enforced, and what enforces each. The rest is guidance.
 > - A few short documents per repo, each with one job. The agent reads one map file every session, and opens the rest when the work needs them.
@@ -107,6 +108,7 @@ For a large codebase (a question teams ask): a good top-level architecture page 
 
 ## Architecture
 
+> **In short**
 > - One architecture page per repo: C4 context and containers, the boundary that matters, and what each part must not do.
 > - Decision records for what's hard to reverse. Contracts change by addition.
 > - A design step before anything big, and the page updated in the same PR whenever the shape changes.
@@ -212,6 +214,7 @@ An inherited decision whose reason nobody knows gets one too, saying so.
 
 ## How work flows
 
+> **In short**
 > - Process sized to the work: small, big, or not yet understood.
 > - Short-lived branches, small PRs, one PR template with a How to check, and CI on everything into main.
 > - You decide twice: when you approve the plan, and when you merge. Claude does the middle.
@@ -329,6 +332,7 @@ Not everyone agrees. On a large legacy codebase, many engineers feel people shou
 
 ## Features
 
+> **In short**
 > - Unclear? Discover first. Then agree what it does, what must not exist yet, and how the system changes.
 > - Prototype for shape, grill for rules. The agreed prototype becomes the mock the build must match.
 > - Decide the size at the plan, against the closest feature. Say "out" as often as "in".
@@ -430,6 +434,7 @@ The plain build told staff a dish no longer contained allergens when it simply c
 
 ## Bugs
 
+> **In short**
 > - Triage turns a raw report into something a fix can be checked against, or a decision that it isn't a bug.
 > - Reproduce first. A failing test that shows the bug, then the fix.
 > - A bug that can hurt someone gets a person in the loop. Small ones can go in a batch.
@@ -485,6 +490,7 @@ with a reason, not "Something went wrong".
 
 ## Testing and the gate
 
+> **In short**
 > - Most of the weight on integration tests against a real database, each behaviour tested once.
 > - One gate command: the same on a laptop, in CI, and before Claude may stop.
 > - In an autonomous run, Claude can't finish on red. After three tries it hands over.
@@ -522,6 +528,7 @@ It must:
 
 ## Security
 
+> **In short**
 > - The usual rules still apply, with checks at each stage.
 > - The agent reads text you didn't write. Take away one leg of the lethal trifecta: usually the secrets.
 > - Layers, not one wall: permissions, auto mode, hooks, review, and the admin's settings.
@@ -585,6 +592,7 @@ These are guardrails for mistakes and injected text, not a wall against someone 
 
 ## Deployment
 
+> **In short**
 > - Infrastructure as code, in the repo, reviewed like any other change.
 > - Deploys from main by pipeline, only for commits that passed the gate, and every one can be rolled back.
 > - No production keys where the agent runs.
@@ -642,6 +650,7 @@ Inside the modules, the database has password sign-in switched off, and the app 
 
 ## Legacy code
 
+> **In short**
 > - Pin today's behaviour before changing anything, bugs included.
 > - Then make a seam, build on it, and remove the old path.
 > - No gate yet? That's the first job. Upgrades come after the safety net, with the gate as proof.
