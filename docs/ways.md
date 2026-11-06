@@ -181,6 +181,19 @@ It adds the documents, standards, templates, labels and CI check, never overwrit
 
 **Let ways keep its working state in GitHub issues.** The briefs, plan comments, specs, tickets and PRs all live there, and that's what lets a fresh session pick up where the last one stopped. If your team's main tickets live in another system, they can stay there: when one becomes work, open a GitHub issue for it and link the two. It's a little double-handling, and fine to start with.
 
+### QA teams: ways-qa
+
+A QA team that tests a running app, without its code, installs `ways-qa` instead. It brings ways and the Playwright plugin with it, and adds two commands for a repo that holds a Playwright suite:
+
+```
+claude plugin install ways-qa@ways-of-working
+```
+
+- **`/ways-qa:triage`** sorts reports: possible duplicates and regressions from open and closed issues, bug or request or working as designed, severity, the team it goes to, evidence from the browser, and a confidence for each call. Calls below the agreed threshold go to a person, and a third bug of the same kind gets an improvement issue drafted for engineering.
+- **`/ways-qa:reproduce #n`** turns one report into a Playwright test that fails for the right reason, written from what should happen rather than what the app does now.
+
+The rules (severity, routing, the confidence threshold, the app's own domain rules) live in the QA repo's `docs/standards/qa.md`, not in the plugin. Its [README](https://github.com/rattling/ways-of-working/tree/main/plugins/ways-qa) has the detail.
+
 ### Moving trackers
 
 If you're about to move to another tracker (Linear, say), don't build a bridge to the old one. When the move happens, decide whether the new tracker holds the plan and GitHub the technical work, or the new tracker holds everything. Ways is adding support for other trackers, built against a real team's setup when one moves.

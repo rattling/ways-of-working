@@ -183,6 +183,16 @@ claude plugin install ways-band@ways-of-working
 
 It's also a small worked example of a [mod](https://code.claude.com/docs/en/plugins/mods/overview): one file, [`register.js`](plugins/ways-band/hooks/register.js), with tests beside it. Mods run with your permissions. This one reads `.claude/ways.json`, `.ways/` and `AGENTS.md`, writes `.ways/last-gate`, runs `git branch` and, on `/gate`, the gate.
 
+## `ways-qa`: for QA teams
+
+A separate plugin for testers who work against a running app through Playwright, without the app's code. It installs ways and the Playwright plugin with it, and adds `/ways-qa:triage` (duplicates, regressions, severity, routing, browser evidence and a stated confidence for each call) and `/ways-qa:reproduce` (a report to a Playwright test that fails for the right reason).
+
+```bash
+claude plugin install ways-qa@ways-of-working
+```
+
+The team's rules live in its own repo, in `docs/standards/qa.md`. [Its README](plugins/ways-qa/README.md) has the rest.
+
 ## Make it yours
 
 For most teams, the right choice is to use ways as it is and keep it up to date: fixes and improvements arrive with each version, and you don't maintain anything. Update it with `claude plugin marketplace update ways-of-working` and `claude plugin update ways@ways-of-working`, restart Claude Code, then run `/ways:setup` in each repo. Setup replaces only what ways owns and leaves your edits alone.
