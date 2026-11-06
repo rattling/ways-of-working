@@ -96,6 +96,15 @@ Every ways convention that's written in GitHub terms today (the parent issue, su
 - **The marker** `.ways/autonomous` holds IDs as written, space-separated, in merge order. The SessionStart hook and the band split it on whitespace instead of keeping digits, and add `#` only to bare numbers. The hook's resume line and its "where status lives" line name the repo's tracker. It reads which tracker from the section setup appended.
 - **`pr-hygiene`** accepts `Closes`, `Fixes`, `Resolves` or `Refs` followed by any ID form. `no-issue` is unchanged.
 - **Setup** asks where issues live (GitHub by default when the remote is GitHub), and asks only on a first run: a re-run reads the existing section. For local and other it skips `gh issue` checks and label creation, and writes the PR template's first line (`Closes `) and `AGENTS.md`'s tracker line to suit. For other it tries one read and records the result (user stories 6 and 7). The GitHub remote check stays, for PRs.
+- **As built** (where the build settled what the spec left open):
+  - The three tracker sections are files of their own beside the overlay (`templates/overlays/where-issues-live-*.md`), headed `## Where issues live: GitHub`, `local markdown` or `other`. Setup appends exactly one, and the hook reads that heading.
+  - The operations table has a seventh row, **claim it**: assign yourself on GitHub and other, cut the branch for local.
+  - A local issue's category goes on the brief's `Category:` line, as Pocock's brief writes it. Only the state is on `Status:`.
+  - Setup still creates the `no-issue` PR label for local and other, since PRs stay on GitHub and `pr-hygiene` skips on it. It doesn't seed `.github/ISSUE_TEMPLATE/` for them.
+  - A setup re-run on a repo set up before this change adds the GitHub section as well as refreshing the overlay, because the overlay points at it.
+  - In the marker, a bare number always reads as a GitHub issue, so old markers keep working. An "other" tracker with numeric IDs would be misread.
+  - `pr-hygiene` accepts a GitHub number anywhere in the body, as before, and any other ID on a line of its own after the keyword.
+  - With local issues, `/ways:build`'s ticket step commits the ticket files on `integration/<slug>`, even when it stops for them to be checked.
 - **Local issues live on branches** ([ADR 0001](../../docs/adr/0001-local-issues-live-on-branches.md)): nothing writes to `main`, and a status reaches it with the PR that changes it.
 - **Context and containers:** nothing new, except that "other" reaches the person's tracker through a CLI or connector they're already signed into. Nothing is stored. The look and the dev seed don't apply: there are no screens, and the throwaway repo is the demo.
 
