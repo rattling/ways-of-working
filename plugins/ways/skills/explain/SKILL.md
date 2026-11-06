@@ -15,7 +15,7 @@ Input, optional: who it's for or what they want to understand ("new PHP develope
 - `AGENTS.md`, `specs/operating-context.md`, `specs/charter.md`, `specs/roadmap.md`, `docs/ARCHITECTURE.md`, `GLOSSARY.md`, `docs/adr/` (titles), `README.md`.
 - `docs/agents/issue-tracker.md`, for how this repo publishes specs and closes work.
 - The merge dial in `AGENTS.md`, `REVIEW.md` and `.github/CODEOWNERS`, with `${CLAUDE_PLUGIN_ROOT}/reference/REVIEW-AND-MERGE.md` for what the tiers mean.
-- Live state: `gh issue list --state open --limit 20`, `gh pr list`, open milestones, and the last ten merged PRs (`gh pr list --state merged --limit 10`).
+- Live state: the open issues (twenty or so, listed as `docs/agents/issue-tracker.md` says), `gh pr list`, open milestones, and the last ten merged PRs (`gh pr list --state merged --limit 10`).
 - The code's top-level layout, only as far as the architecture needs.
 
 Don't explain what you couldn't find. A missing file is worth one line ("no glossary yet"), not a guess.

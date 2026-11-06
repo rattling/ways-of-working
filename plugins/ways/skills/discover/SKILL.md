@@ -8,7 +8,7 @@ disable-model-invocation: true
 
 Big work is planned with `/ways:plan` and built with `/ways:build`. This comes before them, separately and only when it's needed: for when nobody can yet say what the problem is. The usual sign is that the ask is a list of solutions ("a portal, a dashboard, an app like the big firms have"), or that something has been built and nobody is sure it's the right thing. Requirements written from that are a guess written down carefully.
 
-Discovery works from evidence: what people said, what the data shows, what's already been built. It ends in a one-page brief in `specs/brief/<slug>/` and an intake issue labelled `needs-triage`, and the usual flow takes over: `/ways:plan`, then `/ways:build`.
+Discovery works from evidence: what people said, what the data shows, what's already been built. It ends in a one-page brief in `specs/brief/<slug>/` and an intake issue in the state `needs-triage`, and the usual flow takes over: `/ways:plan`, then `/ways:build`.
 
 The steps are adapted from [discovery-to-mvp](https://github.com/oferregev81pt/discovery-to-mvp) 1.2.0 by Ofer Regev (MIT; licence in `LICENSE-discovery-to-mvp`, changes in `NOTICE.md`). Its hard parts are unchanged: separating what people said from what their stories show, finding where people collide, framing the problem without a solution in it, and a cut list you can defend. ways adds a quick mode, sources beyond transcripts, as-is and to-be workflows, a keep-or-delete pass over what's already built, cost and benefit with an order of work, and the hand-off.
 
@@ -131,4 +131,4 @@ There's no unattended mode. If nobody is there to answer, finish the current ste
 
 ## When it ends
 
-The hand-off is the last step in both modes. After it, give three lines: the problem in one sentence, the recommendation and its first step, and the intake issue. Then say what's next: `/triage #<n>`.
+The hand-off is the last step in both modes. After it, give three lines: the problem in one sentence, the recommendation and its first step, and the intake issue. Then say what's next: `/triage <id>`.

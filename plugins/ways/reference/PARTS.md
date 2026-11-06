@@ -32,9 +32,9 @@ Before doing anything, check whether this command's output is already there, and
 | `/ways:discover` | `specs/brief/<slug>/README.md`, or an open `discovery/` PR |
 | `/ways:plan`, `/ways:requirements` | A `Spec:` line on the issue, or `specs/prd/<feature-slug>.md` |
 | `/ways:design` | The PRD's Implementation Decisions filled, or "Design: no change of shape" |
-| `/ways:build` | Sub-issues under the parent, an `integration/<feature-slug>` branch, or a draft integration PR |
+| `/ways:build` | Tickets under the parent, an `integration/<feature-slug>` branch, or a draft integration PR |
 
-If it's there, say what's there and offer to revise it, or say what's next. Only `/ways:build` resumes work part-done, because its state lives in GitHub (the tickets, the integration branch, the draft PR's checklist). The others run in one sitting: don't clear the session during a plan.
+If it's there, say what's there and offer to revise it, or say what's next. Only `/ways:build` resumes work part-done, because its state lives outside the session (the tickets, the integration branch, the draft PR's checklist). The others run in one sitting: don't clear the session during a plan.
 
 ## 2. Open with where you are
 

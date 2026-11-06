@@ -69,7 +69,7 @@ Don't ask the person about it. If there were notes, name them in one line ("Logg
 
 For the ones the person keeps:
 
-- **An issue here:** first check the open issues (`gh issue list --search "<words>"`); if one already covers it, comment on that one instead. Otherwise `gh issue create` with a short body (what was seen, where, why it matters, what the person added) and `needs-triage`, so `/triage` sizes it with the rest. Give the links.
+- **An issue here:** in this repo's tracker (`docs/agents/issue-tracker.md` says how). First check the open issues; if one already covers it, comment on that one instead. Otherwise create one with a short body (what was seen, where, why it matters, what the person added), in the state `needs-triage`, so `/triage` sizes it with the rest. Give the links, or the file paths.
 - **A line in `AGENTS.md`:** add it under `## Rules for this repo`, in the command's own PR if it has one still open, or as a `no-issue` PR of its own.
 
 Once they're done or dropped, delete `.ways/feedback.md`. If the person ends the session first, the file stays, and the next session offers the repo notes and logs the ways ones.
