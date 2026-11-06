@@ -8,7 +8,7 @@ Issues are markdown files under `.scratch/`, committed with the code. These rule
 | Operation | Here |
 |---|---|
 | **Read an issue** | Read its file. A parent's tickets are the files in its `issues/` folder. |
-| **Comment on it** | Append under `## Comments` at the bottom of the file, starting with the date: the plan, the brief, a question left for a person. |
+| **Comment on it** | Append under `## Comments`, starting with the date: the plan, the brief, a question left for a person. `## Comments` stays the last section, so a brief or any other section someone adds goes above it. |
 | **Set its state** | The `Status:` line near the top: a triage role, `needs-human`, or `done`, one at a time. The category (`bug`, `enhancement`) is the brief's `Category:` line. |
 | **Create an issue** | Write the file, with `Status:` near the top. A ticket's blockers go on a `Blocked by: 01, 02` line. |
 | **List open issues** | The `Status:` lines under `.scratch/`, in the checkout the command runs in. A parent's frontier is its tickets not `done` whose blockers are all `done`. |

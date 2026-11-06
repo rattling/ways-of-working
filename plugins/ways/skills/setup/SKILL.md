@@ -145,7 +145,7 @@ Always list as `needs-human`, with the command to run:
 
 ## 8. Existing code: file the backfill
 
-Setup installs the method. On an established repo, the backfill takes days and more than one person, so its state goes in the tracker as issues, not into this skill. Create a parent issue, **"Adopt the ways of working"**, with one ticket per item that applies, each a brief that names the skill that does it, in the state the table gives. On GitHub, file them once the setup PR is open. With local markdown, the parent is `.scratch/adopt-ways/issue.md` and the tickets are `.scratch/adopt-ways/issues/NN-<slug>.md`, committed on the setup branch so they arrive in the setup PR.
+Setup installs the method. On an established repo, the backfill takes days and more than one person, so its state goes in the tracker as issues, not into this skill. Create a parent issue, **"Adopt the ways of working"**, with one ticket per item that applies, each a brief that names the skill that does it, in the state the table gives. On GitHub, file them once the setup PR is open. With local markdown, the parent is `.scratch/adopt-ways/issue.md` and the tickets are `.scratch/adopt-ways/issues/NN-<slug>.md`, committed on the setup branch so they arrive in the setup PR. With another tracker, file them there; if setup couldn't reach it, list them in the report for the person to file.
 
 | Ticket | Done by | State |
 |---|---|---|
