@@ -1,9 +1,10 @@
 # ways-qa
 
-Two skills for a QA team that tests a running app through Playwright and doesn't have the app's code. It installs `ways` (and so Matt Pocock's skills) and the Playwright plugin with it, so a tester installs one thing.
+Skills for a QA team that tests a running app through Playwright and doesn't have the app's code. It installs `ways` (and so Matt Pocock's skills) and the Playwright plugin with it, so a tester installs one thing.
 
 | Command | Use it when | You end up with |
 |---|---|---|
+| `/ways-qa:setup` | A QA repo is new, or the plugin has been updated | One PR: the environments and their URLs, the QA standards, Playwright's planner, generator and healer, CI on every PR and nightly, `CLAUDE.md`, `CODEOWNERS`, and the labels. Four questions, a few minutes. |
 | `/ways-qa:triage` | Reports are coming in and need sorting | For each report: possible duplicates and regressions (open and closed issues), bug, request or working as designed, a severity, a team, evidence from the browser, and a confidence for each call. Calls below the agreed threshold go to a person. A third bug of the same kind gets an improvement issue drafted for engineering. |
 | `/ways-qa:reproduce #n` | A bug needs pinning down before it goes to engineering | A Playwright test, written from what *should* happen, that fails with the bug's own wrong value. Or, if it won't reproduce, a needs-info comment saying exactly what was tried. |
 
@@ -17,14 +18,20 @@ claude plugin install ways-qa@ways-of-working
 
 The official marketplace has to be added first: that's where the Playwright plugin and Pocock's skills come from. You also need `gh`, signed in, and Node for the Playwright suite.
 
-## The repo it expects
+Then, in the QA repo, run **`/ways-qa:setup`**. Not `/ways:setup`: that one is for repos with an app's code in them, and asks about architecture a QA team doesn't need.
 
-A Playwright suite, with the app reached by URL:
+## The repo it sets up
 
-- `tests/`: the tests, with `playwright.config.ts` pointing `baseURL` at the app.
-- `specs/`: what the app should do, area by area. Playwright's planner writes these; people correct them. This is what "correct" means to both skills.
-- `docs/standards/qa.md`: the rules triage and reproduce follow. Copied in from [`templates/docs/standards/qa.md`](templates/docs/standards/qa.md) the first time either skill runs.
-- `CLAUDE.md`: what the suite is and how to run it.
+A Playwright suite, with the app reached by URL. `/ways-qa:setup` asks four things (the apps and their URLs in each environment, the teams for routing, the triage owner, and any domain rules) and writes:
+
+- `environments.json`: each environment and each app's URL in it. `QA_ENV=live npx playwright test` switches all of it; `playwright.config.ts` reads it and gives each app its own project and folder under `tests/`.
+- `docs/standards/qa.md`: the rules triage and reproduce follow.
+- Playwright's planner, generator and healer (`npx playwright init-agents --loop=claude`), `specs/` for their plans and the acceptance notes, `charters/` for exploratory sessions, and an ignored `evidence/`.
+- `CLAUDE.md`: the map of the repo, and how work goes. Every change is a branch and a PR that one other tester approves, and `CODEOWNERS` covers the standards, CI and the environments.
+- A CI workflow that runs the suite on every PR and nightly, and keeps the HTML report and failure traces for 30 days.
+- The labels from `qa.md`.
+
+**The gate is `npx playwright test`, kept green.** A known bug that's still open has its test marked `test.fail()` with the issue linked, so a red run always means something new, and the test going red is how the team learns the bug is fixed. A test that checks an acceptance note carries its tag (`@AN-5`), so `--grep @AN-5` shows what covers it.
 
 ## The rules belong to the repo
 

@@ -183,12 +183,13 @@ It adds the documents, standards, templates, labels and CI check, never overwrit
 
 ### QA teams: ways-qa
 
-A QA team that tests a running app, without its code, installs `ways-qa` instead. It brings ways and the Playwright plugin with it, and adds two commands for a repo that holds a Playwright suite:
+A QA team that tests a running app, without its code, installs `ways-qa` instead. It brings ways and the Playwright plugin with it, and adds three commands for a repo that holds a Playwright suite:
 
 ```
 claude plugin install ways-qa@ways-of-working
 ```
 
+- **`/ways-qa:setup`** sets the repo up in a few minutes and four questions: the environments and their URLs, the QA standards, Playwright's agents, CI, and the labels. The gate is the suite, kept green by marking known open bugs. A QA repo never needs `/ways:setup`, which is for app repos.
 - **`/ways-qa:triage`** sorts reports: possible duplicates and regressions from open and closed issues, bug or request or working as designed, severity, the team it goes to, evidence from the browser, and a confidence for each call. Calls below the agreed threshold go to a person, and a third bug of the same kind gets an improvement issue drafted for engineering.
 - **`/ways-qa:reproduce #n`** turns one report into a Playwright test that fails for the right reason, written from what should happen rather than what the app does now.
 
