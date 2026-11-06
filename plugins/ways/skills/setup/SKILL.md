@@ -15,11 +15,16 @@ As you go, note anything that pops out worth improving, in this repo or in ways,
 - Plugin version: the `version` in `${CLAUDE_PLUGIN_ROOT}/.claude-plugin/plugin.json`.
 - Repo stamp: `.claude/ways.json`. If its `version` matches the plugin's, say the repo is current and stop, unless the person asked for something specific.
 - Pocock's config: `docs/agents/issue-tracker.md`, `docs/agents/triage-labels.md`, `docs/agents/domain.md`, and an `## Agent skills` section in `AGENTS.md` or `CLAUDE.md`. Whatever is missing, this skill writes in step 4; the person doesn't need to run `/setup-matt-pocock-skills`. Note what's already there: someone may have run Pocock's setup with other choices, and those stay.
-- The remote: `git remote -v` should point at GitHub. If it doesn't, stop: the method keeps its status in GitHub.
+- The remote: `git remote -v` should point at GitHub. If it doesn't, stop: PRs and their checks run on GitHub, whatever the tracker.
+- Where issues live, from `docs/agents/issue-tracker.md`. A `## Where issues live: ` heading names the choice (GitHub, local markdown or other), and this run keeps it. A file with the ways conventions but no such heading is from before the choice existed: it's GitHub. Otherwise it's a first run, and step 2 asks.
 - Existing material: `AGENTS.md`, `CLAUDE.md`, `README.md`, `docs/`, `specs/`, `GLOSSARY.md`, any charter, roadmap, milestones file, ADRs, PR or issue templates, CI workflows, `Makefile` or other gate commands.
 - `gh repo view` and `gh label list`, to confirm the CLI works and see what labels exist.
 
 ## 2. Propose, then act
+
+**On a first run, ask where issues live** before anything else, in one question: GitHub Issues (the default), local markdown files under `.scratch/`, committed with the code, or other (Linear, Jira, anything Claude can reach). If Pocock's setup already wrote `docs/agents/issue-tracker.md`, offer its choice as the default instead. A re-run never asks.
+
+**Other** takes a paragraph from the person: the tracker, the project or team, the CLI or connector Claude reaches it through (already signed in), and how an ID is written. Try one read through it: list a few open issues. If it works, say what came back. If it fails, say plainly what failed (the command and its error, or the connector that isn't there) and ask whether to record the tracker anyway. On no, stop here until they've fixed it or chosen another tracker.
 
 Tell the person, in one short list, what you will add, what you will move, and what you will leave alone. Wait for a yes. Then work on a branch named after the version it sets up, `chore/ways-<version>` (for example `chore/ways-0.30.0`), so a later run never trips over an earlier run's branch. If that branch already exists, an earlier run of this same version was cut short: carry on from it rather than starting again.
 
@@ -51,11 +56,13 @@ Templates live in `${CLAUDE_PLUGIN_ROOT}/templates/`. For each one, except `over
 
 **CI that burns minutes.** If the repo already has `.github/workflows/gate.yml` (or another workflow running the gate) that runs on every `pull_request` with no `branches: [main]`, runs on drafts, or has no `concurrency` cancelling, say so in the report and suggest the template's version: under `/ways:build` it runs 25 to 40 times a feature instead of 3 to 5 (`docs/standards/delivery.md`, "CI is sized on purpose"). Don't change the workflow in the setup PR; list it, with the diff, for a person to take.
 
-**Containers and worktrees.** If the repo has a `docker-compose.yml` (or `compose.yaml`), check it against the worktree rules in `${CLAUDE_PLUGIN_ROOT}/templates/docs/standards/delivery.md` ("Every worktree runs its own containers"): no fixed `name:`, published ports from a variable with a default, a gate that needs no host port. Don't change it in the setup PR: where it falls short, file one issue with the fix (or add to an open one that already covers it), labelled `ready-for-agent`, and list it in the report. Do this on every run, not only the first. If the repo's `docs/standards/delivery.md` came from ways and lacks that bullet, add it: it's new since the repo was set up, and the builders' instructions point to it.
+**Containers and worktrees.** If the repo has a `docker-compose.yml` (or `compose.yaml`), check it against the worktree rules in `${CLAUDE_PLUGIN_ROOT}/templates/docs/standards/delivery.md` ("Every worktree runs its own containers"): no fixed `name:`, published ports from a variable with a default, a gate that needs no host port. Don't change it in the setup PR: where it falls short, create one issue with the fix (or add to an open one that already covers it), in the state `ready-for-agent`, and list it in the report. Do this on every run, not only the first. If the repo's `docs/standards/delivery.md` came from ways and lacks that bullet, add it: it's new since the repo was set up, and the builders' instructions point to it.
 
 `.github/CODEOWNERS`: fill in the high-risk paths this repo actually has, matching `REVIEW.md`. Owners are a judgement call: leave `@owner` and list it as `needs-human` unless the person names them.
 
-`AGENTS.md`: Pocock's setup may already have created it with only the `## Agent skills` section. Add the template's sections around that section; never remove or rewrite it. If the `## Agent skills` section is in `CLAUDE.md` instead, it moves to `AGENTS.md` with the rest of `CLAUDE.md`'s content (below), unchanged. Fill in the gate command, the read order and the merge policy from what the repo shows. Leave genuine judgement calls as placeholders and list them.
+`AGENTS.md`: Pocock's setup may already have created it with only the `## Agent skills` section. Add the template's sections around that section; never remove or rewrite it. If the `## Agent skills` section is in `CLAUDE.md` instead, it moves to `AGENTS.md` with the rest of `CLAUDE.md`'s content (below), unchanged. Fill in the gate command, the read order and the merge policy from what the repo shows. Leave genuine judgement calls as placeholders and list them. The `### Issue tracker` line under `## Agent skills` says where this repo's issues live. The template's line is GitHub's. For local markdown it's "Issues live as markdown files under `.scratch/`, committed with the code. See `docs/agents/issue-tracker.md`.", and for other it names the tracker and how Claude reaches it. Change the line only when it names a tracker other than this repo's.
+
+`.github/pull_request_template.md` starts `Closes #` for GitHub. For local markdown or other, the first line is `Closes ` with no `#`.
 
 The one exception to "never overwrite": `## How work goes` and `## Working an issue` belong to the plugin, since they name its commands and files, and go stale when it changes. On every run, replace each section, from its heading to the next `## `, with the template's current one, so the SessionStart hook (which prints it) shows the flow this plugin version has. If the repo's copy had changes of its own, say so in the report and point them to `## Rules for this repo`; the setup PR's diff shows what was replaced.
 
@@ -65,7 +72,7 @@ The one exception to "never overwrite": `## How work goes` and `## Working an is
 
 ## 4. Pocock's config
 
-This is what `/setup-matt-pocock-skills` would write, with the answers the method fixes: GitHub, the default triage labels, single-context, `AGENTS.md`. Ways writes it itself rather than asking four questions whose answers are settled.
+This is what `/setup-matt-pocock-skills` would write, with the tracker from step 2 and the answers the method fixes: the default triage labels, single-context, `AGENTS.md`. Ways writes it itself rather than asking questions whose answers are settled.
 
 **Find Pocock's templates** in the installed plugin, not in a copy of ours, so they follow his updates. The newest version is the last line of:
 
@@ -73,13 +80,13 @@ This is what `/setup-matt-pocock-skills` would write, with the answers the metho
 ls -d ~/.claude/plugins/cache/*/mattpocock-skills/*/skills/*/setup-matt-pocock-skills | sort -V | tail -1
 ```
 
-If that finds nothing, try `find ~/.claude/plugins -type d -path '*mattpocock-skills*' -name setup-matt-pocock-skills`. If there's still nothing, fall back: ask the person to run `/setup-matt-pocock-skills`, accepting GitHub, the default labels and single-context, and choosing `AGENTS.md` if asked; then run this again.
+If that finds nothing, try `find ~/.claude/plugins -type d -path '*mattpocock-skills*' -name setup-matt-pocock-skills`. If there's still nothing, fall back: ask the person to run `/setup-matt-pocock-skills`, choosing the same tracker, the default labels and single-context, and choosing `AGENTS.md` if asked; then run this again.
 
 **Write each file that's missing**, from that folder, as it is:
 
 | File | From |
 |---|---|
-| `docs/agents/issue-tracker.md` | `issue-tracker-github.md` (leave its "PRs as a request surface" flag off) |
+| `docs/agents/issue-tracker.md` | `issue-tracker-github.md` (leave its "PRs as a request surface" flag off) or `issue-tracker-local.md`. Other has no template: start the file with `# Issue tracker: <its name>` |
 | `docs/agents/triage-labels.md` | `triage-labels.md` |
 | `docs/agents/domain.md` | `domain.md` |
 
@@ -87,9 +94,13 @@ A file that's already there stays as it is, whatever it says: a repo that chose 
 
 **The `## Agent skills` section** comes with the `AGENTS.md` template (step 3). If `AGENTS.md` already has one, or `CLAUDE.md` had one that moved, keep it as it is and don't add a second.
 
-**Then the ways conventions:** append `${CLAUDE_PLUGIN_ROOT}/templates/overlays/issue-tracker.md` to the end of `docs/agents/issue-tracker.md`. If a `## This repo's conventions (ways)` section is already there, replace it with the current one. Leave the rest of the file alone.
+**Then the ways conventions:** append `${CLAUDE_PLUGIN_ROOT}/templates/overlays/issue-tracker.md` to the end of `docs/agents/issue-tracker.md`, and after it the tracker's section from the same folder: `where-issues-live-github.md`, `where-issues-live-local.md` or `where-issues-live-other.md`. Exactly one. For other, fill in its two lines: **The tracker:** with the person's paragraph, and **Reached at setup:** with "yes, on <date>, by reading a few open issues", or "no: <what failed>" if they chose to record it anyway.
+
+On a re-run, replace the `## This repo's conventions (ways)` section (from its heading to the next `## `) with the current one. Replace a GitHub or local section the same way, and add the GitHub one if an older run left none. Leave an other section as it is: it holds the person's description. Leave the rest of the file alone.
 
 ## 5. Labels
+
+With local markdown or other, the states live in the tracker, not in GitHub labels: create only `no-issue`, the PR label, as below, and run no `gh issue` command. The rest of this step is for GitHub.
 
 Create the labels in `${CLAUDE_PLUGIN_ROOT}/templates/labels.txt` with `gh label create <name> --color <hex> --description "<text>" --force`, except the ones it marks *if missing*: create those only where no label of that name exists, without `--force`, so a repo's own colours stay.
 
@@ -134,9 +145,9 @@ Always list as `needs-human`, with the command to run:
 
 ## 8. Existing code: file the backfill
 
-Setup installs the method. On an established repo, the backfill takes days and more than one person, so its state goes in GitHub as issues, not into this skill. Once the setup PR is open, file a parent issue, **"Adopt the ways of working"**, with one sub-issue per item that applies, each a brief that names the skill that does it:
+Setup installs the method. On an established repo, the backfill takes days and more than one person, so its state goes in the tracker as issues, not into this skill. Create a parent issue, **"Adopt the ways of working"**, with one ticket per item that applies, each a brief that names the skill that does it, in the state the table gives. On GitHub, file them once the setup PR is open. With local markdown, the parent is `.scratch/adopt-ways/issue.md` and the tickets are `.scratch/adopt-ways/issues/NN-<slug>.md`, committed on the setup branch so they arrive in the setup PR.
 
-| Sub-issue | Done by | Label |
+| Ticket | Done by | State |
 |---|---|---|
 | Gate skeleton (only if there's no working gate; blocks the rest except the charter) | `/ways:work`, autonomous | `ready-for-agent` |
 | Charter, scope ladder and invariants, from the code, the README and the people who know why | `/grill-with-docs` | `ready-for-human` |
@@ -149,4 +160,4 @@ Leave out what the repo already has. With no remote yet, list them in the report
 
 ## 9. Notes
 
-After the report and the backfill, log the run and offer the repo notes, if there are any (`${CLAUDE_PLUGIN_ROOT}/reference/FEEDBACK.md`). `.ways/feedback.md` may exist before this run's `.gitignore` line does: keep it out of the setup PR. A repo finding that's already a backfill sub-issue is covered: drop the note.
+After the report and the backfill, log the run and offer the repo notes, if there are any (`${CLAUDE_PLUGIN_ROOT}/reference/FEEDBACK.md`). `.ways/feedback.md` may exist before this run's `.gitignore` line does: keep it out of the setup PR. A repo finding that's already a backfill ticket is covered: drop the note.
