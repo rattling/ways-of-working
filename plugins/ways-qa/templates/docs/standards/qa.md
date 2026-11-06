@@ -52,11 +52,11 @@ Review the threshold after the first few weeks: compare the calls the agent made
 
 ## Patterns
 
-**A pattern is** <!-- default: three bugs in the same area with the same kind of failure, open or closed, in the last six months --> When a new bug makes one, triage proposes an improvement issue for engineering.
+**A pattern is** three bugs in the same area with the same kind of failure, open or closed, in the last six months. That's the default: change it by PR. When a new bug makes one, triage proposes an improvement issue for engineering.
 
 ## Labels
 
-The label strings triage uses. Change the right-hand column to match this tracker; triage creates a missing label only after asking.
+The label strings triage uses. Change the right-hand column to match this tracker; on its first run, triage offers once to create every label this file names that the tracker doesn't have yet (this table, the severity rows and the routing rows).
 
 | Role | Label |
 |---|---|
