@@ -6,16 +6,16 @@ Where work goes:
 |---|---|
 | New and unsorted, or a pile of it | `/triage` (optional: the commands below size an untriaged issue themselves) |
 | Problem not understood | `/ways:discover`, then `/ways:plan` |
-| Known to be big | `/ways:plan #n`, then `/ways:build #n` |
-| Known to be small | `/ways:work #n` (one issue, or several) |
+| Known to be big | `/ways:plan <id>`, then `/ways:build <id>` |
+| Known to be small | `/ways:work <id>` (one issue, or several) |
 
 Big work is two commands, with discovery before them when it's needed:
 
 | Command | What it does | Ends in | The person merges |
 |---|---|---|---|
 | `/ways:discover` (optional, separate: its input can take days) | Works out what the problem is | A brief in `specs/brief/<slug>/` and an intake issue | The discovery PR: the brief agreed |
-| `/ways:plan #n` | Requirements (prototype, grill, or both), then design, in one sitting | The PRD, what and how, and one spec PR | The spec PR: what it should do and how the system changes, agreed together |
-| `/ways:build #n` | Tickets, then the code | One integration PR | The integration PR: the feature shipped |
+| `/ways:plan <id>` | Requirements (prototype, grill, or both), then design, in one sitting | The PRD, what and how, and one spec PR | The spec PR: what it should do and how the system changes, agreed together |
+| `/ways:build <id>` | Tickets, then the code | One integration PR | The integration PR: the feature shipped |
 
 `/ways:plan` is `/ways:requirements` then `/ways:design` in one session. Those two stay as commands of their own for when different people do the halves (a product person grills, an engineer designs): the PRD file between them is the hand-off.
 

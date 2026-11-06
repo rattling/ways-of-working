@@ -30,7 +30,7 @@ Tell the person, in one short list, what you will add, what you will move, and w
 
 ## 3. Seed from the templates
 
-Templates live in `${CLAUDE_PLUGIN_ROOT}/templates/`. For each one, except `overlays/` and `labels.txt`:
+Templates live in `${CLAUDE_PLUGIN_ROOT}/templates/`. For each one, except `overlays/` and `labels.txt` (and `.github/ISSUE_TEMPLATE/` when issues aren't in GitHub):
 
 - **Missing:** copy it in.
 - **Present:** never overwrite. Merge what's missing into it, or leave it and list it in the report.

@@ -183,7 +183,7 @@ It adds the documents, standards, templates, labels and CI check, never overwrit
 
 ### Moving trackers
 
-If you're about to move to another tracker (Linear, say), don't build a bridge to the old one. When the move happens, decide whether the new tracker holds the plan and GitHub the technical work, or the new tracker holds everything. Either works: ways takes issue IDs in any form, so point it at the new tracker when you move.
+If you're about to move to another tracker (Linear, say), don't build a bridge to the old one. When the move happens, decide whether the new tracker holds the plan and GitHub the technical work, or the new tracker holds everything. Either works: ways takes issue IDs in any form. Setup records the tracker once, so moving means rewriting the tracker section of `docs/agents/issue-tracker.md` by hand. Ways doesn't move open issues for you.
 
 ### Not on git yet: your own plugin, for now
 

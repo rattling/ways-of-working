@@ -66,7 +66,7 @@ start 0.5.0 0.5.0 agents "allergen chart · plan"
 check "a part under way is named, with where to check its state" '[[ $out == *"Big work in progress: allergen chart · plan"* && $out == *PARTS.md* ]]'
 
 start 0.5.0 0.5.0 no-agents
-check "no flow section: a short fallback and a setup nudge" '[[ $out == *"has no \"How work goes\" section"* && $out == *"/ways:discover"* && $out == *"/ways:plan #n"* && $out == *"/ways:setup"* ]]'
+check "no flow section: a short fallback and a setup nudge" '[[ $out == *"has no \"How work goes\" section"* && $out == *"/ways:discover"* && $out == *"/ways:plan <id>"* && $out == *"/ways:setup"* ]]'
 
 start 0.5.0 0.5.1
 check "a patch release doesn't nudge setup" '[[ $out != *"/ways:setup"* ]]'

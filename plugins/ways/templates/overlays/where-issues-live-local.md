@@ -17,6 +17,6 @@ Issues are markdown files under `.scratch/`, committed with the code. These rule
 
 **Nothing writes to `main`.** A change to an issue file (a state, a comment, a new ticket) is committed on the work's branch and reaches `main` when its PR merges. One made before the branch exists, such as sizing or the plan comment, is carried onto it when it's cut. One made with no work to carry it, such as a `/triage` pass or a note for the repo, goes in a small PR of its own. Until then, a session on `main` sees the old state.
 
-**A build** keeps its tickets' states on the integration branch: each ticket's PR sets its `Status: done` there, and a resumed build reads them there. The integration PR carries them to `main`.
+**A build** cuts its tickets onto the integration branch: the ticket step creates `integration/<slug>` from `main` and commits the ticket files there, even when it stops for the tickets to be checked. A resumed build reads them there, and keeps their states there: each ticket's PR sets its `Status: done` there, and a resumed build reads them there. The integration PR carries them to `main`.
 
 **Ticket numbers** come only from `/ways:build`'s ticket step. If two branches add the same number anyway, the second to merge renumbers its ticket.

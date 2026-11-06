@@ -39,7 +39,7 @@ plugin_version="$(json_field version "$root/.claude-plugin/plugin.json")"
 gate="$(json_field gate "$stamp")"
 
 # Where issues live: the section setup appended to docs/agents/issue-tracker.md. Without one, GitHub.
-tracker="$(sed -n 's/^## Where issues live: *//p' "$project/docs/agents/issue-tracker.md" 2>/dev/null | tr -d '\r' | tail -1)"
+tracker="$(sed -n 's/^## Where issues live: *//p' "$project/docs/agents/issue-tracker.md" 2>/dev/null | tr -d '\r' | sed 's/[[:space:]]*$//' | tr '[:upper:]' '[:lower:]' | tail -1)"
 case "$tracker" in
   "local markdown") status_lives="Status lives in the issue files under .scratch/ (their Status: lines), on the work's branch." ;;
   other) status_lives="Status lives in the tracker docs/agents/issue-tracker.md describes, not in files." ;;
@@ -48,7 +48,7 @@ esac
 
 # How to read one ID from the marker. A number (12 or #12) is a GitHub issue, as old markers were.
 read_issue() {
-  local id="$1" f
+  local id="$1" f g
   if [[ $id =~ ^#?([0-9]+)$ ]]; then echo "\`gh issue view ${BASH_REMATCH[1]} --comments\`"; return; fi
   case "$tracker" in
     "local markdown")
@@ -78,7 +78,7 @@ if [[ -n "$flow" ]]; then
   echo "$flow"
   echo
 else
-  echo "- Flow: AGENTS.md has no \"How work goes\" section. New and unsorted, or a pile: /triage (optional). Problem not understood: /ways:discover, then /ways:plan. Known to be big: /ways:plan #n, then /ways:build #n. Known to be small: /ways:work #n. Say which command comes next when a step finishes. Suggest running /ways:setup to restore the section."
+  echo "- Flow: AGENTS.md has no \"How work goes\" section. New and unsorted, or a pile: /triage (optional). Problem not understood: /ways:discover, then /ways:plan. Known to be big: /ways:plan <id>, then /ways:build <id>. Known to be small: /ways:work <id>. Say which command comes next when a step finishes. Suggest running /ways:setup to restore the section."
 fi
 echo "- The flow commands' rules (look for the output first, open with where you are, end with the one merge): ${root}/reference/PARTS.md"
 part="$project/.ways/part"
