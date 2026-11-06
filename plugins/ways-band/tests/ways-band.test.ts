@@ -105,6 +105,22 @@ test('a batch shows every issue the lead is running, in merge order', async ($, 
   await ui.unmount()
 })
 
+test('a local ticket shows as written, with no #', async ($, on) => {
+  stubRepo(on, { ...REPO, '.ways/autonomous': 'billing/03\n' })
+  await $.session.start({ cwd: '/repo' })
+  const ui = await $.ui.mount(BAND as any)
+  expect(await ui.find({ type: 'Text', text: 'autonomous billing/03' })).toBeDefined()
+  await ui.unmount()
+})
+
+test('a batch shows each ID as written, # only on numbers', async ($, on) => {
+  stubRepo(on, { ...REPO, '.ways/autonomous': '#12 billing/03 ENG-123\n' })
+  await $.session.start({ cwd: '/repo' })
+  const ui = await $.ui.mount(BAND as any)
+  expect(await ui.find({ type: 'Text', text: 'autonomous batch #12 billing/03 ENG-123' })).toBeDefined()
+  await ui.unmount()
+})
+
 // The plan's usage windows: shown in the band, and written where an autonomous run can
 // read them, so an integration PR can report usage at the start and after each ticket.
 const WINDOWS = [

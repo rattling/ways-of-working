@@ -1,8 +1,8 @@
 // ways-band: a status band above the prompt for repos that work the ways-of-working way,
 // and a /gate command that runs the gate at once, without a Claude turn.
 //
-// It reads: .claude/ways.json (version, gate), .ways/autonomous (the issue or
-// issues an autonomous run is on), .ways/progress (a spec run's tickets done, of total),
+// It reads: .claude/ways.json (version, gate), .ways/autonomous (the IDs, as
+// written, an autonomous run is on), .ways/progress (a spec run's tickets done, of total),
 // .ways/part (the big work under way and its command, written by the flow commands),
 // .ways/last-gate (written by the ways Stop hook and by /gate),
 // the Dial line in AGENTS.md, and the current git branch. In a repo without .claude/ways.json
@@ -83,8 +83,8 @@ async function refresh($) {
     version: field(stamp, 'version'),
     gate: field(stamp, 'gate'),
     autonomous: marker !== null,
-    // One number for a single run; several, space-separated, for a batch the lead is running.
-    issues: marker ? marker.match(/\d+/g) || [] : [],
+    // One ID as written (12, billing/03, ENG-123) for a single run; several, space-separated, for a batch.
+    issues: marker ? marker.split(/\s+/).filter(Boolean) : [],
     progress: marker && total ? done + ' of ' + total : null,
     part,
     gateResult: ['pass', 'fail', 'unrunnable'].includes(result) ? result : null,
@@ -182,7 +182,7 @@ export function register(on) {
     const sep = () => Text({ dimColor: true, children: ['  ·  '] })
 
     const mode = view.autonomous
-      ? Text({ color: 'yellow', bold: true, children: ['autonomous' + (view.issues.length > 1 ? ' batch ' : view.issues.length ? ' ' : '') + view.issues.map((n) => '#' + n).join(' ') + (view.progress ? ' · ' + view.progress : '')] })
+      ? Text({ color: 'yellow', bold: true, children: ['autonomous' + (view.issues.length > 1 ? ' batch ' : view.issues.length ? ' ' : '') + view.issues.map((id) => (/^\d+$/.test(id) ? '#' + id : id)).join(' ') + (view.progress ? ' · ' + view.progress : '')] })
       : Text({ color: 'cyan', children: ['interactive'] })
 
     let gate

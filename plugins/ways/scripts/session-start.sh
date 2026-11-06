@@ -38,9 +38,37 @@ repo_version="$(json_field version "$stamp")"
 plugin_version="$(json_field version "$root/.claude-plugin/plugin.json")"
 gate="$(json_field gate "$stamp")"
 
+# Where issues live: the section setup appended to docs/agents/issue-tracker.md. Without one, GitHub.
+tracker="$(sed -n 's/^## Where issues live: *//p' "$project/docs/agents/issue-tracker.md" 2>/dev/null | tr -d '\r' | tail -1)"
+case "$tracker" in
+  "local markdown") status_lives="Status lives in the issue files under .scratch/ (their Status: lines), on the work's branch." ;;
+  other) status_lives="Status lives in the tracker docs/agents/issue-tracker.md describes, not in files." ;;
+  *) status_lives="Status lives in GitHub issues, not in files." ;;
+esac
+
+# How to read one ID from the marker. A number (12 or #12) is a GitHub issue, as old markers were.
+read_issue() {
+  local id="$1" f
+  if [[ $id =~ ^#?([0-9]+)$ ]]; then echo "\`gh issue view ${BASH_REMATCH[1]} --comments\`"; return; fi
+  case "$tracker" in
+    "local markdown")
+      if [[ $id == */* ]]; then
+        f=".scratch/${id%%/*}/issues/${id#*/}-*.md"
+        for g in "$project"/$f; do [[ -f $g ]] && f="${g#"$project"/}" && break; done
+      else
+        f=".scratch/$id/issue.md"
+      fi
+      echo "\`$f\`" ;;
+    other) echo "$id in the tracker docs/agents/issue-tracker.md describes" ;;
+    *) echo "\`gh issue view $id --comments\`" ;;
+  esac
+}
+# An ID as people write it: # only on a bare number.
+show_id() { [[ $1 =~ ^[0-9]+$ ]] && echo "#$1" || echo "$1"; }
+
 echo "This repo works the ways-of-working way on Matt Pocock's skills (ways ${plugin_version}, repo set up at ${repo_version:-unknown})."
 echo
-echo "- Read AGENTS.md first. Specs: specs/ (charter, roadmap, operating-context, brief/, prd/). Language: GLOSSARY.md. Decisions: docs/adr/. Status lives in GitHub issues, not in files."
+echo "- Read AGENTS.md first. Specs: specs/ (charter, roadmap, operating-context, brief/, prd/). Language: GLOSSARY.md. Decisions: docs/adr/. ${status_lives}"
 # The flow is written once, in the repo's AGENTS.md ("How work goes"): print that section, not a copy of it.
 flow=""
 [[ -f "$project/AGENTS.md" ]] && flow="$(awk '/^## How work goes/{f=1; next} /^## /{f=0} f && !/^<!--.*-->$/' "$project/AGENTS.md" | sed '/./,$!d')"
@@ -65,13 +93,15 @@ fi
 echo "- Gate: ${gate:-not set in .claude/ways.json}"
 marker="$project/.ways/autonomous"
 if [[ -f "$marker" ]]; then
-  # One issue number for a single run; several, space-separated, for a batch.
-  read -ra issues <<< "$(tr -cs '0-9' ' ' < "$marker")"
+  # One ID as written for a single run (12, #12, billing/03, ENG-123); several, space-separated, for a batch.
+  read -ra issues <<< "$(tr -s '[:space:]' ' ' < "$marker")"
   echo "- Autonomous mode is ON (.ways/autonomous exists): the Stop hook runs the gate before a turn can end. Delete the marker at handover."
   if [[ ${#issues[@]} -eq 1 ]]; then
-    echo "- You are mid-run on issue #${issues[0]}. If you don't remember the details, the context was compacted or cleared: before doing anything else, re-read the issue and its comments (your plan comment is there), the draft PR, and \`git log main..HEAD\`. Don't redo what the commits show is done."
+    echo "- You are mid-run on $(show_id "${issues[0]}"). If you don't remember the details, the context was compacted or cleared: before doing anything else, re-read the issue and its comments ($(read_issue "${issues[0]}"); your plan comment is there), the draft PR, and \`git log main..HEAD\`. Don't redo what the commits show is done."
   elif [[ ${#issues[@]} -gt 1 ]]; then
-    echo "- You are leading a batch: issues $(printf '#%s ' "${issues[@]}")in that merge order. If you don't remember the details, the context was compacted or cleared: before doing anything else, check each issue's state and its PR (\`gh pr list --search \"<n> in:body\"\`). Merged ones are done; for the rest, resume from the PR and its commits. Don't start a builder for an issue that already has a PR in progress."
+    shown="" reads=""
+    for id in "${issues[@]}"; do shown+="$(show_id "$id") "; reads+="; $(show_id "$id"), $(read_issue "$id")"; done
+    echo "- You are leading a batch: ${shown}in that merge order. If you don't remember the details, the context was compacted or cleared: before doing anything else, check each issue's state and its PR (\`gh pr list --search \"<id> in:body\"\`). Merged ones are done; for the rest, resume from the PR and its commits. Don't start a builder for an issue that already has a PR in progress. Where to read each one:${reads#;}."
   fi
 fi
 # Only a minor or major release changes what setup lays down; a patch release doesn't.
