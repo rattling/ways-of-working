@@ -62,7 +62,7 @@ flowchart TD
     W -->|you merge| S
 ```
 
-The method behind it, area by area, is at **[Building software with Claude](https://rattling.github.io/ways-of-working/)**: what working with an agent is like, then architecture, how work flows, testing, bugs, features, legacy code, deployment and security, each with a small interactive. It's also [one document](docs/method.md). To try the flow itself, **[Issue to Merge](https://rattling.github.io/ways-of-working/issue-to-merge/)** runs example issues down it, stopping at every merge until you click it through.
+The thinking behind it is at **[Building software with Claude](https://rattling.github.io/ways-of-working/)**, in three parts: [why](https://rattling.github.io/ways-of-working/) (what good software needs, and where AI helps and hurts), [the method](https://rattling.github.io/ways-of-working/method/) area by area with no tools required, and [ways](https://rattling.github.io/ways-of-working/ways/) as one way to put it in place. New to software engineering? There's [a one-page guide](https://rattling.github.io/ways-of-working/basics/). To try the flow itself, **[Issue to Merge](https://rattling.github.io/ways-of-working/issue-to-merge/)** runs example issues down it, stopping at every merge until you click it through. The text is markdown in [`docs/`](docs/).
 
 | Command | Use it when | You end up with |
 |---|---|---|

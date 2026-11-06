@@ -219,3 +219,41 @@ body[data-view="area"] .area.current { display: grid; border-top: 0; margin-top:
 /* Let grid children shrink, and long file names wrap, so nothing pushes a narrow screen sideways. */
 .area > *, .two > *, .try > * { min-width: 0; }
 .files label { overflow-wrap: anywhere; }
+
+/* ---------- three parts: site navigation ---------- */
+.links { display: flex; gap: 4px 14px; flex-wrap: wrap; align-items: center; font: 600 13px var(--mono); margin-left: auto; }
+.links a { text-decoration: none; color: var(--ink-2); padding: 2px 0; border-bottom: 3px solid transparent; }
+.links a:hover { color: var(--ink); }
+.links a[aria-current="page"] { color: var(--ink); border-bottom-color: var(--a4); }
+.sub { max-width: 980px; margin: 6px auto 0; display: flex; align-items: center; gap: 12px; min-width: 0; }
+@media (max-width: 640px) { .bar-in { flex-wrap: wrap; row-gap: 4px; } .links { margin-left: 0; gap: 4px 12px; font-size: 12px; } }
+
+/* hubs: groups of cards */
+.hero .lead { font-size: 18px; max-width: 66ch; }
+.groups { display: grid; gap: 22px; margin-top: 8px; }
+.group { display: grid; gap: 10px; }
+.group-name { font: 600 12px var(--mono); letter-spacing: .14em; text-transform: uppercase; color: var(--c); display: flex; align-items: center; gap: 10px; }
+.group-name::after { content: ""; flex: 1; height: 3px; border-radius: 2px; background: var(--c); opacity: .5; }
+.group .cards { margin-top: 0; }
+.area .badge:empty, .card .badge:empty { width: 26px; height: 26px; border-width: 6px; }
+.area-head .badge:empty { width: 34px; height: 34px; border-width: 8px; }
+
+/* the why page: parts, sections, cards */
+.parts { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(230px, 100%), 1fr)); gap: 12px; margin-top: 6px; }
+.part { display: grid; gap: 4px; text-decoration: none; background: var(--panel); border: 1.5px solid var(--rule); border-top: 6px solid var(--a4); border-radius: 8px; padding: 14px 16px; }
+.part:nth-child(2) { border-top-color: var(--a7); } .part:nth-child(3) { border-top-color: var(--a9); }
+.part:hover, .part:focus-visible { border-color: var(--ink-2); }
+.part b { font-family: var(--display); font-size: 24px; font-weight: 800; text-transform: uppercase; line-height: 1; }
+.part span { font-size: 14.5px; color: var(--ink-2); line-height: 1.45; }
+.parts-end { margin-top: 48px; }
+.psec { padding-block: 48px 4px; display: grid; gap: 16px; border-top: 1px solid var(--rule); margin-top: 32px; }
+.psec h2 { display: flex; gap: 12px; align-items: center; }
+.psec h2::before { content: ""; width: 26px; height: 26px; border-radius: 50%; border: 6px solid var(--c); background: var(--panel); flex: none; }
+.psec .prose { max-width: 74ch; }
+
+/* a run of paragraphs that each open in bold: cards */
+.pcards { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(280px, 100%), 1fr)); gap: 12px; margin: 0 0 1em; max-width: none; }
+.pcards p { margin: 0; background: var(--panel); border: 1px solid var(--rule); border-left: 5px solid var(--c, var(--a4)); border-radius: 6px; padding: 12px 14px; font-size: 15.5px; }
+.pcards p strong:first-child { display: block; font-family: var(--display); font-size: 20px; font-weight: 800; text-transform: uppercase; line-height: 1.1; margin-bottom: 4px; }
+.prose:has(.pcards) { max-width: none; }
+.prose:has(.pcards) > :not(.pcards):not(.scroll) { max-width: 74ch; }

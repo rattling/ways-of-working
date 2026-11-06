@@ -1,0 +1,334 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>:root{color-scheme:light} body{margin:0} img{max-width:100%} [hidden]{display:none!important}</style>
+<title>Software Engineering in One Page</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* A field guide on squared paper: eight short stops, each with one drawing, plain words, and where to go next. */
+:root {
+  --paper: #F4F6F3;
+  --grid: #E3E8E2;
+  --card: #FFFFFF;
+  --ink: #1B2433;
+  --ink-2: #566070;
+  --line: #CDD5CF;
+  --accent: #2F6BD8;
+  --mark: #F2B632;
+  --ok: #2E8B57;
+  --display: 'Bricolage Grotesque', 'Segoe UI', system-ui, sans-serif;
+  --body: 'Atkinson Hyperlegible', 'Segoe UI', system-ui, sans-serif;
+  --mono: 'JetBrains Mono', ui-monospace, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --paper: #11161E; --grid: #1A212C; --card: #19212D; --ink: #E7ECF3; --ink-2: #9BA6B5; --line: #2C3644;
+  --accent: #6FA0F5; --mark: #F2C04E; --ok: #4CC184; color-scheme: dark; } }
+:root[data-theme="dark"] {
+  --paper: #11161E; --grid: #1A212C; --card: #19212D; --ink: #E7ECF3; --ink-2: #9BA6B5; --line: #2C3644;
+  --accent: #6FA0F5; --mark: #F2C04E; --ok: #4CC184; color-scheme: dark; }
+
+* { box-sizing: border-box; }
+body {
+  background-color: var(--paper);
+  background-image: linear-gradient(var(--grid) 1px, transparent 1px), linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+  background-size: 24px 24px;
+  color: var(--ink); font: 17px/1.6 var(--body);
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 32px 64px;
+}
+.wrap { max-width: 860px; margin: 0 auto; display: grid; gap: 28px; }
+h1, h2 { font-family: var(--display); font-weight: 800; line-height: 1.05; text-wrap: balance; margin: 0; letter-spacing: -0.01em; }
+h1 { font-size: clamp(40px, 7vw, 68px); }
+h2 { font-size: clamp(28px, 4vw, 36px); }
+p { margin: 0; max-width: 64ch; }
+a { color: var(--accent); }
+:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+.kicker { font: 600 12px var(--mono); letter-spacing: .14em; text-transform: uppercase; color: var(--ink-2); }
+.lede { font-size: 20px; line-height: 1.5; }
+.hl { background: linear-gradient(transparent 58%, color-mix(in srgb, var(--mark) 55%, transparent) 58%); padding: 0 2px; }
+
+/* the map */
+.map { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(190px, 100%), 1fr)); gap: 10px; }
+.map a { display: grid; gap: 2px; text-decoration: none; color: var(--ink); background: var(--card); border: 1.5px solid var(--line); border-radius: 10px; padding: 10px 12px; }
+.map a:hover { border-color: var(--accent); }
+.map b { font-family: var(--display); font-size: 17px; }
+.map span { font-size: 13px; color: var(--ink-2); }
+.map a.got { border-color: var(--ok); }
+.map a.got b::after { content: " ✓"; color: var(--ok); }
+.progress { display: flex; align-items: center; gap: 12px; font: 13px var(--mono); color: var(--ink-2); }
+.bar { flex: 1; max-width: 260px; height: 8px; background: var(--line); border-radius: 4px; overflow: hidden; }
+.bar i { display: block; height: 100%; width: 0; background: var(--ok); transition: width .3s; }
+
+/* stops */
+.stop { background: var(--card); border: 1.5px solid var(--line); border-radius: 14px; padding: 22px; display: grid; gap: 14px; scroll-margin-top: 16px; }
+.stop header { display: grid; gap: 6px; }
+.when { justify-self: start; font: 600 12px var(--mono); padding: 3px 9px 2px; border-radius: 999px; background: color-mix(in srgb, var(--mark) 30%, var(--card)); color: var(--ink); }
+.draw { overflow-x: auto; background: var(--paper); border-radius: 10px; padding: 12px; }
+.draw svg { display: block; width: 100%; min-width: 520px; height: auto; }
+.draw svg text { font-family: var(--body); fill: var(--ink); font-size: 14px; }
+.draw svg .small { font-size: 12px; fill: var(--ink-2); }
+.draw svg .box { fill: var(--card); stroke: var(--ink); stroke-width: 2; }
+.draw svg .soft { fill: var(--card); stroke: var(--line); stroke-width: 2; stroke-dasharray: 6 5; }
+.draw svg .hot { fill: color-mix(in srgb, var(--mark) 35%, var(--card)); stroke: var(--ink); stroke-width: 2; }
+.draw svg .blue { fill: color-mix(in srgb, var(--accent) 16%, var(--card)); stroke: var(--accent); stroke-width: 2; }
+.draw svg .wire { stroke: var(--ink); stroke-width: 2; fill: none; }
+.draw svg .wire-b { stroke: var(--accent); stroke-width: 2.5; fill: none; }
+.draw svg .wire-ok { stroke: var(--ok); stroke-width: 2.5; fill: none; }
+.draw svg .dot { fill: var(--ink); } .draw svg .dot-b { fill: var(--accent); } .draw svg .dot-ok { fill: var(--ok); }
+.cols { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(240px, 100%), 1fr)); gap: 14px; }
+.cols > div { display: grid; gap: 6px; align-content: start; min-width: 0; }
+.label { font: 600 11px var(--mono); letter-spacing: .12em; text-transform: uppercase; color: var(--ink-2); }
+ul.go { margin: 0; padding-left: 18px; display: grid; gap: 4px; font-size: 15.5px; }
+.got-btn { justify-self: start; font: 600 14px var(--mono); border: 1.5px solid var(--line); background: var(--paper); color: var(--ink); border-radius: 8px; padding: 8px 14px 6px; cursor: pointer; }
+.got-btn[aria-pressed="true"] { border-color: var(--ok); color: var(--ok); }
+.term { font-family: var(--mono); font-size: .9em; background: var(--paper); padding: 0 5px; border-radius: 4px; }
+.end { background: var(--ink); color: var(--paper); border-radius: 14px; padding: 22px; display: grid; gap: 10px; }
+.end a { color: var(--mark); }
+.end p { max-width: 70ch; }
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header style="display:grid;gap:14px">
+  <div class="kicker"><a href="../" style="color:inherit">ways</a> · A field guide for people building with AI</div>
+  <h1>Software engineering, in one page</h1>
+  <p class="lede">You can get a long way building with Claude without any of this. Then something breaks, or a second person needs to use it, or a customer's data goes somewhere it shouldn't. <span class="hl">Software engineering is mostly about what happens after the first version works.</span></p>
+  <p>This page won't teach it all: that's a long course. It's a map of the ground, eight stops, so you know what's out there, roughly how it fits together, and when each piece will start to matter. Each stop has a drawing, the idea in plain words, and where to go next. Tick off the ones you're comfortable with.</p>
+</header>
+
+<div style="display:grid;gap:10px">
+  <div class="progress"><span id="count">0 of 8 ticked</span><span class="bar"><i id="bar"></i></span></div>
+  <nav class="map" id="map" aria-label="The eight stops"></nav>
+</div>
+
+<!-- 1 -->
+<section class="stop" id="problem" data-title="The problem" data-sub="Before any code">
+  <header><div class="kicker">Stop 1</div><h2>The problem, before the code</h2><span class="when">Bites: before you start</span></header>
+  <div class="draw"><svg viewBox="0 0 640 170" role="img" aria-label="An idea leads to three questions: who has the problem, what it costs them, how you'd know it's fixed. Only then build.">
+    <rect class="soft" x="10" y="55" width="120" height="56" rx="10"/><text x="70" y="80" text-anchor="middle">"Let's build</text><text x="70" y="98" text-anchor="middle">a dashboard"</text>
+    <path class="wire" d="M132 83 H160"/><path class="wire" d="M152 77 L160 83 L152 89"/>
+    <rect class="hot" x="164" y="14" width="190" height="42" rx="8"/><text x="259" y="40" text-anchor="middle">Who has the problem?</text>
+    <rect class="hot" x="164" y="62" width="190" height="42" rx="8"/><text x="259" y="88" text-anchor="middle">What does it cost them?</text>
+    <rect class="hot" x="164" y="110" width="190" height="42" rx="8"/><text x="259" y="136" text-anchor="middle">How would we know it's fixed?</text>
+    <path class="wire" d="M356 83 H392"/><path class="wire" d="M384 77 L392 83 L384 89"/>
+    <rect class="box" x="396" y="55" width="230" height="56" rx="10"/><text x="511" y="80" text-anchor="middle">The smallest thing</text><text x="511" y="98" text-anchor="middle">worth building</text>
+  </svg></div>
+  <p>Most software fails because it solves the wrong problem, not because the code is bad. An idea usually arrives as a solution ("we need a dashboard"). Work back to the problem: who has it, what it costs them, and what you'd see if it went away. Then build the smallest thing that tests whether you're right. Often the first answer is a change to how people work, and needs no code at all.</p>
+  <div class="cols">
+    <div><div class="label">You'll hit this when</div><p>You've built something nobody uses, or three people want three different things from it.</p></div>
+    <div><div class="label">Go further</div><ul class="go"><li><a href="https://www.momtestbook.com/">The Mom Test</a>, Rob Fitzpatrick: how to ask people about problems without them lying to you</li></ul></div>
+  </div>
+  <button class="got-btn" type="button" aria-pressed="false">Got it</button>
+</section>
+
+<!-- 2 -->
+<section class="stop" id="anatomy" data-title="How an app fits" data-sub="Front end, back end, database">
+  <header><div class="kicker">Stop 2</div><h2>How an app is put together</h2><span class="when">Bites: before you start</span></header>
+  <div class="draw"><svg viewBox="0 0 640 250" role="img" aria-label="At runtime, a browser shows the front end, which talks to the back end, which reads and writes the database. At design time, you and Claude write code, kept in a repo, which is deployed to where the app runs.">
+    <text class="small" x="10" y="20">RUNTIME: what your users touch, with no Claude in the loop</text>
+    <rect class="box" x="10" y="32" width="170" height="70" rx="10"/><text x="95" y="62" text-anchor="middle">Front end</text><text class="small" x="95" y="82" text-anchor="middle">screens, in the browser</text>
+    <path class="wire" d="M182 67 H230"/><path class="wire" d="M222 61 L230 67 L222 73"/><text class="small" x="206" y="58" text-anchor="middle">requests</text>
+    <rect class="box" x="234" y="32" width="170" height="70" rx="10"/><text x="319" y="62" text-anchor="middle">Back end (API)</text><text class="small" x="319" y="82" text-anchor="middle">rules, on a server</text>
+    <path class="wire" d="M406 67 H454"/><path class="wire" d="M446 61 L454 67 L446 73"/>
+    <path class="box" d="M470 40 a60 12 0 0 1 120 0 v56 a60 12 0 0 1 -120 0 z"/><path class="wire" d="M470 40 a60 12 0 0 0 120 0"/><text x="530" y="78" text-anchor="middle">Database</text>
+    <text class="small" x="10" y="148">DESIGN TIME: where you and Claude work</text>
+    <rect class="blue" x="10" y="160" width="170" height="70" rx="10"/><text x="95" y="190" text-anchor="middle">You + Claude</text><text class="small" x="95" y="210" text-anchor="middle">writing the code</text>
+    <path class="wire-b" d="M182 195 H230"/><path class="wire-b" d="M222 189 L230 195 L222 201"/>
+    <rect class="blue" x="234" y="160" width="170" height="70" rx="10"/><text x="319" y="190" text-anchor="middle">The repo (Git)</text><text class="small" x="319" y="210" text-anchor="middle">every version, kept</text>
+    <path class="wire-b" d="M406 195 H454"/><path class="wire-b" d="M446 189 L454 195 L446 201"/>
+    <rect class="blue" x="458" y="160" width="172" height="70" rx="10"/><text x="544" y="190" text-anchor="middle">Deploy</text><text class="small" x="544" y="210" text-anchor="middle">puts it where it runs</text>
+  </svg></div>
+  <p>Most apps have three parts. The <b>front end</b> is the screens, running in the user's browser. The <b>back end</b> is code on a server that holds the rules and decides what's allowed. The <b>database</b> keeps the data. They're separate on purpose: anything in the browser can be read and changed by the user, so the rules and the data live behind the back end.</p>
+  <p>It also helps to keep <b>design time</b> and <b>runtime</b> apart in your head. Claude helps you write the code at design time. At runtime, the app runs on its own for your users, and Claude isn't there. If your app needs AI while people use it, that's a separate part you build in on purpose.</p>
+  <div class="cols">
+    <div><div class="label">You'll hit this when</div><p>A rule only exists in the screen, and someone gets round it. Or you can't tell why something works on your laptop and not on the server.</p></div>
+    <div><div class="label">Go further</div><ul class="go"><li><a href="https://developer.mozilla.org/en-US/docs/Learn">MDN's learning area</a>: how the web works, from the people who document it</li><li><a href="https://missing.csail.mit.edu/">The Missing Semester</a>, MIT: the tools nobody teaches</li></ul></div>
+  </div>
+  <button class="got-btn" type="button" aria-pressed="false">Got it</button>
+</section>
+
+<!-- 3 -->
+<section class="stop" id="data" data-title="Data" data-sub="Tables, and one source of truth">
+  <header><div class="kicker">Stop 3</div><h2>Data</h2><span class="when">Bites: before you start</span></header>
+  <div class="draw"><svg viewBox="0 0 640 190" role="img" aria-label="Two tables, Customers and Orders. Each order points at its customer by id, so a customer's email is stored once.">
+    <rect class="box" x="10" y="20" width="260" height="150" rx="8"/><rect class="hot" x="10" y="20" width="260" height="32" rx="8"/><text x="22" y="41">Customers</text>
+    <text class="small" x="22" y="74">id</text><text class="small" x="72" y="74">name</text><text class="small" x="160" y="74">email</text>
+    <path class="wire" d="M10 82 H270" style="stroke-width:1"/>
+    <text x="22" y="104">7</text><text x="72" y="104">Aoife</text><text x="160" y="104">aoife@…</text>
+    <text x="22" y="132">8</text><text x="72" y="132">Tom</text><text x="160" y="132">tom@…</text>
+    <rect class="box" x="370" y="20" width="260" height="150" rx="8"/><rect class="hot" x="370" y="20" width="260" height="32" rx="8"/><text x="382" y="41">Orders</text>
+    <text class="small" x="382" y="74">id</text><text class="small" x="432" y="74">customer</text><text class="small" x="532" y="74">total</text>
+    <path class="wire" d="M370 82 H630" style="stroke-width:1"/>
+    <text x="382" y="104">301</text><text x="432" y="104">7</text><text x="532" y="104">€40</text>
+    <text x="382" y="132">302</text><text x="432" y="132">7</text><text x="532" y="132">€12</text>
+    <path class="wire-b" d="M440 98 C 360 98, 330 100, 40 100" style="stroke-dasharray:5 4"/><circle class="dot-b" cx="40" cy="100" r="4"/>
+    <text class="small" x="320" y="185" text-anchor="middle">Aoife's email lives in one place. Her orders point at her.</text>
+  </svg></div>
+  <p>A database is mostly <b>tables</b>: rows and columns, like a spreadsheet with rules. The big idea is that each fact lives in <b>one place</b>. Aoife's email is stored once, and her orders point at her. Copy it into every order and one day the copies disagree, and nobody knows which is right.</p>
+  <p>Two other things to know early. Data about people is <b>personal data</b>, and the law cares where it goes, including into an AI tool. And analysing data (questions about last month) is a different job from running the app on it. Don't point a report at the live database without thinking about it.</p>
+  <div class="cols">
+    <div><div class="label">You'll hit this when</div><p>Two screens show different answers for the same thing, or you need to change how something is stored and everything breaks.</p></div>
+    <div><div class="label">Go further</div><ul class="go"><li><a href="https://sqlbolt.com/">SQLBolt</a>: SQL, the language of databases, in short interactive lessons</li><li><a href="https://www.postgresql.org/docs/current/tutorial.html">The PostgreSQL tutorial</a></li></ul></div>
+  </div>
+  <button class="got-btn" type="button" aria-pressed="false">Got it</button>
+</section>
+
+<!-- 4 -->
+<section class="stop" id="apis" data-title="APIs and MCP" data-sub="How systems talk">
+  <header><div class="kicker">Stop 4</div><h2>Talking to other systems: APIs, and MCP</h2><span class="when">Bites: when you connect things</span></header>
+  <div class="draw"><svg viewBox="0 0 640 200" role="img" aria-label="Your app sends a request to a payment provider's API and gets a response. An AI agent uses an MCP server, which calls your app's API.">
+    <rect class="box" x="10" y="20" width="160" height="60" rx="10"/><text x="90" y="56" text-anchor="middle">Your app</text>
+    <path class="wire" d="M172 40 H420"/><path class="wire" d="M412 34 L420 40 L412 46"/><text class="small" x="296" y="32" text-anchor="middle">request: "charge €40 to card ending 4242"</text>
+    <path class="wire" d="M420 64 H172"/><path class="wire" d="M180 58 L172 64 L180 70"/><text class="small" x="296" y="82" text-anchor="middle">response: "paid, receipt 9a1c"</text>
+    <rect class="hot" x="424" y="20" width="206" height="60" rx="10"/><text x="527" y="48" text-anchor="middle">A payment provider's</text><text x="527" y="66" text-anchor="middle">API</text>
+    <rect class="blue" x="10" y="122" width="160" height="60" rx="10"/><text x="90" y="157" text-anchor="middle">An AI agent</text>
+    <path class="wire-b" d="M172 152 H234"/><path class="wire-b" d="M226 146 L234 152 L226 158"/><text class="small" x="203" y="142" text-anchor="middle">MCP</text>
+    <rect class="blue" x="238" y="122" width="170" height="60" rx="10"/><text x="323" y="150" text-anchor="middle">Your MCP server</text><text class="small" x="323" y="168" text-anchor="middle">tools the agent can use</text>
+    <path class="wire-b" d="M410 152 H470"/><path class="wire-b" d="M462 146 L470 152 L462 158"/>
+    <rect class="box" x="474" y="122" width="156" height="60" rx="10"/><text x="552" y="150" text-anchor="middle">Your app's API</text><text class="small" x="552" y="168" text-anchor="middle">same rules apply</text>
+  </svg></div>
+  <p>An <b>API</b> is how one program asks another to do something: a request goes out, a response comes back. Your front end talks to your back end through one. Your app talks to a payment provider through theirs. An API is a promise to whoever uses it, so once something depends on it, change it carefully: add to it, don't break it.</p>
+  <p><b>MCP</b> is the same idea for AI agents: a standard way to give an agent tools, like "look up a customer" or "log time". It usually sits in front of your existing API, so the agent goes through the same rules a person does.</p>
+  <div class="cols">
+    <div><div class="label">You'll hit this when</div><p>You connect to a service like payments or email, or you want Claude to use your app directly.</p></div>
+    <div><div class="label">Go further</div><ul class="go"><li><a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Overview">An overview of HTTP</a>, MDN: what a request and response really are</li><li><a href="https://modelcontextprotocol.io/">modelcontextprotocol.io</a>: MCP's own introduction</li></ul></div>
+  </div>
+  <button class="got-btn" type="button" aria-pressed="false">Got it</button>
+</section>
+
+<!-- 5 -->
+<section class="stop" id="auth" data-title="Who can use it" data-sub="Sign-in, permissions, secrets">
+  <header><div class="kicker">Stop 5</div><h2>Who can use it</h2><span class="when">Bites: before anyone else uses it</span></header>
+  <div class="draw"><svg viewBox="0 0 640 170" role="img" aria-label="A person passes two gates. First: who are you, answered by signing in. Second: what may you do, answered by their role. Only then do they reach the data.">
+    <circle class="box" cx="45" cy="70" r="20"/><path class="box" d="M15 130 a30 30 0 0 1 60 0 z"/><text class="small" x="45" y="155" text-anchor="middle">a person</text>
+    <path class="wire" d="M85 90 H150"/><path class="wire" d="M142 84 L150 90 L142 96"/>
+    <rect class="hot" x="154" y="40" width="170" height="100" rx="10"/><text x="239" y="78" text-anchor="middle">Who are you?</text><text class="small" x="239" y="100" text-anchor="middle">authentication:</text><text class="small" x="239" y="118" text-anchor="middle">signing in</text>
+    <path class="wire" d="M326 90 H376"/><path class="wire" d="M368 84 L376 90 L368 96"/>
+    <rect class="hot" x="380" y="40" width="150" height="100" rx="10"/><text x="455" y="78" text-anchor="middle">What may you do?</text><text class="small" x="455" y="100" text-anchor="middle">authorisation:</text><text class="small" x="455" y="118" text-anchor="middle">roles and rights</text>
+    <path class="wire" d="M532 90 H570"/><path class="wire" d="M562 84 L570 90 L562 96"/>
+    <path class="box" d="M576 62 a28 9 0 0 1 56 0 v52 a28 9 0 0 1 -56 0 z"/><text class="small" x="604" y="96" text-anchor="middle">data</text>
+  </svg></div>
+  <p>Two different questions, often mixed up. <b>Authentication</b> is who you are: signing in. <b>Authorisation</b> is what you're allowed to do once you're in: a manager can see everyone's hours, a staff member only their own. Both are checked in the back end, every time, never just by hiding a button on the screen.</p>
+  <p>Don't build sign-in yourself: use a proven service (Google, Microsoft, or a library made for it). And keep <b>secrets</b>, like passwords, API keys and database logins, out of your code and out of anything you paste into a chat. They go in settings on the server.</p>
+  <div class="cols">
+    <div><div class="label">You'll hit this when</div><p>A second person signs in, a customer sees someone else's data, or a key ends up on GitHub.</p></div>
+    <div><div class="label">Go further</div><ul class="go"><li><a href="https://cheatsheetseries.owasp.org/cheatsheets/Authentication_Cheat_Sheet.html">OWASP's authentication cheat sheet</a>: what the security people check</li></ul></div>
+  </div>
+  <button class="got-btn" type="button" aria-pressed="false">Got it</button>
+</section>
+
+<!-- 6 -->
+<section class="stop" id="hosting" data-title="Where it runs" data-sub="Hosting, deploying, environments">
+  <header><div class="kicker">Stop 6</div><h2>Where it runs</h2><span class="when">Bites: before anyone else uses it</span></header>
+  <div class="draw"><svg viewBox="0 0 640 190" role="img" aria-label="Code moves from your laptop to a test environment to production through a pipeline. A file describing the servers, infrastructure as code, builds test and production the same way.">
+    <rect class="box" x="10" y="30" width="150" height="70" rx="10"/><text x="85" y="60" text-anchor="middle">Your laptop</text><text class="small" x="85" y="80" text-anchor="middle">local: try anything</text>
+    <path class="wire-ok" d="M162 65 H234"/><path class="wire-ok" d="M226 59 L234 65 L226 71"/><text class="small" x="198" y="55" text-anchor="middle">checks pass</text>
+    <rect class="box" x="238" y="30" width="160" height="70" rx="10"/><text x="318" y="60" text-anchor="middle">Test</text><text class="small" x="318" y="80" text-anchor="middle">made-up data</text>
+    <path class="wire-ok" d="M400 65 H472"/><path class="wire-ok" d="M464 59 L472 65 L464 71"/><text class="small" x="436" y="55" text-anchor="middle">approved</text>
+    <rect class="hot" x="476" y="30" width="154" height="70" rx="10"/><text x="553" y="60" text-anchor="middle">Production</text><text class="small" x="553" y="80" text-anchor="middle">real users, real data</text>
+    <rect class="blue" x="238" y="130" width="160" height="48" rx="8"/><text x="318" y="152" text-anchor="middle">infra as code</text><text class="small" x="318" y="169" text-anchor="middle">servers, in a file</text>
+    <path class="wire-b" d="M318 128 V102"/><path class="wire-b" d="M312 110 L318 102 L324 110"/>
+    <path class="wire-b" d="M400 154 H553 V102"/><path class="wire-b" d="M547 110 L553 102 L559 110"/>
+  </svg></div>
+  <p>Your app runs somewhere: a server, or a cloud service that manages servers for you. <b>Deploying</b> is getting a new version there. Do it the same way every time, by a script or a pipeline, never by hand, and make sure you can go back to the last version if the new one breaks.</p>
+  <p>Keep separate <b>environments</b>: your laptop to try things, a test copy with made-up data, and production with real users. And describe the servers themselves in files (<b>infrastructure as code</b>), so test and production are built the same way, you can rebuild either, and Claude can read and change them like any other code.</p>
+  <div class="cols">
+    <div><div class="label">You'll hit this when</div><p>It works on your laptop but not live, you're scared to deploy, or nobody remembers how the server was set up.</p></div>
+    <div><div class="label">Go further</div><ul class="go"><li><a href="https://12factor.net/">The Twelve-Factor App</a>: short rules for apps that deploy cleanly</li><li><a href="https://learn.microsoft.com/azure/well-architected/">Azure's Well-Architected Framework</a>: the questions to ask of anything you host</li></ul></div>
+  </div>
+  <button class="got-btn" type="button" aria-pressed="false">Got it</button>
+</section>
+
+<!-- 7 -->
+<section class="stop" id="git" data-title="Git and working together" data-sub="Branches, pull requests, review">
+  <header><div class="kicker">Stop 7</div><h2>Keeping track, and working together</h2><span class="when">Bites: before you start</span></header>
+  <div class="draw"><svg viewBox="0 0 640 170" role="img" aria-label="The main line of history. A short branch splits off for one change, gets reviewed in a pull request, and merges back.">
+    <path class="wire" d="M20 110 H620"/>
+    <circle class="dot" cx="60" cy="110" r="8"/><circle class="dot" cx="160" cy="110" r="8"/><circle class="dot" cx="520" cy="110" r="8"/><circle class="dot" cx="600" cy="110" r="8"/>
+    <text class="small" x="20" y="145">main: the version everyone trusts</text>
+    <path class="wire-b" d="M160 110 C 200 110, 200 50, 240 50 H400 C 440 50, 440 110, 520 110"/>
+    <circle class="dot-b" cx="270" cy="50" r="7"/><circle class="dot-b" cx="330" cy="50" r="7"/><circle class="dot-b" cx="390" cy="50" r="7"/>
+    <text class="small" x="330" y="30" text-anchor="middle">a branch: one change, a day or two</text>
+    <rect class="hot" x="430" y="58" width="110" height="30" rx="6"/><text class="small" x="485" y="78" text-anchor="middle" style="fill:var(--ink)">pull request</text>
+  </svg></div>
+  <p><b>Git</b> keeps every version of your code, so you can see what changed, when, and why, and undo it. The trusted version lives on a line called <b>main</b>. Each change goes on its own short <b>branch</b>, and comes back through a <b>pull request</b>: a page that shows exactly what changed, where someone (or a check) reviews it before it's merged.</p>
+  <p>Keep branches short and changes small. A small change is easy to review and easy to undo; a week's worth is neither. GitHub is where most teams keep the repo and the pull requests.</p>
+  <div class="cols">
+    <div><div class="label">You'll hit this when</div><p>Something worked yesterday and doesn't today, or two people change the same thing at once.</p></div>
+    <div><div class="label">Go further</div><ul class="go"><li><a href="https://learngitbranching.js.org/">Learn Git Branching</a>: Git, visually, in the browser</li><li><a href="https://git-scm.com/book/en/v2">Pro Git</a>: the free book, when you want the detail</li></ul></div>
+  </div>
+  <button class="got-btn" type="button" aria-pressed="false">Got it</button>
+</section>
+
+<!-- 8 -->
+<section class="stop" id="habits" data-title="The engineer's habits" data-sub="Failure, tests, small steps">
+  <header><div class="kicker">Stop 8</div><h2>The engineer's habits</h2><span class="when">Bites: from the first day</span></header>
+  <div class="draw"><svg viewBox="0 0 640 200" role="img" aria-label="A loop: a small change, tested, reviewed, released, then watched, which leads to the next small change.">
+    <rect class="hot" x="245" y="10" width="150" height="40" rx="20"/><text x="320" y="35" text-anchor="middle">A small change</text>
+    <rect class="box" x="470" y="60" width="150" height="40" rx="20"/><text x="545" y="85" text-anchor="middle">Tested</text>
+    <rect class="box" x="400" y="150" width="150" height="40" rx="20"/><text x="475" y="175" text-anchor="middle">Reviewed</text>
+    <rect class="box" x="90" y="150" width="150" height="40" rx="20"/><text x="165" y="175" text-anchor="middle">Released</text>
+    <rect class="box" x="20" y="60" width="150" height="40" rx="20"/><text x="95" y="85" text-anchor="middle">Watched</text>
+    <path class="wire" d="M397 34 C 470 36, 520 44, 535 58"/><path class="wire" d="M527 52 L535 58 L526 61"/>
+    <path class="wire" d="M560 102 C 565 125, 548 140, 535 148"/><path class="wire" d="M534 140 L535 148 L527 149"/>
+    <path class="wire" d="M398 170 H244"/><path class="wire" d="M252 164 L244 170 L252 176"/>
+    <path class="wire" d="M120 148 C 95 140, 88 120, 90 103"/><path class="wire" d="M84 110 L90 103 L96 110"/>
+    <path class="wire" d="M120 58 C 150 36, 200 30, 243 30"/><path class="wire" d="M235 24 L243 30 L235 36"/>
+  </svg></div>
+  <p>Engineers have a habit of asking <b>"how could this fail, and how would I know?"</b> before they ship. That's most of the mindset. It shows up as <b>tests</b>: small programs that check your code still does what it should, run every time anything changes, so a fix here doesn't quietly break something there. Claude writes them well, if you ask it to and check they test the right thing.</p>
+  <p>The rest is small steps and leaving things tidy. Change one thing at a time, so when something breaks you know what did it. Write down the decisions that would surprise the next person, which is often you, or Claude in a new session. And watch the app once it's live, so you hear about problems before your users tell you.</p>
+  <div class="cols">
+    <div><div class="label">You'll hit this when</div><p>Fixing one bug creates two more, or you're afraid to touch a part of the app.</p></div>
+    <div><div class="label">Go further</div><ul class="go"><li><a href="https://martinfowler.com/articles/practical-test-pyramid.html">The Practical Test Pyramid</a>, Ham Vocke on Martin Fowler's site: what kinds of tests to write</li></ul></div>
+  </div>
+  <button class="got-btn" type="button" aria-pressed="false">Got it</button>
+</section>
+
+<section class="end">
+  <div class="kicker" style="color:var(--mark)">Next</div>
+  <h2 style="color:var(--paper)">You don't have to know all of this to start</h2>
+  <p>You need to know it's there. Build with Claude, and when one of these stops starts to bite, come back to it. Better still, work in a way that has the guardrails built in, so the checks happen whether or not you remember them. That's what <a href="../">the ways method</a> is for: it puts most of these stops into how the work is done.</p>
+</section>
+
+</div>
+
+<script>
+(function () {
+  const stops = [...document.querySelectorAll('.stop')];
+  const map = document.getElementById('map');
+  let got = {};
+  try { got = JSON.parse(localStorage.getItem('se-one-page') || '{}') || {}; } catch (e) { got = {}; }
+  const save = () => { try { localStorage.setItem('se-one-page', JSON.stringify(got)); } catch (e) {} };
+  stops.forEach(s => {
+    const a = document.createElement('a');
+    a.href = '#' + s.id;
+    a.innerHTML = `<b>${s.dataset.title}</b><span>${s.dataset.sub}</span>`;
+    map.appendChild(a);
+    const btn = s.querySelector('.got-btn');
+    btn.addEventListener('click', () => { got[s.id] = !got[s.id]; save(); render(); });
+  });
+  function render() {
+    let n = 0;
+    stops.forEach((s, i) => {
+      const on = !!got[s.id]; if (on) n++;
+      const btn = s.querySelector('.got-btn');
+      btn.setAttribute('aria-pressed', on);
+      btn.textContent = on ? 'Got it ✓' : 'Got it';
+      map.children[i].classList.toggle('got', on);
+    });
+    document.getElementById('count').textContent = `${n} of ${stops.length} ticked`;
+    document.getElementById('bar').style.width = (n / stops.length * 100) + '%';
+  }
+  render();
+})();
+</script>
+</body>
+</html>
