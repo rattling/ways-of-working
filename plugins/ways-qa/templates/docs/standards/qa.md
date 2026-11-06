@@ -1,13 +1,12 @@
 # QA standards
 
-Copied in by `ways-qa` the first time `/ways-qa:triage` or `/ways-qa:reproduce` runs in a repo. This repo's copy is the one that counts: change it by PR. Both skills read it every time, so a rule written here is a rule they follow. Until the sections marked **fill in** are filled in, triage hands every call to a person.
+Written by `/ways-qa:setup`. This repo's copy is the one that counts: change it by PR. Both skills read it every time, so a rule written here is a rule they follow. Until the sections marked **fill in** are filled in, triage hands every call to a person.
 
 ## The app under test
 
-<!-- fill in -->
-- **URL:** <https://staging.example.com>
+- **Environments and URLs:** in `environments.json`, one entry per environment with each app's URL. `QA_ENV` picks one; without it, a laptop run uses `default` and CI uses `ci`.
+- **Allowed:** <!-- fill in: which environments testers may use, and any they mustn't (production with real customers, a shared demo) -->
 - **Test accounts:** where they are (a password manager entry, a seed file), never the passwords themselves.
-- **Environments:** which ones testers may use, and which they must not (production, a shared demo).
 
 ## Domain rules
 

@@ -1,0 +1,8 @@
+{
+  "default": "beta",
+  "ci": "beta",
+  "environments": {
+    "beta": { "app": "https://beta.example.com/" },
+    "live": { "app": "https://www.example.com/" }
+  }
+}

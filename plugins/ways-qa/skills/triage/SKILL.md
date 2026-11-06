@@ -12,7 +12,7 @@ This is Matt Pocock's `triage` adapted for a QA team. His assumes the app's code
 
 ## Before you start
 
-1. **Read `docs/standards/qa.md`.** It has the app's URL, the domain rules, the severity rubric, the routing table, the confidence threshold, what counts as a pattern, and the label names. If it's missing, copy `${CLAUDE_PLUGIN_ROOT}/templates/docs/standards/qa.md` there, tell the person which sections need filling in, and carry on with every call going to a person until they are. A section still marked `fill in` counts as missing: no routing table means routing is a recommendation, never a label.
+1. **Read `docs/standards/qa.md`.** It has the domain rules, the severity rubric, the routing table, the confidence threshold, what counts as a pattern, and the label names. The app's URLs are in `environments.json` (the `default` entry, unless the person names an environment). If `qa.md` is missing, the repo isn't set up: say so, suggest `/ways-qa:setup`, and carry on with every call going to a person. A section still marked `fill in` counts as missing: no routing table means routing is a recommendation, never a label.
 2. **Read the rest of what the repo knows:** `CLAUDE.md`, `specs/` (Playwright planner plans and any acceptance notes), `charters/` if there is one, and the tests in `tests/` for the area. A spec or a domain rule is how you tell a bug from working as designed.
 3. **The tracker is GitHub, through `gh`,** unless `docs/agents/issue-tracker.md` says otherwise. Check `gh repo view` works.
 4. **Labels.** Compare `gh label list --limit 200` with every label `qa.md` names: the Labels table, the severity rows and the routing rows. A new repo has almost none of them. If any are missing, offer once to create the whole missing set (`gh label create <name> --description <its meaning from qa.md>`), list them in one line, and on a yes create them all and carry on. On a no, carry on: calls that need a missing label become recommendations in the comment.
@@ -67,7 +67,7 @@ Say what you compared against. "The spec at `specs/checkout.md` says…" is a re
 
 ### 5. Reproduce, and collect the evidence
 
-For a bug, reproduce it in the browser with the Playwright MCP tools, at the URL in `qa.md`.
+For a bug, reproduce it in the browser with the Playwright MCP tools, at the app's URL in `environments.json` (or the `baseURL` in `playwright.config.ts`).
 
 - Follow the reporter's steps. If there are none, take the shortest path to the symptom.
 - Collect as you go: the steps you took, `browser_console_messages` at error level, `browser_network_requests` and any failed request in full with `browser_network_request` (status, URL, the start of the response body), and a `browser_take_screenshot` of the symptom.

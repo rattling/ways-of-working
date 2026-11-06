@@ -1,7 +1,7 @@
 {
   "name": "ways-qa",
   "displayName": "Ways for QA",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "QA skills on top of ways, for testers working against a running app through Playwright: triage a report (duplicates, regressions, severity, routing, with evidence from the browser and a stated confidence), and reproduce one as a Playwright test that fails for the right reason.",
   "author": {
     "name": "John Curry"
