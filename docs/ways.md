@@ -203,15 +203,38 @@ Much of the method doesn't need git at all: discovery, the requirements grill, m
 
 ### Making it yours
 
-A method is a set of decisions written down. Whichever tooling you start with, there are three ways to make it yours:
+For most teams the right choice is the simplest one: use ways as it is, and keep it up to date. Fixes and improvements arrive with each version, and nobody on your side has to maintain a method. Every so often, update it:
 
-| | |
-|---|---|
-| Edit the repo's copy | The standards belong to the repo once setup copies them. Enough for one repo or a small team |
-| Fork ways | Rewrite the standards and templates, and change them by PR with a version bump |
-| Add your own plugin | Keep ways as it is, and add your standards and skills for your deploys and services on top |
+```
+claude plugin marketplace update ways-of-working
+claude plugin update ways@ways-of-working
+```
 
-And whichever you pick:
+Restart Claude Code, then run `/ways:setup` in each repo. Setup brings the repo up to date: it replaces the sections ways owns, adds anything new to the standards, and leaves your own edits alone.
+
+From there, add what's yours in layers. Each one adds to the layer above it:
+
+| Layer | What it holds | Who owns it |
+|---|---|---|
+| ways | The method, the commands, the shared standards | Us. You update it |
+| Your organisation's plugin (optional) | Your standards, your stack, skills for your deploys, environments and services | Your team |
+| Each repo | Its own rules, exceptions and risky areas | The repo |
+
+**Each repo** already has its layer: its rules in `AGENTS.md` (under "Rules for this repo"), exceptions and their reasons in `CODING_STANDARDS.md`, risky areas in `REVIEW.md` and `CODEOWNERS`. That's where "this repo holds safety data" or "this one is still on PHP 7.4" belongs.
+
+**An organisation plugin** is worth having once several repos share the same additions. To keep it coherent with ways:
+
+- **Add, don't replace.** Put your standards in their own files beside ways' (`docs/standards/acme.md`, a file for your stack), and your procedures in your own skills. Don't edit what ways owns: the next setup puts it back.
+- **Use your own names,** so nobody mistakes one of your files or skills for one of ways'.
+- **Say what enforces each rule,** as ways' standards do. A rule nothing checks is advice.
+- **Run ways' setup first, then yours,** so yours adds to an up-to-date repo.
+- **Distribute it the same way:** a marketplace your Claude admin adds to managed settings, so everyone gets both plugins.
+
+Ways doesn't yet know an organisation layer is there. We're adding that ([#67](https://github.com/rattling/ways-of-working/issues/67)), so setup can find your plugin and fit its standards in cleanly.
+
+**Fork ways** only if your method really differs from it. You own everything from then on, and you stop getting improvements unless you merge them in yourself.
+
+Whichever you pick:
 
 - **Every rule you add says what enforces it.**
 - **Change the method only when something recurs.** One bad run is not a pattern. Log every run, the fine ones too, and look for what comes up again.

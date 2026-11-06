@@ -185,11 +185,13 @@ It's also a small worked example of a [mod](https://code.claude.com/docs/en/plug
 
 ## Make it yours
 
-The standards are a starting point. A team should end up owning its own:
+For most teams, the right choice is to use ways as it is and keep it up to date: fixes and improvements arrive with each version, and you don't maintain anything. Update it with `claude plugin marketplace update ways-of-working` and `claude plugin update ways@ways-of-working`, restart Claude Code, then run `/ways:setup` in each repo. Setup replaces only what ways owns and leaves your edits alone.
 
-- **Edit the repo's copy.** `docs/standards/` belongs to the repo once setup has copied it. Enough for one repo or a small team.
-- **Fork this repo**, rewrite the standards and templates, and point your repos at your fork.
-- **Add your own plugin on top** for your standards, deploys and internal services, and keep `ways` as it is.
+Then add what's yours in layers:
+
+- **Each repo:** its own rules in `AGENTS.md`, exceptions in `CODING_STANDARDS.md`, risky areas in `REVIEW.md` and `CODEOWNERS`.
+- **Your organisation's plugin, on top of ways,** once several repos share the same additions: your standards, your stack, skills for your deploys and services. Add beside ways rather than replacing it, use your own names, and distribute both plugins through managed settings. Setup will learn to fit an organisation layer in ([#67](https://github.com/rattling/ways-of-working/issues/67)).
+- **A fork,** only if your method really differs. You then maintain it yourself.
 
 Whichever you choose, keep one rule: a rule nothing checks is advice, so every rule you add says what enforces it. [`WORKING-CONTRACT.md`](WORKING-CONTRACT.md) has the reasoning behind who owns what.
 
