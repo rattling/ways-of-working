@@ -13,7 +13,7 @@
   /* ---------- hubs: one area at a time ---------- */
   // No hash: the groups and cards. #area-<key>: that area alone, with a pager and the dots in the bar lit.
   if (document.body.dataset.kind === 'hub') {
-    const mini = $('#mini'), here = $('#here');
+    const mini = $('#mini') || document.createElement('ol'), here = $('#here') || document.createElement('span');
     const areas = $$('.area');
     areas.forEach(a => {
       const li = document.createElement('li');
@@ -356,6 +356,25 @@
       $('.tm', root).innerHTML = n === 3 ? '<b>All three: where a coding agent with your permissions starts.</b> Someone else\'s text can make it send your data out. Take one away: usually the secrets.' : n === 2 ? 'Any two are fine. Take the third away and an injected instruction has nothing to steal, or nowhere to send it.' : 'Any one on its own is fine.';
     }));
   };
+
+  /* ---------- the left panel: where you are on this page ---------- */
+  const toc = $('.toc');
+  if (toc) {
+    const links = $$('a', toc);
+    const mark = id => links.forEach(a => a.classList.toggle('on', a.getAttribute('href') === '#' + id));
+    if (document.body.dataset.kind === 'hub') {
+      const upd = () => mark(location.hash.slice(1));
+      window.addEventListener('hashchange', upd); upd();
+    } else {
+      const spy = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) mark(e.target.id); }), { rootMargin: '-30% 0px -60% 0px' });
+      $$('.psec').forEach(s => spy.observe(s));
+    }
+    const btn = $('#toc-toggle');
+    const set = open => { document.body.dataset.side = open ? 'open' : ''; btn.setAttribute('aria-expanded', open); };
+    btn.addEventListener('click', () => set(document.body.dataset.side !== 'open'));
+    links.forEach(a => a.addEventListener('click', () => set(false)));
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') set(false); });
+  }
 
   $$('.try[data-widget]').forEach(el => { const f = W[el.dataset.widget]; if (f) f(el); });
 })();

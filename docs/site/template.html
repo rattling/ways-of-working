@@ -16,11 +16,13 @@
 <nav class="bar" aria-label="Site">
   <div class="bar-in">
     <a class="brand" href="{{ROOT}}">ways</a>
+    <button class="toc-toggle" id="toc-toggle" type="button" aria-controls="side" aria-expanded="false">Contents</button>
     <div class="links">{{NAV}}</div>
   </div>
-  {{SUB}}
 </nav>
 
+<div class="shell">
+<aside class="side" id="side">{{SIDE}}</aside>
 <div class="wrap" id="top">
 {{BODY}}
 
@@ -28,6 +30,7 @@
   <p>ways builds on <a href="https://github.com/mattpocock/skills">Matt Pocock's skills</a> and Ofer Regev's <a href="https://github.com/oferregev81pt/discovery-to-mvp">discovery-to-mvp</a>, with thanks. Examples come from demo apps: Larder &amp; Co. is a made-up café group. Measurements are one run each: indicative, not proof.</p>
   <p><a href="https://github.com/rattling/ways-of-working">ways on GitHub</a> · MIT licence · the text lives in <a href="https://github.com/rattling/ways-of-working/tree/main/docs">docs/</a> as markdown</p>
 </footer>
+</div>
 </div>
 
 <script src="{{ROOT}}assets/site.js?v={{V}}"></script>
