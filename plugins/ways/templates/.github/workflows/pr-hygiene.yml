@@ -37,10 +37,14 @@ jobs:
             const body = context.payload.pull_request.body || "";
             const problems = [];
 
-            if (!/(?:closes|fixes|resolves|refs)\s+#\d+/i.test(body)) {
+            // A line starting with the keyword, then an ID in any form: #12, billing/03,
+            // login-timeout, ENG-123. A bare word has no #digits, `-` or `/`, so "Closes the gap" fails.
+            const issueRef = /^[ \t>*-]*(?:closes|fixes|resolves|refs):?[ \t]+(?:#\d+|[\w.]*[-\/][\w./-]+)\b/im;
+            if (!issueRef.test(body)) {
               problems.push(
-                "No issue reference. Add `Closes #123` (or `Refs #123` if it only partly " +
-                "satisfies it). No issue behind it at all? Add the `no-issue` label."
+                "No issue reference. Add a line like `Closes #123`, `Closes billing/03` or " +
+                "`Closes ENG-123` (or `Refs ...` if it only partly satisfies it). No issue " +
+                "behind it at all? Add the `no-issue` label."
               );
             }
 
