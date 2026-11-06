@@ -185,7 +185,7 @@ It's also a small worked example of a [mod](https://code.claude.com/docs/en/plug
 
 ## `ways-qa`: for QA teams
 
-A separate plugin for testers who work against a running app through Playwright, without the app's code. It installs ways and the Playwright plugin with it, and adds `/ways-qa:triage` (duplicates, regressions, severity, routing, browser evidence and a stated confidence for each call) and `/ways-qa:reproduce` (a report to a Playwright test that fails for the right reason).
+A separate plugin for testers who work against a running app through Playwright, without the app's code. It installs ways and the Playwright plugin with it, and adds `/ways-qa:setup` (the QA repo's own setup, in place of `/ways:setup`), `/ways-qa:triage` (duplicates, regressions, severity, routing, browser evidence and a stated confidence for each call) and `/ways-qa:reproduce` (a report to a Playwright test that fails for the right reason).
 
 ```bash
 claude plugin install ways-qa@ways-of-working

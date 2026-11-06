@@ -18,7 +18,7 @@
     {
       "name": "ways-qa",
       "source": "./plugins/ways-qa",
-      "description": "QA skills on top of ways, for testers working against a running app with Playwright: /ways-qa:triage (duplicates, regressions, severity, routing, evidence, stated confidence) and /ways-qa:reproduce (a report to a Playwright test that fails for the right reason). Installs ways and the Playwright plugin with it."
+      "description": "QA skills on top of ways, for testers working against a running app with Playwright: /ways-qa:setup (the QA repo's own setup), /ways-qa:triage (duplicates, regressions, severity, routing, evidence, stated confidence) and /ways-qa:reproduce (a report to a Playwright test that fails for the right reason). Installs ways and the Playwright plugin with it."
     }
   ],
   "allowCrossMarketplaceDependenciesOn": [
