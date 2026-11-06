@@ -34,7 +34,7 @@ With the Playwright MCP tools, at the URL from `qa.md` (or the config's `baseURL
 
 - Follow the reporter's steps. With none, take the shortest path to the symptom. Vary one thing at a time when it won't show: data, size of window, order of steps, a fresh session.
 - Use `browser_snapshot` to read the page by role and name. Those are the locators the test will use.
-- Collect: the steps that worked, `browser_console_messages` at error level, failed requests from `browser_network_requests` (and `browser_network_request` for detail), and a `browser_take_screenshot` of the symptom. Save them under `evidence/issue-<n>/`, with `evidence/` in `.gitignore`.
+- Collect: the steps that worked, `browser_console_messages` at error level, failed requests from `browser_network_requests` (and `browser_network_request` for detail), and a `browser_take_screenshot` of the symptom. Save them under `evidence/issue-<n>/`, with `evidence/` in `.gitignore`. Never overwrite a file already there: give yours a new name.
 
 Stop trying after a reasonable effort (say five distinct attempts), and go to step 6.
 

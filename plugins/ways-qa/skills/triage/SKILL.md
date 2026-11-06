@@ -71,7 +71,7 @@ For a bug, reproduce it in the browser with the Playwright MCP tools, at the URL
 
 - Follow the reporter's steps. If there are none, take the shortest path to the symptom.
 - Collect as you go: the steps you took, `browser_console_messages` at error level, `browser_network_requests` and any failed request in full with `browser_network_request` (status, URL, the start of the response body), and a `browser_take_screenshot` of the symptom.
-- Save the screenshot and a short `notes.md` (steps, console errors, failed requests) under `evidence/issue-<n>/`. Add `evidence/` to `.gitignore` if it isn't there.
+- Save the screenshot and a short `notes.md` (steps, console errors, failed requests) under `evidence/issue-<n>/`. Add `evidence/` to `.gitignore` if it isn't there. The folder isn't in git, so never overwrite what's already in it: an earlier run's files stay, and yours get new names (`notes-2.md`).
 - Cut passwords, tokens and personal data out of anything you'll post.
 
 The outcome is one of:
