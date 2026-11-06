@@ -14,7 +14,7 @@ Ways is our implementation of [the method](../method/): a Claude Code plugin tha
 | | |
 |---|---|
 | **Borrowed** | Matt Pocock's skills, used as they are: the grill, domain modelling, `to-spec`, `to-tickets`, `implement-spec`, TDD, code review, triage, diagnosing bugs, prototypes. And Ofer Regev's [discovery-to-mvp](https://github.com/oferregev81pt/discovery-to-mvp), inside `/ways:discover` (MIT; the changes are in its notice). |
-| **Joined up** | `/ways:plan`, `/ways:build` and `/ways:work` run those pieces in the right order, resume where they left off, and keep their state in GitHub. |
+| **Joined up** | `/ways:plan`, `/ways:build` and `/ways:work` run those pieces in the right order, resume where they left off, and keep their state in your issue tracker. |
 | **Added** | What was missing: technical design (C4, parts, contracts, ADRs), mocks with a guided tour, setup, the hooks that hold the gate, the status band, proportion. |
 | **Opinionated** | Standards that say what checks them, routing by kind of work, review sized to risk, a model chosen per ticket. |
 
@@ -179,11 +179,11 @@ Open a new terminal after installing `gh`, or it won't be found.
 
 It adds the documents, standards, templates, labels and CI check, never overwrites what's already there, and opens one PR for you to review. Its report says what's left and who can finish it. Run it again after an update to bring the repo up to date. For a whole team, the Claude admin can add the marketplace and plugins to managed settings instead.
 
-**Let ways keep its working state in GitHub issues.** The briefs, plan comments, specs, tickets and PRs all live there, and that's what lets a fresh session pick up where the last one stopped. If your team's main tickets live in another system, they can stay there: when one becomes work, open a GitHub issue for it and link the two. It's a little double-handling, and fine to start with.
+**Let ways keep its working state in your issue tracker.** The briefs, plan comments, specs and tickets live there, and that's what lets a fresh session pick up where the last one stopped. The tracker can be GitHub issues, files in the repo, or your own (Linear, say). PRs stay on GitHub.
 
 ### Moving trackers
 
-If you're about to move to another tracker (Linear, say), don't build a bridge to the old one. When the move happens, decide whether the new tracker holds the plan and GitHub the technical work, or the new tracker holds everything. Ways is adding support for other trackers, built against a real team's setup when one moves.
+If you're about to move to another tracker (Linear, say), don't build a bridge to the old one. When the move happens, decide whether the new tracker holds the plan and GitHub the technical work, or the new tracker holds everything. Either works: ways takes issue IDs in any form, so point it at the new tracker when you move.
 
 ### Not on git yet: your own plugin, for now
 

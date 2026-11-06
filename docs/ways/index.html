@@ -45,7 +45,7 @@
 </tr>
 <tr>
 <td><strong>Joined up</strong></td>
-<td><code>/ways:plan</code>, <code>/ways:build</code> and <code>/ways:work</code> run those pieces in the right order, resume where they left off, and keep their state in GitHub.</td>
+<td><code>/ways:plan</code>, <code>/ways:build</code> and <code>/ways:work</code> run those pieces in the right order, resume where they left off, and keep their state in your issue tracker.</td>
 </tr>
 <tr>
 <td><strong>Added</strong></td>
@@ -240,8 +240,8 @@ gh auth refresh -s workflow
 <pre><code>/ways:setup
 </code></pre>
 <p>It adds the documents, standards, templates, labels and CI check, never overwrites what's already there, and opens one PR for you to review. Its report says what's left and who can finish it. Run it again after an update to bring the repo up to date. For a whole team, the Claude admin can add the marketplace and plugins to managed settings instead.</p>
-<p><strong>Let ways keep its working state in GitHub issues.</strong> The briefs, plan comments, specs, tickets and PRs all live there, and that's what lets a fresh session pick up where the last one stopped. If your team's main tickets live in another system, they can stay there: when one becomes work, open a GitHub issue for it and link the two. It's a little double-handling, and fine to start with.</p></div>
-<div class="panel prose" role="tabpanel" id="area-getting-started-moving-trackers" aria-labelledby="area-getting-started-moving-trackers-tab" hidden><p>If you're about to move to another tracker (Linear, say), don't build a bridge to the old one. When the move happens, decide whether the new tracker holds the plan and GitHub the technical work, or the new tracker holds everything. Ways is adding support for other trackers, built against a real team's setup when one moves.</p></div>
+<p><strong>Let ways keep its working state in your issue tracker.</strong> The briefs, plan comments, specs and tickets live there, and that's what lets a fresh session pick up where the last one stopped. The tracker can be GitHub issues, files in the repo, or your own (Linear, say). PRs stay on GitHub.</p></div>
+<div class="panel prose" role="tabpanel" id="area-getting-started-moving-trackers" aria-labelledby="area-getting-started-moving-trackers-tab" hidden><p>If you're about to move to another tracker (Linear, say), don't build a bridge to the old one. When the move happens, decide whether the new tracker holds the plan and GitHub the technical work, or the new tracker holds everything. Either works: ways takes issue IDs in any form, so point it at the new tracker when you move.</p></div>
 <div class="panel prose" role="tabpanel" id="area-getting-started-not-on-git-yet-your-own-plugin-for-now" aria-labelledby="area-getting-started-not-on-git-yet-your-own-plugin-for-now-tab" hidden><p>The build side of ways needs git: branches, worktrees, one PR per change. If your code is in another version control system, don't wait, and don't bolt a sync onto it. Have Claude build you a small, temporary plugin that follows this method as closely as your setup allows. A starting prompt:</p>
 <blockquote>
 <p>Attached is the method we want to work to. We can't use the ways plugin yet, because our code isn't in git; we expect to move in [when].</p>
