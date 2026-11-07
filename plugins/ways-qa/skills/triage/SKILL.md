@@ -12,7 +12,7 @@ This is Matt Pocock's `triage` adapted for a QA team. His assumes the app's code
 
 ## Before you start
 
-1. **Read `docs/standards/qa.md`.** It has the domain rules, the severity rubric, the routing table, the confidence threshold, what counts as a pattern, and the label names. The app's URLs are in `environments.json` (the `default` entry, unless the person names an environment). If `qa.md` is missing, the repo isn't set up: say so, suggest `/ways-qa:setup`, and carry on with every call going to a person. A section still marked `fill in` counts as missing: no routing table means routing is a recommendation, never a label.
+1. **Read `docs/standards/qa.md` and `specs/domain-rules.md`.** `qa.md` is how the team works: the severity rubric, the routing table, the confidence threshold, what counts as a pattern, and the label names. `domain-rules.md` is what's true about the app, whatever a report says. The app's URLs are only in `environments.json` (the `default` entry, unless the person names an environment). If `domain-rules.md` is missing but `qa.md` has a `## Domain rules` section with rules in it, the suite was set up by 0.2.0 or earlier: use the rules there, and suggest `/ways-qa:setup` to move them. If `qa.md` is missing, the repo isn't set up: say so, suggest `/ways-qa:setup`, and carry on with every call going to a person. A section still marked `fill in` counts as missing: no routing table means routing is a recommendation, never a label.
 2. **Read the rest of what the repo knows:** `CLAUDE.md`, `specs/` (Playwright planner plans and any acceptance notes), `charters/` if there is one, and the tests in `tests/` for the area. A spec or a domain rule is how you tell a bug from working as designed.
 3. **The tracker is GitHub, through `gh`,** unless `docs/agents/issue-tracker.md` says otherwise. Check `gh repo view` works.
 4. **Labels.** Compare `gh label list --limit 200` with every label `qa.md` names: the Labels table, the severity rows and the routing rows. A new repo has almost none of them. If any are missing, offer once to create the whole missing set (`gh label create <name> --description <its meaning from qa.md>`), list them in one line, and on a yes create them all and carry on. On a no, carry on: calls that need a missing label become recommendations in the comment.
@@ -31,7 +31,7 @@ The person runs `/ways-qa:triage` and says what they want. For example:
 - "What needs triage?": list unlabelled issues, `needs-triage`, and `needs-info` where the reporter has replied since the last triage notes, oldest first, a line each, with counts. Let them pick.
 - "Triage #42", or "triage everything new".
 - "Move #42 to ready-for-human": trust them, say what you'll change, and do it.
-- "Apply the confident ones": post and label the calls at or above the threshold from this session's table, and leave the rest to the person.
+- "Apply the confident ones" (or "the high ones"): post and label the calls at or above the threshold from this session's table, and leave the rest to the person. The ones left are the "Needs you" list.
 
 ## Triage one report
 
@@ -59,7 +59,7 @@ A closed issue closed as not planned or working as designed isn't a regression. 
 
 ### 4. Bug, request or working as designed
 
-- **Bug:** the app does something the spec, a domain rule, the acceptance notes or plain sense says it shouldn't.
+- **Bug:** the app does something the spec, a domain rule in `specs/domain-rules.md`, the acceptance notes or plain sense says it shouldn't.
 - **Request:** the app does what it was built to do, and the reporter wants something else. Label `enhancement`.
 - **Working as designed:** the spec or a domain rule says this is right. Quote it. A person closes it; you recommend.
 
@@ -84,7 +84,7 @@ Triage doesn't write the failing test; `/ways-qa:reproduce #<n>` does. Recommend
 
 ### 6. Severity
 
-From the rubric in `qa.md`, and its domain rules first: a domain rule that sets a severity wins over your reading of the rubric. Say which row and why. Don't set priority: that's for whoever owns the backlog.
+From the rubric in `qa.md`, with `specs/domain-rules.md` first: a domain rule that sets a severity wins over your reading of the rubric. Say which row and why. Don't set priority: that's for whoever owns the backlog.
 
 ### 7. Routing
 
@@ -106,7 +106,7 @@ Give each call a confidence, by these criteria:
 
 These aren't probabilities. Don't write a percentage.
 
-Show the person the table of calls, then the comment you'd post. Then, when they say go (or "apply the confident ones"):
+Show the person the table of calls (see "Showing the calls" below), the **Needs you** list under it, then the comment you'd post. Then, when they say go (or "apply the confident ones"):
 
 - **At or above the threshold in `qa.md`:** apply the label.
 - **Below it:** write the call into the comment as a recommendation for a person, don't apply the label, and leave `needs-triage` on with the triage owner mentioned.
@@ -122,9 +122,32 @@ The state after triage, from Pocock's machine:
 - `ready-for-human`: a reproduced bug or an agreed request, routed, for a person to pick up.
 - `wontfix`: a person closed it.
 
+## Showing the calls
+
+The person has to see at a glance which calls are theirs. A confidence tucked in brackets at the end of every cell ("S3 (high)") hides them, so don't write it that way.
+
+- **In the table, a high call is the answer alone:** `S3 minor`, `team:checkout`. A call below high, or one that always goes to a person (closing, a duplicate, S1), is **bold, with its level after a dash**: **S2 major · medium**, **possibly #31 · low**, **S1 critical · person decides**. Say so in one line under the table: "Plain cells are high and can be applied. Bold ones need you."
+- **Under the table, a "Needs you" list:** one line per bold cell, in issue order, with the issue, the call, the proposed answer, its level, why it isn't high, and what would settle it. For example:
+
+  ```
+  Needs you (3)
+  - #42 severity: S2 major, medium. The rubric fits S2 or S3; it depends whether the reload workaround is easy to find. Your call.
+  - #42 duplicate: possibly #31, low. Same page, but #31 is mobile only. Yes or no?
+  - #45 severity: S1 critical, a person decides. Wrong invoice total (specs/domain-rules.md). Confirm S1?
+  ```
+
+  If nothing needs the person, say "Needs you: nothing. Every call is high." A person asked to "apply the high ones" should be able to read this list and know exactly what's left.
+
 ## Batches
 
-For "triage everything new", work through each report to step 8, then show one table, a row per report and a column per call, with the confidence in each cell. Look across the batch for duplicates of each other, not only of older issues. Post as the person directs.
+For "triage everything new", work through each report to step 8, then show one table, a row per report and a column per call, with cells written as in "Showing the calls", and one "Needs you" list for the batch under it. Look across the batch for duplicates of each other, not only of older issues. Post as the person directs.
+
+## Ending a run
+
+Never end on a bare "Shall I post?". The last thing the person reads says what happened and what they do next:
+
+- **What was posted and labelled,** by issue, or "Nothing posted yet" for a dry run (the person asked to look first, or hasn't said go).
+- **What they do next,** in concrete words. For a dry run, for example: "Nothing is posted. Next: answer the 3 under Needs you (a reply like '#42 S3, #42 not a dup, #45 yes S1' is enough), then say 'post' to post every comment and apply the labels, or 'apply the high ones' to post now and leave those three on `needs-triage` for @triage-owner." After posting: which issues still wait on a person and who has been mentioned, and `/ways-qa:reproduce #n` for any reproduced bug going to engineering.
 
 ## Watching the agent
 
