@@ -14,6 +14,11 @@
       "name": "ways-band",
       "source": "./plugins/ways-band",
       "description": "A mod: a status band above the prompt (mode, issue, last gate result, merge dial, context use) and /gate to run the gate instantly. Optional, and a small worked example of a mod."
+    },
+    {
+      "name": "ways-qa",
+      "source": "./plugins/ways-qa",
+      "description": "QA skills on top of ways, for testers working against a running app with Playwright: /ways-qa:setup (the QA repo's own setup), /ways-qa:triage (duplicates, regressions, severity, routing, evidence, stated confidence) and /ways-qa:reproduce (a report to a Playwright test that fails for the right reason). Installs ways and the Playwright plugin with it."
     }
   ],
   "allowCrossMarketplaceDependenciesOn": [

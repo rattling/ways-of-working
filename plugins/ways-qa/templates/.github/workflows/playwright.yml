@@ -1,0 +1,47 @@
+name: Playwright
+
+# The suite on every PR, and nightly against the CI environment in environments.json.
+# The HTML report and the traces of any failures are kept as artifacts for 30 days:
+# that's the record of what ran, and what it found.
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  schedule:
+    - cron: '0 3 * * *'
+  workflow_dispatch:
+    inputs:
+      qa_env:
+        description: 'Environment (a name in environments.json). Empty for the CI default.'
+        required: false
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: lts/*
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - name: Run the suite
+        run: npx playwright test
+        env:
+          QA_ENV: ${{ inputs.qa_env }}
+      - uses: actions/upload-artifact@v4
+        if: ${{ !cancelled() }}
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 30
+      - uses: actions/upload-artifact@v4
+        if: ${{ !cancelled() }}
+        with:
+          name: test-results
+          path: test-results/
+          retention-days: 30
+          if-no-files-found: ignore
