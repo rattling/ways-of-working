@@ -96,6 +96,15 @@ Every ways convention that's written in GitHub terms today (the parent issue, su
 - **The marker** `.ways/autonomous` holds IDs as written, space-separated, in merge order. The SessionStart hook and the band split it on whitespace instead of keeping digits, and add `#` only to bare numbers. The hook's resume line and its "where status lives" line name the repo's tracker. It reads which tracker from the section setup appended.
 - **`pr-hygiene`** accepts `Closes`, `Fixes`, `Resolves` or `Refs` followed by any ID form. `no-issue` is unchanged.
 - **Setup** asks where issues live (GitHub by default when the remote is GitHub), and asks only on a first run: a re-run reads the existing section. For local and other it skips `gh issue` checks and label creation, and writes the PR template's first line (`Closes `) and `AGENTS.md`'s tracker line to suit. For other it tries one read and records the result (user stories 6 and 7). The GitHub remote check stays, for PRs.
+- **As built** (where the build settled what the spec left open):
+  - The three tracker sections are files of their own beside the overlay (`templates/overlays/where-issues-live-*.md`), headed `## Where issues live: GitHub`, `local markdown` or `other`. Setup appends exactly one, and the hook reads that heading.
+  - The operations table has a seventh row, **claim it**: assign yourself on GitHub and other, cut the branch for local.
+  - A local issue's category goes on the brief's `Category:` line, as Pocock's brief writes it. Only the state is on `Status:`.
+  - Setup still creates the `no-issue` PR label for local and other, since PRs stay on GitHub and `pr-hygiene` skips on it. It doesn't seed `.github/ISSUE_TEMPLATE/` for them.
+  - A setup re-run on a repo set up before this change adds the GitHub section as well as refreshing the overlay, because the overlay points at it.
+  - In the marker, a bare number always reads as a GitHub issue, so old markers keep working. An "other" tracker with numeric IDs would be misread.
+  - `pr-hygiene` accepts a GitHub number anywhere in the body, as before, and any other ID on a line of its own after the keyword.
+  - With local issues, `/ways:build`'s ticket step commits the ticket files on `integration/<slug>`, even when it stops for them to be checked.
 - **Local issues live on branches** ([ADR 0001](../../docs/adr/0001-local-issues-live-on-branches.md)): nothing writes to `main`, and a status reaches it with the PR that changes it.
 - **Context and containers:** nothing new, except that "other" reaches the person's tracker through a CLI or connector they're already signed into. Nothing is stored. The look and the dev seed don't apply: there are no screens, and the throwaway repo is the demo.
 
@@ -147,7 +156,7 @@ In a new, empty throwaway repo with a GitHub remote:
 1. Run `/ways:setup` and choose local markdown. The setup PR has `docs/agents/issue-tracker.md` from Pocock's local template plus the ways conventions. No labels are created on GitHub, and `AGENTS.md` says issues live in `.scratch/`.
 2. Write a small bug as `.scratch/login-timeout/issue.md` with `Status: needs-triage`, and run `/triage` on it. Its `Status:` becomes `ready-for-agent` and no GitHub issue is created.
 3. Run `/ways:work login-timeout`. The branch is `fix/login-timeout-<slug>`, the band shows `login-timeout`, the plan is under `## Comments` in the file, and the PR says `Closes login-timeout`, sets `Status: done`, and passes `pr-hygiene`.
-4. Write a request as `.scratch/billing/issue.md` and run `/ways:plan billing`, then `/ways:build billing` with two tickets. The parent gets a `Spec:` line, the tickets are `.scratch/billing/issues/01-…` and `02-…`, the band shows `billing/01` and then `billing/02` during the run, and the integration PR closes both.
+4. Write a request as `.scratch/billing/issue.md` and run `/ways:plan billing`, then `/ways:build billing` with two tickets. The parent gets a `Spec:` line, the tickets are `.scratch/billing/issues/01-…` and `02-…`, the band shows `billing` (the parent, as `/ways:build` writes it) during the run, each ticket PR says `Closes billing/0N` and sets `Status: done` on the integration branch, and the integration PR closes the parent and both tickets.
 5. Re-run `/ways:setup` on an existing GitHub ways repo. It doesn't ask about the tracker, and its PR changes only the overlay text.
 6. In another throwaway repo, choose "other" and describe a tracker Claude can't reach. Setup says what failed, asks whether to record it anyway, and on yes writes the description with a line saying it wasn't reached.
 

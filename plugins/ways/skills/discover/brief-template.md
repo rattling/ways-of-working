@@ -1,6 +1,6 @@
 # <Title>
 
-**Discovery:** <date> · **Mode:** quick | deep · **Run by:** <person> · **Intake:** #<n> · **Status:** draft | agreed
+**Discovery:** <date> · **Mode:** quick | deep · **Run by:** <person> · **Intake:** <id> · **Status:** draft | agreed
 
 <One paragraph: what was asked for, what we found the problem really is, and what we recommend doing first.>
 
@@ -85,4 +85,4 @@ flowchart LR
 - Decisions, and who made them: `out/decisions.md`
 - Prototype: `prototype/` <leave out if none>
 
-**Next:** `/triage #<n>`.
+**Next:** `/triage <id>`.

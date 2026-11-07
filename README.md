@@ -29,7 +29,7 @@ Ways answers each of those with a step a person can see, and a check that holds 
 | | |
 |---|---|
 | 🧭 **One flow** | Four commands cover discovery, planning, building and small fixes. Each one tells you where you are and what comes next. |
-| 📄 **Specs in the repo** | Requirements and design go in a PRD file, agreed in one PR. Status lives in GitHub issues, not in a chat. |
+| 📄 **Specs in the repo** | Requirements and design go in a PRD file, agreed in one PR. Status lives in your issue tracker, not in a chat. |
 | 🤖 **Interactive or autonomous** | Work alongside Claude, or let it build a whole spec on its own while the **gate** (your tests, lint and checks, as one command) holds every step. Or on a schedule, overnight ([Scheduled runs](#scheduled-runs)). |
 | ✅ **Merge by risk** | Low-risk changes can merge themselves once CI is green. High-risk ones need a code owner. A dial in each repo sets how much people review ([the policy](plugins/ways/reference/REVIEW-AND-MERGE.md)). |
 | 📏 **Built in proportion** | Plans recommend the minimal answer, state the expected size up front, and the build is checked against it. |
@@ -46,7 +46,7 @@ claude plugin install ways@ways-of-working
 
 Then, in a repo, run **`/ways:setup`**. It adds the files, labels and CI check the method needs, never overwrites what's already there, and opens a PR for you to review. Run it again after an update to bring the repo up to date.
 
-You'll also need [`gh`](https://cli.github.com/), signed in. The build commands (`/ways:work`, `/ways:build`) need the repo in git and on GitHub, for its issues and PRs. The ones that don't build (`/ways:discover`, `/ways:mock`, `/ways:explain`, `/ways:arch-review`) work without either. Installing `ways` installs Pocock's skills with it, and a repo set up with ways offers the same plugins to anyone who opens it in Claude Code.
+You'll also need [`gh`](https://cli.github.com/), signed in. The build commands (`/ways:work`, `/ways:build`) need git, and GitHub for PRs. Issues can be in GitHub, in files in the repo, or in your own tracker. The ones that don't build (`/ways:discover`, `/ways:mock`, `/ways:explain`, `/ways:arch-review`) work without either. Installing `ways` installs Pocock's skills with it, and a repo set up with ways offers the same plugins to anyone who opens it in Claude Code.
 
 ## How work flows
 

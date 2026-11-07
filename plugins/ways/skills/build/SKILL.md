@@ -8,23 +8,23 @@ disable-model-invocation: true
 
 After `/ways:plan`: from an agreed spec to one reviewed integration PR. It runs what `/to-tickets` then `/implement-spec` would, with this repo's conventions, and manages the autonomous marker itself.
 
-Input: the parent issue, `#<n>`, the one with the `Spec:` line. Without one, use the issue the conversation is about, or ask once.
+Input: the parent issue's ID (`#12`, `billing`, `ENG-123`), the one with the `Spec:` line. Without one, use the issue the conversation is about, or ask once.
 
-Follow `${CLAUDE_PLUGIN_ROOT}/reference/PARTS.md`: look for the output first, open with where you are, and end with the merge sentence. This is the one command that resumes work part-done: its state lives in GitHub.
+Follow `${CLAUDE_PLUGIN_ROOT}/reference/PARTS.md`: look for the output first, open with where you are, and end with the merge sentence. This is the one command that resumes work part-done: its state lives in the tracker and on the integration branch.
 
 ## 1. Find where the build is
 
-Read the parent issue, its `Spec:` line, its sub-issues, the `integration/<feature-slug>` branch and the PRs that refer to it. If the spec PR isn't merged yet, stop: say that merging it agrees the spec, and that the build starts after.
+Read the parent issue, its `Spec:` line, its tickets, the `integration/<feature-slug>` branch and the PRs that refer to it. If the spec PR isn't merged yet, stop: say that merging it agrees the spec, and that the build starts after.
 
 - **A build is under way** (an `integration/<feature-slug>` branch or a draft integration PR for this parent): resume it. Read the draft PR's checklist and the branch's commits, say "N of M done", and carry on from step 3, in the integration branch's worktree (step 3.1). Don't recut tickets.
-- **Tickets exist under the parent** (open sub-issues): go to step 3. Nothing to ask.
+- **Tickets exist under the parent** (open ones): go to step 3. Nothing to ask.
 - **No tickets yet:** go to step 2.
 
 ## 2. Cut the tickets
 
 Before cutting, ask once: "I'll cut the tickets first. Then go straight into the build, or stop so you can check them?"
 
-Run Pocock's `to-tickets` steps (`${CLAUDE_PLUGIN_ROOT}/reference/POCOCK.md`: only a person can type it, so read its instructions and follow them here), with the parent issue. It shows the breakdown for approval: that step always happens. With it, show which tickets are independent of the main chain (no blocking edge between them, and they touch different parts), and offer parallel as an explicit choice: "Tickets 4, 6 and 9 don't depend on the main chain. Build them alongside it? That saves roughly <time>, but runs a stack per worktree at once (more memory) and is harder to follow. Default: one at a time." Take the answer with the approval. In straight-through mode, that one approval also starts the build; otherwise stop after publishing, with the merge sentence (nothing to merge yet) and "Next: `/ways:build #<n>`".
+Run Pocock's `to-tickets` steps (`${CLAUDE_PLUGIN_ROOT}/reference/POCOCK.md`: only a person can type it, so read its instructions and follow them here), with the parent issue. It shows the breakdown for approval: that step always happens. With it, show which tickets are independent of the main chain (no blocking edge between them, and they touch different parts), and offer parallel as an explicit choice: "Tickets 4, 6 and 9 don't depend on the main chain. Build them alongside it? That saves roughly <time>, but runs a stack per worktree at once (more memory) and is harder to follow. Default: one at a time." Take the answer with the approval. In straight-through mode, that one approval also starts the build; otherwise stop after publishing, with the merge sentence (nothing to merge yet) and "Next: `/ways:build <id>`".
 
 **Few tickets, each with its size.** A ticket is the smallest slice worth a PR of its own, not one per concept: a feature near its closest neighbour's size is usually two or three. The breakdown shows each ticket's expected lines and model, from the PRD's **Size**, and the total beside the PRD's estimate. If the tickets add up to more than the estimate, cut back to it or say why before asking for approval. If every ticket comes out on Opus, say so, and offer to move the ones that only display, print or wire up a result to Sonnet (`docs/agents/issue-tracker.md`, "A model per ticket").
 
@@ -36,7 +36,7 @@ Every ticket gets a **Human verification** line, which `to-tickets`' template la
 
 1. **Its own worktree, never the person's checkout.** Their checkout is where their dev server runs: switch it to the integration branch and it serves half-built code, and its database gets migrated under them. So the lead works in a worktree of its own: enter one (Claude Code's `EnterWorktree`), and in it check out `integration/<feature-slug>`, or create it from an up-to-date `main`. Resuming: if `git worktree list` shows a worktree already on that branch, work in that one if you can enter it; otherwise, once `git -C <path> status` shows nothing uncommitted there, remove it (`git worktree remove <path>`) and enter a fresh one. The marker, the progress file, the final gate and the hand-over walk all happen in this worktree, on its own containers and ports (`docs/standards/delivery.md`): move `.ways/part` across with you. The person's checkout stays on whatever branch they left it on.
 2. **Run the gate once, before the marker.** A red gate before any code is written is the environment, not the build: a service that isn't running (Docker Desktop after a restart, say), generated files left stale by a running dev server, a missing dependency. Fix what you can; for anything else, tell the person exactly what's needed and wait. Write no marker until the gate is green here: a red one only makes the Stop hook block turns for a cause nobody can fix in code.
-3. **Marker.** Write the parent's number to `.ways/autonomous` (`echo <n> > .ways/autonomous`), so the Stop hook holds the gate and a fresh context resumes from the issue. Nobody should have to know about it.
+3. **Marker.** Write the parent's ID as written to `.ways/autonomous` (`echo <id> > .ways/autonomous`), so the Stop hook holds the gate and a fresh context resumes from the issue. Nobody should have to know about it.
 4. **Build.** Run Pocock's `implement-spec` steps (`${CLAUDE_PLUGIN_ROOT}/reference/POCOCK.md`: only a person can type it, so read its instructions and follow them here), with the parent issue. In straight-through mode this follows the ticket approval without stopping. `docs/agents/issue-tracker.md` sets how: one ticket at a time unless the person asked for parallel, a model per ticket, progress as "N of M done", the run's cost in the integration PR, on `integration/<feature-slug>`.
 5. **Review.** The code review is Pocock's `code-review` (`mattpocock-skills:code-review`), not Claude Code's built-in skill of the same name. Call it by that full name. Fix what's wrong, not what could be grander: a fix doesn't add classes or layers, and a finding that would grow the feature goes on the Later list (`${CLAUDE_PLUGIN_ROOT}/reference/REVIEW-AND-MERGE.md`, "Findings").
 
@@ -48,6 +48,6 @@ Every ticket gets a **Human verification** line, which `to-tickets`' template la
 
 **Compare the size with the estimate.** Count the `main...integration/<feature-slug>` diff as the PRD's **Size** table does (files, new classes, lines of code and of tests, leaving out specs, docs and the mock) and put the actual beside the estimate in the integration PR. More than about a third over: say so at the top of the PR, with where the extra went, so the reviewer can ask for cuts rather than find them.
 
-Delete `.ways/autonomous`, `.ways/progress` and `.ways/part`, and stop what the integration worktree started (containers, a dev server). Mark the integration PR ready. Say what was built and what's left in a few lines, with anything labelled `needs-human` and why.
+Delete `.ways/autonomous`, `.ways/progress` and `.ways/part`, and stop what the integration worktree started (containers, a dev server). Mark the integration PR ready. Say what was built and what's left in a few lines, with anything set to `needs-human` and why.
 
 Then the merge sentence: "To ship it, merge PR #<m>: that's every ticket and the review, and merging closes them." Next: nothing in this feature; follow-ups are new issues: `/ways:work` for small ones, `/triage` for a pile. Then log the run, and offer the repo notes if there are any (`${CLAUDE_PLUGIN_ROOT}/reference/FEEDBACK.md`).

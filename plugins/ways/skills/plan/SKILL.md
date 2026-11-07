@@ -8,7 +8,7 @@ disable-model-invocation: true
 
 Big work is planned in one sitting: what it should do (requirements), then how the system changes (design), in one PRD and one spec PR. `/ways:build` comes after; `/ways:discover` comes before, when the problem isn't understood.
 
-Input: the issue, `#<n>`. Without one, use the issue the conversation is about, or ask for it once.
+Input: the issue's ID, in the tracker's own form (`#12`, `billing`, `ENG-123`). Without one, use the issue the conversation is about, or ask for it once.
 
 Follow `${CLAUDE_PLUGIN_ROOT}/reference/PARTS.md`: look for the output first, open with where you are, end with the merge sentence. This runs in one session: don't clear it during a plan.
 
@@ -26,4 +26,4 @@ Follow `${CLAUDE_PLUGIN_ROOT}/skills/design/SKILL.md`, steps 1 to 3, reading the
 
 Mark the spec PR ready. Say in a few lines what the PRD settles (what, and how), its size beside the closest feature, what went on the Later list, and what's still open. Delete `.ways/part`. Then:
 
-> To agree the spec, merge PR #<m>: that's what it should do and how the system changes. Next: `/ways:build #<n>`.
+> To agree the spec, merge PR #<m>: that's what it should do and how the system changes. Next: `/ways:build <id>`.

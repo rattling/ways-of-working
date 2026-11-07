@@ -6,26 +6,26 @@ disable-model-invocation: true
 
 # Work an issue
 
-Input: an issue number, and optionally a mode (`interactive` or `autonomous`). Without a mode, take it from the issue's label (`ready-for-agent` is autonomous, `ready-for-human` is interactive) and say which you're using. An untriaged issue gets its label in step 0.
+Input: an issue ID in the tracker's own form (`#12`, `login-timeout`, `billing/03`, `ENG-123`), and optionally a mode (`interactive` or `autonomous`). Without a mode, take it from the issue's state (`ready-for-agent` is autonomous, `ready-for-human` is interactive) and say which you're using. An untriaged issue gets its state in step 0.
 
-Read first: `docs/agents/issue-tracker.md` (how this repo publishes, links and closes work), `${CLAUDE_PLUGIN_ROOT}/reference/REVIEW-AND-MERGE.md`, and `docs/standards/architecture.md`, "Proportion": build the minimum that delivers the issue, in the shape of the closest code already here. The gate command is in `.claude/ways.json`. As you go, note anything that pops out worth improving, in this repo or in ways, and when you hand over, log the run and offer the repo findings: `${CLAUDE_PLUGIN_ROOT}/reference/FEEDBACK.md`.
+Read first: `docs/agents/issue-tracker.md` (how this repo publishes, links and closes work, and how each tracker operation named here is done), `${CLAUDE_PLUGIN_ROOT}/reference/REVIEW-AND-MERGE.md`, and `docs/standards/architecture.md`, "Proportion": build the minimum that delivers the issue, in the shape of the closest code already here. The gate command is in `.claude/ways.json`. As you go, note anything that pops out worth improving, in this repo or in ways, and when you hand over, log the run and offer the repo findings: `${CLAUDE_PLUGIN_ROOT}/reference/FEEDBACK.md`.
 
-For a whole spec with several tickets, this isn't the skill: use `/ways:build #<parent>`. For several **unrelated** issues at once (a batch of bugs), see **Batch** at the end.
+For a whole spec with several tickets, this isn't the skill: use `/ways:build <parent>`. For several **unrelated** issues at once (a batch of bugs), see **Batch** at the end.
 
 ## 0. A raw issue: size, reproduce, brief
 
-Triage is optional. If the issue has no state label (or only `needs-triage`), do triage's part yourself before step 1:
+Triage is optional. If the issue has no state (or only `needs-triage`), do triage's part yourself before step 1:
 
-1. **Size it**, by the sizing rules in `docs/agents/issue-tracker.md`. Big work: say so, and point to `/ways:plan #<n>` instead of starting. The problem isn't understood: point to `/ways:discover`. Either way, stop there.
+1. **Size it**, by the sizing rules in `docs/agents/issue-tracker.md`. Big work: say so, and point to `/ways:plan <id>` instead of starting. The problem isn't understood: point to `/ways:discover`. Either way, stop there.
 2. **A bug: reproduce it first**, before anything else, as Pocock's `diagnosing-bugs` does (a loop that shows the failure). If it won't reproduce, say what you tried and ask for what would, and stop.
-3. **Write the brief yourself**: the outcome, acceptance criteria, what's out of scope, and human verification. Post it as the plan comment (step 3.1's), with the reproduction for a bug, so the person sees what you think the job is before they say go. Label the issue as triage would (`bug` or `enhancement`, and `ready-for-agent` or `ready-for-human`), and take the mode from that label unless the person names one.
+3. **Write the brief yourself**: the outcome, acceptance criteria, what's out of scope, and human verification. Post it as the plan comment (step 3.1's), with the reproduction for a bug, so the person sees what you think the job is before they say go. Give it triage's category (`bug` or `enhancement`) and set its state (`ready-for-agent` or `ready-for-human`), and take the mode from that state unless the person names one.
 4. **Wait for go.** Then carry on from step 1, with the brief just written. In autonomous mode, the plan comment is already posted: don't post a second.
 
 ## 1. Start
 
-1. Read the issue and its comments, and the spec it points to if any. If it has open sub-issues, it's a parent: work its frontier one ticket at a time.
-2. Check the brief has an outcome, acceptance criteria, scope boundaries and human verification. Missing one: ask once, then proceed on a stated assumption and add it to the issue. In autonomous mode with no runnable acceptance and no human verification, stop: label it `needs-human` and say what's missing.
-3. Check it isn't blocked (open blockers) or assigned to someone else. Assign yourself.
+1. Read the issue and its comments, and the spec it points to if any. If it has open tickets, it's a parent: work its frontier one ticket at a time.
+2. Check the brief has an outcome, acceptance criteria, scope boundaries and human verification. Missing one: ask once, then proceed on a stated assumption and add it to the issue. In autonomous mode with no runnable acceptance and no human verification, stop: set its state to `needs-human` and say what's missing.
+3. Check it isn't blocked (open blockers) or claimed by someone else. Claim it.
 4. Branch from an up-to-date `main`, named as `docs/agents/issue-tracker.md` says.
 5. If the issue's work touches `.github/workflows/`, check now that the GitHub token has the `workflow` scope (`gh auth status`), and ask for `gh auth refresh -s workflow` if it doesn't, rather than finding out at the push.
 
@@ -36,11 +36,11 @@ Work with the person turn by turn, and keep the gate green as you go. When the a
 ## 3. Autonomous mode
 
 1. **Plan comment.** Post a short plan on the issue: the approach, the seams you'll test at, anything you're assuming, how you'll prove each acceptance item, its expected size (rough lines of code and tests, beside the closest existing change), and which docs the change will touch (step 4.2's list), or "no docs change expected", so they're agreed before go. Wait for a person to say go, unless they've said in this session that you needn't.
-2. **Marker.** Write the issue number to `.ways/autonomous` (`echo <n> > .ways/autonomous`). While it exists, the Stop hook runs the gate and won't let a turn end on red (after three blocks in a row it tells you to hand over, then lets the turn end), and after a compaction the SessionStart hook points you back at the issue.
-3. **Draft PR early.** After the first meaningful commit, push and open a draft PR with `Closes #<n>`. Commits are the progress record.
+2. **Marker.** Write the issue's ID as written to `.ways/autonomous` (`echo <id> > .ways/autonomous`). While it exists, the Stop hook runs the gate and won't let a turn end on red (after three blocks in a row it tells you to hand over, then lets the turn end), and after a compaction the SessionStart hook points you back at the issue.
+3. **Draft PR early.** After the first meaningful commit, push and open a draft PR with the close line (`Closes <id>`). Commits are the progress record.
 4. **Build.** Use `tdd` at the seams in your plan comment, and `diagnosing-bugs` for a bug. Commit in small steps with messages that say why.
 5. **Keep the state outside your context.** Your plan comment, the draft PR and the commits are what a fresh context resumes from. If the plan changes materially, update the plan comment.
-6. **Escalate only for** a change of scope, a public contract, major architecture, anything irreversible or outward-facing, or a material cost. Label `needs-human`, say what you need in five lines or fewer, and carry on with whatever doesn't depend on the answer.
+6. **Escalate only for** a change of scope, a public contract, major architecture, anything irreversible or outward-facing, or a material cost. Set the issue's state to `needs-human`, say what you need in five lines or fewer, and carry on with whatever doesn't depend on the answer.
 
 ## 4. Before the PR is ready
 
@@ -54,7 +54,7 @@ Work with the person turn by turn, and keep the gate green as you go. When the a
    A decision that's hard to reverse (a data store, a framework, how it's hosted) gets a drafted ADR in `docs/adr/`, marked as a draft, for the person to agree, and the PR says so. If nothing needed changing, the PR body says what was checked: "Docs: checked ARCHITECTURE, README, GLOSSARY, standards; no change." Fix only what the change made untrue: older drift you notice is a `[repo]` note (`${CLAUDE_PLUGIN_ROOT}/reference/FEEDBACK.md`).
 3. Run Pocock's `code-review` (call it as `mattpocock-skills:code-review`, not Claude Code's built-in skill of the same name) against `main`. Answer every finding: **fixed**, or **not a problem because…**, verifying each before acting. A fix doesn't add structure: one that would add a class, a layer or a feature becomes a new issue (`REVIEW-AND-MERGE.md`, "Findings"). At most three rounds; whatever is still disputed goes in the PR body.
 4. Decide the risk tier from `${CLAUDE_PLUGIN_ROOT}/reference/REVIEW-AND-MERGE.md`, `REVIEW.md` and `.github/CODEOWNERS`. If the review argued for a higher tier, take it. High risk: also run `/security-review`.
-5. Write the PR body with the `pr` skill, plus `Closes #<n>`, a `## How to check` section, the docs it changed or checked (step 2), and the risk tier. Evidence is output you actually ran. For a visual change, that includes headless-browser screenshots of what changed, each beside the matching mock screen if there is one, comparing layout and content with the mock and the look with the one the PRD chose, attached to the PR. For printed work, a headless PDF isn't enough: the How to check names the real browser's print dialog and what it should show ("Chrome, Ctrl+P, A4 portrait, 1 page").
+5. Write the PR body with the `pr` skill, plus the close line, a `## How to check` section, the docs it changed or checked (step 2), and the risk tier. Evidence is output you actually ran. For a visual change, that includes headless-browser screenshots of what changed, each beside the matching mock screen if there is one, comparing layout and content with the mock and the look with the one the PRD chose, attached to the PR. For printed work, a headless PDF isn't enough: the How to check names the real browser's print dialog and what it should show ("Chrome, Ctrl+P, A4 portrait, 1 page").
 6. **Stop what you started**: a dev server, a watcher, and, in a repo that runs in containers, the containers. While building in a worktree, run the stack as its own copy (`docs/standards/delivery.md`): its own Compose project, or its own databases on a native server, and, if it publishes ports, a port other than the default. With containers, check with `docker ps` that none of this worktree's are still up: a container left running holds memory and its port (8080, say) and blocks the next run.
 7. Delete `.ways/autonomous` if it exists.
 8. Mark the PR ready (`gh pr ready`).
@@ -62,18 +62,18 @@ Work with the person turn by turn, and keep the gate green as you go. When the a
 ## 5. Merge and close
 
 - Merge only if the dial in the **Merging** section of `AGENTS.md` allows it at this risk tier and CI is green. Otherwise stop: the handover is the PR. At medium that's the person who ran you; at high, request review from the code owners.
-- On merge: squash, delete the branch, and confirm the issue closed. If it was a sub-issue, report the parent's new frontier.
+- On merge: squash, delete the branch, and confirm the issue closed. If it was a ticket under a parent, report the parent's new frontier.
 - Anything agreed but not done becomes a new issue, linked from the PR. Nothing lives only in the conversation.
 
 ## Batch
 
-Input: several issue numbers, or "everything `ready-for-agent`". You are the lead: you don't build, you start builders, check their evidence and merge.
+Input: several issue IDs, or "everything `ready-for-agent`" (list open issues by state). You are the lead: you don't build, you start builders, check their evidence and merge.
 
 1. **Raw issues first.** Do step 0 for each untriaged one: size it, reproduce a bug, write the brief. Drop any that turn out big (point them to `/ways:plan`) or not understood, and say which.
-2. **Check they're independent.** Drop any with open blockers, any assigned to someone else, and any without acceptance or human verification (label those `needs-human`). Where two will plainly touch the same code, say so and order them; don't run them blind in parallel. The merge order is the order given, or yours, stated.
+2. **Check they're independent.** Drop any with open blockers, any claimed by someone else, and any without acceptance or human verification (set those to `needs-human`). Where two will plainly touch the same code, say so and order them; don't run them blind in parallel. The merge order is the order given, or yours, stated.
 3. **One plan comment per issue** (raw ones already have theirs, from step 1), then wait once for a person to say go for the whole batch, unless they've said in this session that you needn't.
-4. **Marker:** write the issue numbers, space-separated in merge order, to `.ways/autonomous`. After a compaction, the SessionStart hook lists them and points you at their PRs.
-5. **One builder per issue**: a subagent with its own worktree (`isolation: "worktree"`), in the background, briefed with the issue number and these steps: branch, build (steps 3.3–3.5), then step 4, docs included (4.2), ending with a ready PR. The Stop hook doesn't run inside subagents, so the brief says plainly: run the gate and report its output, with how many times you ran it and the total time, don't report done on red, stop what you started (a dev server, containers) before reporting done (step 4.6), and, if the repo's stack publishes ports, run yours on a port other than the default (`docs/standards/delivery.md`). When a builder finishes in a repo that runs in containers, check with `docker ps` that its containers are gone, and stop any it left. One builder at a time unless the person asks for parallel ("two at a time", "in parallel"); then cap at what they'll review, five unless told otherwise. Each builder has its own worktree, and in a repo that runs in containers each worktree starts its own copy of them: several at once can run a laptop out of memory.
-6. **Don't take their word for it.** For each finished builder, read the PR's diff, the gate output and the How to check, and run the How to check if it's cheap. Send a builder back once, with the specific defect. If it's still wrong, label the issue `needs-human` and move on.
+4. **Marker:** write the IDs as written, space-separated, in merge order, to `.ways/autonomous`. After a compaction, the SessionStart hook lists them and points you at their PRs.
+5. **One builder per issue**: a subagent with its own worktree (`isolation: "worktree"`), in the background, briefed with the issue ID and these steps: branch, build (steps 3.3–3.5), then step 4, docs included (4.2), ending with a ready PR. The Stop hook doesn't run inside subagents, so the brief says plainly: run the gate and report its output, with how many times you ran it and the total time, don't report done on red, stop what you started (a dev server, containers) before reporting done (step 4.6), and, if the repo's stack publishes ports, run yours on a port other than the default (`docs/standards/delivery.md`). When a builder finishes in a repo that runs in containers, check with `docker ps` that its containers are gone, and stop any it left. One builder at a time unless the person asks for parallel ("two at a time", "in parallel"); then cap at what they'll review, five unless told otherwise. Each builder has its own worktree, and in a repo that runs in containers each worktree starts its own copy of them: several at once can run a laptop out of memory.
+6. **Don't take their word for it.** For each finished builder, read the PR's diff, the gate output and the How to check, and run the How to check if it's cheap. Send a builder back once, with the specific defect. If it's still wrong, set the issue's state to `needs-human` and move on.
 7. **Merge one at a time, in order,** as the dial allows (step 5 for each). After each merge, the next PR rebases onto `main` and reruns the gate before it merges; resolve conflicts yourself, and if a conflict changes behaviour, say so in that PR. PRs the dial won't let you merge stay open for their reviewer, and the rest carry on.
-8. **Hand over:** delete the marker and post one summary as your reply: each issue, its PR, merged or waiting on whom, and anything labelled `needs-human` with the reason.
+8. **Hand over:** delete the marker and post one summary as your reply: each issue, its PR, merged or waiting on whom, and anything set to `needs-human` with the reason.

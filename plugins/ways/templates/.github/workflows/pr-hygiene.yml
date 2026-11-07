@@ -37,10 +37,16 @@ jobs:
             const body = context.payload.pull_request.body || "";
             const problems = [];
 
-            if (!/(?:closes|fixes|resolves|refs)\s+#\d+/i.test(body)) {
+            // A GitHub number anywhere, as before (`Closes #12, #13`). Any other ID form
+            // (billing/03, login-timeout, typo, ENG-123) on a line of its own after the keyword,
+            // so "Closes the gap in X" fails.
+            const githubRef = /(?:closes|fixes|resolves|refs)\s+#\d+/i;
+            const otherRef = /^[ \t>*-]*(?:closes|fixes|resolves|refs):?[ \t]+[\w./-]*\w[ \t.]*$/im;
+            if (!githubRef.test(body) && !otherRef.test(body)) {
               problems.push(
-                "No issue reference. Add `Closes #123` (or `Refs #123` if it only partly " +
-                "satisfies it). No issue behind it at all? Add the `no-issue` label."
+                "No issue reference. Add a line like `Closes #123`, `Closes billing/03` or " +
+                "`Closes ENG-123` (or `Refs ...` if it only partly satisfies it). No issue " +
+                "behind it at all? Add the `no-issue` label."
               );
             }
 

@@ -66,7 +66,7 @@ start 0.5.0 0.5.0 agents "allergen chart · plan"
 check "a part under way is named, with where to check its state" '[[ $out == *"Big work in progress: allergen chart · plan"* && $out == *PARTS.md* ]]'
 
 start 0.5.0 0.5.0 no-agents
-check "no flow section: a short fallback and a setup nudge" '[[ $out == *"has no \"How work goes\" section"* && $out == *"/ways:discover"* && $out == *"/ways:plan #n"* && $out == *"/ways:setup"* ]]'
+check "no flow section: a short fallback and a setup nudge" '[[ $out == *"has no \"How work goes\" section"* && $out == *"/ways:discover"* && $out == *"/ways:plan <id>"* && $out == *"/ways:setup"* ]]'
 
 start 0.5.0 0.5.1
 check "a patch release doesn't nudge setup" '[[ $out != *"/ways:setup"* ]]'
@@ -108,6 +108,37 @@ check ".ways/ ignores itself, with no .gitignore line" '[[ -z $(git -C "$main" s
 echo 6 > "$main/.ways/autonomous"; mkdir -p "$main/.claude/ways"; echo 5 > "$main/.claude/ways/autonomous"
 start_in "$main"
 check "a newer marker in .ways/ isn't overwritten by an old one" '[[ $(cat "$main/.ways/autonomous") == 6 ]]'
+git -C "$main" worktree remove --force "$wt"; rm -rf "$main"
+
+# The tracker is the section setup appended to docs/agents/issue-tracker.md. $1: its heading's tail.
+tracker() {
+  mkdir -p "$main/docs/agents"
+  printf '# Issue tracker\n\nConventions.\n\n## Where issues live: %s\n\nThe operations.\n' "$1" > "$main/docs/agents/issue-tracker.md"
+}
+mark() { mkdir -p "$main/.ways"; echo "$1" > "$main/.ways/autonomous"; }
+
+pair; tracker "local markdown"; mark "billing/03"
+mkdir -p "$main/.scratch/billing/issues"; echo "Status: ready-for-agent" > "$main/.scratch/billing/issues/03-refunds.md"
+start_in "$main"
+check "a local ticket is named as written, and the resume line names its file" '[[ $out == *"mid-run on billing/03"* && $out == *".scratch/billing/issues/03-refunds.md"* && $out != *"gh issue view"* && $out != *"#billing"* ]]'
+check "and status lives in the issue files" '[[ $out == *"Status lives in the issue files under .scratch/"* && $out != *"GitHub issues"* ]]'
+mark "login-timeout billing/03"
+start_in "$main"
+check "a local batch lists its IDs as written, in merge order, with their files" '[[ $out == *"leading a batch: login-timeout billing/03 in that merge order"* && $out == *".scratch/login-timeout/issue.md"* && $out == *".scratch/billing/issues/03-refunds.md"* && $out != *"gh issue view"* ]]'
+mark "12"
+start_in "$main"
+check "a bare number in an old marker still reads as GitHub" '[[ $out == *"mid-run on #12"* && $out == *"gh issue view 12"* ]]'
+git -C "$main" worktree remove --force "$wt"; rm -rf "$main"
+
+pair; tracker "other"; mark "ENG-123"
+start_in "$main"
+check "a tracker key is named as written, read from the described tracker" '[[ $out == *"mid-run on ENG-123"* && $out == *"ENG-123 in the tracker docs/agents/issue-tracker.md describes"* && $out != *"gh issue view"* && $out != *"#ENG"* ]]'
+check "and status lives in that tracker" '[[ $out == *"Status lives in the tracker docs/agents/issue-tracker.md describes"* ]]'
+git -C "$main" worktree remove --force "$wt"; rm -rf "$main"
+
+pair; mark "#12 14"
+start_in "$main"
+check "no tracker file: GitHub, with # written once" '[[ $out == *"leading a batch: #12 #14 in that merge order"* && $out == *"gh issue view 12 --comments"* && $out == *"gh issue view 14 --comments"* && $out == *"Status lives in GitHub issues"* ]]'
 git -C "$main" worktree remove --force "$wt"; rm -rf "$main"
 
 echo

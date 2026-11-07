@@ -36,14 +36,14 @@ Pick the path by what's known about the work. A person types each command; when 
 |---|---|
 | New and unsorted, or a pile of it | `/triage`. Optional: the commands below size an untriaged issue themselves |
 | Problem not understood: a wish list of solutions, an idea, a half-built app nobody's sure about | `/ways:discover`, quick or deep, then `/ways:plan`. Documents go in `specs/brief/inbox/` |
-| Known to be big: more than one ticket, or it changes an invariant or a contract | `/ways:plan #<n>`, then `/ways:build #<n>` |
-| Known to be small: a bug, a small enhancement | `/ways:work #<n>`, for one issue or several (one at a time by default) |
+| Known to be big: more than one ticket, or it changes an invariant or a contract | `/ways:plan <id>`, then `/ways:build <id>` |
+| Known to be small: a bug, a small enhancement | `/ways:work <id>`, for one issue or several (one at a time by default) |
 | Typo-sized | Just do it: a PR labelled `no-issue` |
 
 Big work is two commands, each ending in one PR a person merges:
 
-- **`/ways:plan #<n>`**: requirements (from the discovery brief if there is one), worked out by prototyping, grilling or both, then the system-level design, in one sitting. The agreed prototype is kept as the mock. Ends in one spec PR: merging it agrees what it should do and how the system changes. Don't clear the session during a plan.
-- **`/ways:build #<n>`**: tickets, then the code on one integration branch. Ends in the integration PR: merging it ships the feature. It resumes a build under way.
+- **`/ways:plan <id>`**: requirements (from the discovery brief if there is one), worked out by prototyping, grilling or both, then the system-level design, in one sitting. The agreed prototype is kept as the mock. Ends in one spec PR: merging it agrees what it should do and how the system changes. Don't clear the session during a plan.
+- **`/ways:build <id>`**: tickets, then the code on one integration branch. Ends in the integration PR: merging it ships the feature. It resumes a build under way.
 
 When different people do the two halves of a plan, `/ways:requirements` and `/ways:design` run them separately, with the PRD file as the hand-off. Pocock's skills run underneath (`grilling`, `domain-modeling`, `to-spec`, `to-tickets`, `implement-spec`, `code-review`, `triage`) and can still be typed on their own.
 
@@ -55,13 +55,13 @@ Skips, and only these:
 
 Also: `/ways:explain` before working in code you don't know; `/ways:arch-review` at the start of a repo, before a big change, and every so often. The commands note what's worth improving as it happens, in this repo or in the method. Repo findings are offered at the end as issues here, for you to accept, drop or add to. Method findings go into the ways log on your machine with every run, fine or not, and `/ways:feedback` reviews that log every so often and sends ways only what keeps coming up.
 
-**Working here with another agent** (Codex, say). The `/ways:*` commands are Claude Code skills, but everything they rely on is in this repo and GitHub, and holds for any agent: this file, the specs and standards, the tracker conventions in `docs/agents/issue-tracker.md`, the labels, one PR per ticket with `Closes #n` and a How to check, and the gate before every push. To run a command's steps, read its `SKILL.md` from the ways plugin (the folder for `ways:plan` is `skills/plan/`) and follow its intent, adapting what's Claude Code specific: the Skill tool, subagents, `${CLAUDE_PLUGIN_ROOT}` paths. No hook holds the gate for you, so run it yourself before each push. Say in the PR what you adapted or skipped.
+**Working here with another agent** (Codex, say). The `/ways:*` commands are Claude Code skills, but everything they rely on is in this repo, GitHub and the issue tracker, and holds for any agent: this file, the specs and standards, the tracker conventions in `docs/agents/issue-tracker.md`, the labels, one PR per ticket with `Closes <id>` and a How to check, and the gate before every push. To run a command's steps, read its `SKILL.md` from the ways plugin (the folder for `ways:plan` is `skills/plan/`) and follow its intent, adapting what's Claude Code specific: the Skill tool, subagents, `${CLAUDE_PLUGIN_ROOT}` paths. No hook holds the gate for you, so run it yourself before each push. Say in the PR what you adapted or skipped.
 
 ## Working an issue
 
 <!-- Owned by the ways plugin: /ways:setup replaces this section on every run. Put repo-specific rules under "Rules for this repo". -->
 
-Use `/ways:work #<n>`. It runs interactively for `ready-for-human` and autonomously for `ready-for-agent`. An untriaged issue is fine: it sizes it, reproduces a bug, and posts the brief it will work to before you say go. For a whole spec at once, `/ways:build #<parent>`: it sets the autonomous marker itself so the gate holds, and builds one ticket at a time unless you ask for parallel (`docs/agents/issue-tracker.md` says why).
+Use `/ways:work <id>`. It runs interactively for `ready-for-human` and autonomously for `ready-for-agent`. An untriaged issue is fine: it sizes it, reproduces a bug, and posts the brief it will work to before you say go. For a whole spec at once, `/ways:build <parent>`: it sets the autonomous marker itself so the gate holds, and builds one ticket at a time unless you ask for parallel (`docs/agents/issue-tracker.md` says why). An `<id>` is written the way the tracker writes it: `#12`, `login-timeout`, `billing/03`, `ENG-123`.
 
 ## Merging
 

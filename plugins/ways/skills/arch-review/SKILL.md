@@ -19,7 +19,7 @@ Finding facts is your job, never the person's. Read, with subagents for anything
 - `specs/charter.md` (its invariants), `specs/operating-context.md`, `specs/roadmap.md`, `docs/ARCHITECTURE.md`, `docs/adr/`, `GLOSSARY.md`, `README.md`.
 - `docs/standards/`, mainly `architecture.md` (and its NFR walkthrough), `security.md` and `delivery.md`.
 - The code, as far as the pillars need: entry points, the data store and schema, dependencies and their versions, containers, CI, infrastructure files, how it's deployed.
-- Open issues (`gh issue list --state open`), so you don't report as new what's already known.
+- Open issues, listed as `docs/agents/issue-tracker.md` says, so you don't report as new what's already known.
 
 ## 2. Fit, first
 

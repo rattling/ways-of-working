@@ -3,20 +3,38 @@
 
 These override the defaults above where they differ.
 
+### Tracker operations
+
+The conventions below, and the ways commands, are written in these operations. The section at the end of this file says how each one is done in this repo's tracker. Setup appends one of three: `## Where issues live: GitHub`, `## Where issues live: local markdown` or `## Where issues live: other`. The SessionStart hook reads that heading to tell which tracker the repo uses, so keep it as written.
+
+| Operation | What it does |
+|---|---|
+| **Read an issue** | Its body, its state, its comments, and, for a parent, its tickets. |
+| **Comment on it** | Add a comment: the plan, a brief, a question for a person. |
+| **Set its state** | Give it one state: a triage role, `needs-human`, or done. |
+| **Create an issue** | A new issue, or a ticket under a parent, with what blocks it. |
+| **List open issues** | By state ("everything `ready-for-agent`"), or a parent's open tickets. |
+| **Claim it** | Show that someone has started it. |
+| **Close it through a PR** | The line the PR carries, so merging it closes the issue. |
+
+An issue's **ID** is written the way the tracker writes it: `#12`, `login-timeout`, `billing/03`, `ENG-123`. Commands take an ID in any of these forms. A branch carries it with `/` turned into `-` (`fix/billing-03-<slug>`).
+
+Specs stay in `specs/prd/` whatever the tracker. Code stays in git, and PRs on GitHub.
+
 ### When a skill says "publish a spec" (for example `/to-spec`)
 
 A spec is a PRD, and it lives in the repo, not in an issue.
 
 1. Write it to `specs/prd/<feature-slug>.md` on a branch `spec/<feature-slug>`.
-2. Put a line at the top: `**Tracking:** #<n> · **Status:** draft · **Owner:** <person>`.
+2. Put a line at the top: `**Tracking:** <id> · **Status:** draft · **Owner:** <person>`.
 3. Add two sections if the template lacks them: **Must not exist yet** (things a builder might reasonably add that we don't want now) and **Human verification** (how someone who didn't build it confirms it).
-4. The parent issue. **If an issue already asks for this work** (the request that was triaged or grilled, or one the person names), it becomes the parent: add a short summary and `Spec: specs/prd/<feature-slug>.md` at the top of its body, keeping the original request below. Don't create a second issue. Only when no issue asks for it, create the parent with the summary and the `Spec:` line. Either way, fill in its number on the Tracking line.
-5. **The parent keeps one state label.** Don't apply `ready-for-agent` to it (where `/to-spec` says to): it keeps triage's `ready-for-human` until it's built. The tickets cut from it are what's `ready-for-agent`.
-6. Open a **draft** PR titled `spec: <feature>` with `Refs #<n>`. The design goes onto the same branch, and whoever finishes the design (`/ways:plan` or `/ways:design`) marks it ready. A person merges it once, and that is the spec, what and how, being agreed.
+4. The parent issue. **If an issue already asks for this work** (the request that was triaged or grilled, or one the person names), it becomes the parent: add a short summary and `Spec: specs/prd/<feature-slug>.md` at the top of its body, keeping the original request below. Don't create a second issue. Only when no issue asks for it, create the parent with the summary and the `Spec:` line. Either way, fill in its ID on the Tracking line.
+5. **The parent keeps one state.** Don't set it to `ready-for-agent` (where `/to-spec` says to): it keeps triage's `ready-for-human` until it's built. The tickets cut from it are what's `ready-for-agent`.
+6. Open a **draft** PR titled `spec: <feature>` with `Refs <id>`. The design goes onto the same branch, and whoever finishes the design (`/ways:plan` or `/ways:design`) marks it ready. A person merges it once, and that is the spec, what and how, being agreed.
 
 ### When a skill says "publish the tickets" (`/to-tickets`)
 
-Each ticket is a sub-issue of the parent, labelled `ready-for-agent`, as `/to-tickets` says. Add a **Human verification** section to each, after its acceptance criteria: how someone who didn't build it confirms it, from the PRD's Human verification, or "matches the mock" with what to compare. `/ways:work` won't build a ticket autonomously without it. Add an **Expected size** line too, from the breakdown: rough lines of code and of tests, and the model. If the PRD's design chose a new look, or says the app has no shared look yet, the first ticket builds the theme (and the styled shell, if there's none), and the screen tickets are blocked by it. If it keeps the app's current look, there's no such ticket. If the PRD says the dev seed lacks what the feature needs, the seed ticket comes first (or each ticket adds its own records, as the PRD chose).
+Create each ticket under the parent, with its blockers, in the state `ready-for-agent`, as `/to-tickets` says. Add a **Human verification** section to each, after its acceptance criteria: how someone who didn't build it confirms it, from the PRD's Human verification, or "matches the mock" with what to compare. `/ways:work` won't build a ticket autonomously without it. Add an **Expected size** line too, from the breakdown: rough lines of code and of tests, and the model. If the PRD's design chose a new look, or says the app has no shared look yet, the first ticket builds the theme (and the styled shell, if there's none), and the screen tickets are blocked by it. If it keeps the app's current look, there's no such ticket. If the PRD says the dev seed lacks what the feature needs, the seed ticket comes first (or each ticket adds its own records, as the PRD chose).
 
 A feature needs a PRD only if it needs more than one ticket or changes an invariant or a contract between systems. Otherwise the issue is the spec.
 
@@ -60,8 +78,8 @@ Read the parent issue, follow its `Spec:` line, and read the file.
 
 Work closes through a PR, never by closing the issue directly.
 
-- One ticket, one branch, one PR: `<type>/<issue>-<slug>`, where type is `feature`, `fix`, `chore` or `docs`.
-- The PR body has `Closes #<n>` and a `## How to check` section (the `pr-hygiene` check fails without both), plus what the `pr` skill asks for.
+- One ticket, one branch, one PR: `<type>/<id>-<slug>`, where type is `feature`, `fix`, `chore` or `docs`, and the ID has its `/` turned into `-`.
+- The PR body has the close line (`Closes <id>`, as this repo's tracker section says) and a `## How to check` section (the `pr-hygiene` check fails without both), plus what the `pr` skill asks for.
 - Merging follows the **Merging** section of `AGENTS.md`.
 
 ### Briefs
@@ -72,12 +90,12 @@ An agent brief also has a **Human verification** line: how someone who didn't bu
 
 Triage is optional: `/ways:plan`, `/ways:requirements` and `/ways:work` size an untriaged issue themselves, by these same rules. `/triage` is for new and unsorted work, or a pile of it. Say which path an issue takes, using the table in `AGENTS.md` under **How work goes**:
 
-- **The problem isn't understood yet** (the ask is a list of solutions, or nobody can say who it's for or how we'd know it worked): don't size it. Label it `needs-info`, and say in the comment that it needs `/ways:discover` first, then `/ways:plan`.
-- **One ticket** (fits one PR, changes no invariant or contract): brief it as usual. It's worked with `/ways:work #<n>`.
+- **The problem isn't understood yet** (the ask is a list of solutions, or nobody can say who it's for or how we'd know it worked): don't size it. Set its state to `needs-info`, and say in the comment that it needs `/ways:discover` first, then `/ways:plan`.
+- **One ticket** (fits one PR, changes no invariant or contract): brief it as usual. It's worked with `/ways:work <id>`.
 - **One ticket in disguise:** if every part of big work except the build would be skipped (no real requirements question, nothing to design), it's one ticket. Brief it as one, or say what's missing; often it's the real-world problem the work is meant to fix.
-- **Big work** (more than one ticket, or it changes an invariant or a contract): don't brief it as a ticket. Label it `ready-for-human`, and say in the comment that it's big work and next is `/ways:plan #<n>`, then `/ways:build #<n>`. An intake from `/ways:discover` has a `Brief:` line: read the brief and size from it, and the plan starts from it.
+- **Big work** (more than one ticket, or it changes an invariant or a contract): don't brief it as a ticket. Set its state to `ready-for-human`, and say in the comment that it's big work and next is `/ways:plan <id>`, then `/ways:build <id>`. An intake from `/ways:discover` has a `Brief:` line: read the brief and size from it, and the plan starts from it.
 
-### Labels beyond the triage roles
+### States and labels beyond the triage roles
 
-- `needs-human`: a run is waiting on a decision, an acceptance or information only a person has.
-- `no-issue`: a PR deliberately has no issue behind it (skips `pr-hygiene`).
+- `needs-human`, a state: a run is waiting on a decision, an acceptance or information only a person has.
+- `no-issue`, a PR label whatever the tracker: a PR deliberately has no issue behind it (skips `pr-hygiene`).
