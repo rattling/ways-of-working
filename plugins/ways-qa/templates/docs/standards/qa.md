@@ -1,6 +1,6 @@
 # QA standards
 
-Written by `/ways-qa:setup`. This repo's copy is the one that counts: change it by PR. Both skills read it every time, so a rule written here is a rule they follow. Until the sections marked **fill in** are filled in, triage hands every call to a person.
+Written by `/ways-qa:setup`. This repo's copy is the one that counts: change it by PR. Triage and reproduce read it every time, so a rule written here is a rule they follow. Until the sections marked **fill in** are filled in, triage hands every call to a person.
 
 ## The app under test
 
@@ -10,10 +10,7 @@ Written by `/ways-qa:setup`. This repo's copy is the one that counts: change it 
 
 ## Domain rules
 
-Rules about this app's domain that decide severity or what "correct" means, whatever any one report says. Triage and reproduce treat them as part of the spec.
-
-<!-- fill in. For example: "A wrong total on an invoice is always S1." "Dates show in the user's time zone." -->
-- 
+Not here. This file is how the team works. What's true about the app lives beside the specs: the domain rules (a wrong total is always S1, dates show in the user's time zone) in `specs/domain-rules.md`, what each area should do in `specs/`, and the URLs only in `environments.json`. A domain rule that sets a severity wins over the rubric below.
 
 ## Severity
 

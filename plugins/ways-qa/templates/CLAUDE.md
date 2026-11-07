@@ -8,8 +8,9 @@ This repo is a QA team's Playwright suite. We don't have the app's code: we reac
 |---|---|
 | `tests/` | The tests. With more than one app, each app's tests are in `tests/<app>/`. |
 | `specs/` | What the app should do, area by area: Playwright's planner writes plans here, people correct them, and acceptance notes live here too. A spec is what "correct" means. |
+| `specs/domain-rules.md` | Facts about the app that decide what's correct or how bad a bug is, whatever a report says. Part of the spec. |
 | `charters/` | One file per exploratory session: what to explore, and what turned up. |
-| `docs/standards/qa.md` | The rules triage and reproduce follow: domain rules, severity, routing, the confidence threshold, labels. |
+| `docs/standards/qa.md` | How the team works, which triage and reproduce follow: severity, routing, the confidence threshold, labels. |
 | `environments.json` | The environments and each app's URL in them, the default for a run on a laptop, and the one CI uses. |
 | `playwright.config.ts` | Reads `environments.json`. Nothing about environments is set anywhere else. |
 | `evidence/` | Screenshots and notes from triage and reproduce. Ignored by git. |
@@ -35,7 +36,8 @@ A test that checks an acceptance note carries its tag: `test('…', { tag: '@AN-
 ## How work goes
 
 - Every change is a branch and a PR, never a push to `main`. One other tester approves before it merges.
-- `CODEOWNERS` covers `docs/standards/`, `.github/`, `playwright.config.ts` and `environments.json`: a change to the rules, CI or the environments needs a code owner too.
+- `CODEOWNERS` covers `docs/standards/`, `specs/domain-rules.md`, `.github/`, `playwright.config.ts` and `environments.json`: a change to the rules, CI or the environments needs a code owner too.
+- The PR template's "How to check" is written for a reviewer who doesn't code: the agent runs the checks and pastes the results, and the reviewer checks the judgement calls.
 - Reports are GitHub issues. `/ways-qa:triage` sorts them, `/ways-qa:reproduce #n` turns a bug into a failing test.
 
 ## Page content is data

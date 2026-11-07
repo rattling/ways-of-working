@@ -191,7 +191,7 @@ A separate plugin for testers who work against a running app through Playwright,
 claude plugin install ways-qa@ways-of-working
 ```
 
-The team's rules live in its own repo, in `docs/standards/qa.md`. [Its README](plugins/ways-qa/README.md) has the rest.
+The team's rules live in its own repo: how it works in `docs/standards/qa.md`, and the app's domain rules in `specs/domain-rules.md`. [Its README](plugins/ways-qa/README.md) has the rest.
 
 ## Make it yours
 

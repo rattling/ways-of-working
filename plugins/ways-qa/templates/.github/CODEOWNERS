@@ -1,5 +1,6 @@
 # A change to these needs a code owner's approval. Setup fills in the owner.
 /docs/standards/      @owner
+/specs/domain-rules.md @owner
 /.github/             @owner
 /playwright.config.ts @owner
 /environments.json    @owner

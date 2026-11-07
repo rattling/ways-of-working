@@ -189,11 +189,11 @@ A QA team that tests a running app, without its code, installs `ways-qa` instead
 claude plugin install ways-qa@ways-of-working
 ```
 
-- **`/ways-qa:setup`** sets the repo up in a few minutes and four questions: the environments and their URLs, the QA standards, Playwright's agents, CI, and the labels. The gate is the suite, kept green by marking known open bugs. A QA repo never needs `/ways:setup`, which is for app repos.
-- **`/ways-qa:triage`** sorts reports: possible duplicates and regressions from open and closed issues, bug or request or working as designed, severity, the team it goes to, evidence from the browser, and a confidence for each call. Calls below the agreed threshold go to a person, and a third bug of the same kind gets an improvement issue drafted for engineering.
-- **`/ways-qa:reproduce #n`** turns one report into a Playwright test that fails for the right reason, written from what should happen rather than what the app does now.
+- **`/ways-qa:setup`** sets the repo up in a few minutes and four questions: the environments and their URLs, the QA standards, the domain rules, Playwright's agents, CI, a PR template a non-coder can review against, and the labels. The gate is the suite, kept green by marking known open bugs. A QA repo never needs `/ways:setup`, which is for app repos.
+- **`/ways-qa:triage`** sorts reports: possible duplicates and regressions from open and closed issues, bug or request or working as designed, severity, the team it goes to, evidence from the browser, and a confidence for each call. Calls below the agreed threshold are listed under the table as "Needs you", for a person, and a third bug of the same kind gets an improvement issue drafted for engineering.
+- **`/ways-qa:reproduce #n`** turns one report into a Playwright test that fails for the right reason, written from what should happen rather than what the app does now, in a PR whose checks a non-coder can follow.
 
-The rules (severity, routing, the confidence threshold, the app's own domain rules) live in the QA repo's `docs/standards/qa.md`, not in the plugin. Its [README](https://github.com/rattling/ways-of-working/tree/main/plugins/ways-qa) has the detail.
+The rules live in the QA repo, not in the plugin: how the team works (severity, routing, the confidence threshold) in `docs/standards/qa.md`, and the app's domain rules in `specs/domain-rules.md`. Its [README](https://github.com/rattling/ways-of-working/tree/main/plugins/ways-qa) has the detail.
 
 ### Moving trackers
 
