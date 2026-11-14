@@ -85,7 +85,7 @@ The full routing table, with what counts as big and the only two shortcuts allow
 | `/ways:arch-review` | A guided architecture review, ending in a critique to turn into tickets |
 | `/ways:requirements`, `/ways:design` | The two halves of a plan, for when different people do them |
 | `/ways:feedback` | Reviews how ways has worked across your runs, and sends what keeps coming up back here as issues |
-| `/ways:handover` | Before you `/clear`: writes down where the work stands, so the next session picks up from the repo |
+| `/ways:handover` | Before you `/clear`: tidies git, the issue and the PR, then writes down where the work stands, so the next session picks up from the repo |
 
 <details>
 <summary><b>More about each command</b></summary>
@@ -98,7 +98,7 @@ The full routing table, with what counts as big and the only two shortcuts allow
 - **`/ways:mock`** is for anything people look at. Mocks come after the decisions, look like the finished product, and carry a guided tour. [`examples/mocks/`](examples/mocks/) has three.
 - **`/ways:arch-review`** walks the pillars of a Well-Architected Review (reliability, security, cost, operations, performance) and ends with what holds, the one thing that would sink it, and the gaps.
 - **`/ways:feedback`** reviews the ways log every so often. Every command logs its run to `~/.ways/log.md` on your machine, fine or not, with a note for each step that felt heavy, missing or broken. The review counts them across runs and repos and brings back only what recurs, so one awkward session doesn't steer the method. For each theme you keep, it strips client and repo detail, shows you the text, and opens the issue only after a yes.
-- **`/ways:handover`** is a shift change. Run it before `/clear` and it writes two short notes while the session still remembers: `.ways/handover.md` (where things stand, what was decided and why, what's next), replaced each time and never committed, and how the session went, appended to `~/.ways/sessions.md` or wherever your own CLAUDE.md says. Lessons about the repo or about ways go where they already go (`AGENTS.md`, issues, the ways log). Then you type `/clear`, and the next session reads the note before anything else.
+- **`/ways:handover`** is a shift change. Run it before `/clear` and it tidies up first: commits and pushes the work's branch (never `main`), brings the issue's status and the PR up to date, puts what was decided on the issue, and stops what the session started. Then it writes two short notes while the session still remembers: `.ways/handover.md` (where things stand, what was decided and why, what's next), replaced each time and never committed, and how the session went, appended to `~/.ways/sessions.md` or wherever your own CLAUDE.md says. Lessons about the repo or about ways go where they already go (`AGENTS.md`, issues, the ways log). Then you type `/clear`, and the next session reads the note before anything else.
 
 Pocock's skills run underneath and can still be typed on their own. `/ways:plan` uses `grilling`, `domain-modeling` and `to-spec`; `/ways:build` uses `to-tickets`, `implement-spec` and `code-review`. Ways calls them and adds its conventions; it doesn't copy them.
 
