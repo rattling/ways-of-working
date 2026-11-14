@@ -141,6 +141,34 @@ start_in "$main"
 check "no tracker file: GitHub, with # written once" '[[ $out == *"leading a batch: #12 #14 in that merge order"* && $out == *"gh issue view 12 --comments"* && $out == *"gh issue view 14 --comments"* && $out == *"Status lives in GitHub issues"* ]]'
 git -C "$main" worktree remove --force "$wt"; rm -rf "$main"
 
+
+# The note /ways:handover leaves in .ways/handover.md. $1: what started the session.
+start_as() {
+  local plugin
+  plugin="$(mktemp -d)"; mkdir -p "$plugin/.claude-plugin"
+  echo '{"name": "ways", "version": "0.5.0"}' > "$plugin/.claude-plugin/plugin.json"
+  out="$(printf '{"cwd":"%s","source":"%s"}' "$main" "$1" | CLAUDE_PROJECT_DIR="$main" CLAUDE_PLUGIN_ROOT="$plugin" bash "$script")"
+  rm -rf "$plugin"
+}
+pair
+start_as clear
+check "no handover note: nothing said about one" '[[ $out != *handover* ]]'
+mkdir -p "$main/.ways"; printf '# Handover · branch 84-handover\n\n## Next\n- write the test\n' > "$main/.ways/handover.md"
+for how in clear startup resume; do
+  start_as "$how"
+  check "on $how, the note is printed, with read-it-first" '[[ $out == *"handover note from an earlier session"* && $out == *"Before anything else"* && $out == *"- write the test"* ]]'
+done
+start_as compact
+check "not after a compaction, whose summary is newer" '[[ $out == *"Gate:"* && $out != *"write the test"* ]]'
+check "the note stays out of git" '[[ -z $(git -C "$main" status --porcelain --untracked-files=all -- .ways) ]]'
+git -C "$main" worktree remove --force "$wt"; rm -rf "$main"
+
+repo="$(mktemp -d)"; mkdir -p "$repo/.ways"; echo "- a stray note" > "$repo/.ways/handover.md"
+plugin="$(mktemp -d)"; mkdir -p "$plugin/.claude-plugin"; echo '{"version": "0.5.0"}' > "$plugin/.claude-plugin/plugin.json"
+out="$(echo '{"source":"clear"}' | CLAUDE_PROJECT_DIR="$repo" CLAUDE_PLUGIN_ROOT="$plugin" bash "$script")"
+check "a repo that hasn't opted in hears nothing, even with a note" '[[ -z $out ]]'
+rm -rf "$repo" "$plugin"
+
 echo
 if (( failures )); then echo "$failures failed"; exit 1; fi
 echo "all passed"

@@ -10,6 +10,8 @@ input="$(cat)"
 # can point at the main checkout, which would share .ways/ state between sessions.
 # sed -E, so the pattern works in GNU and BSD sed alike.
 cwd="$(printf '%s' "$input" | sed -nE 's/.*"cwd"[[:space:]]*:[[:space:]]*"(([^"\\]|\\.)*)".*/\1/p' | head -1 | sed 's/\\\\/\\/g')"
+# What started the session: startup, resume, clear or compact.
+started="$(printf '%s' "$input" | sed -nE 's/.*"source"[[:space:]]*:[[:space:]]*"([a-z]+)".*/\1/p' | head -1)"
 project=""
 [[ -n "$cwd" ]] && project="$(git -C "$cwd" rev-parse --show-toplevel 2>/dev/null)"
 project="${project:-${CLAUDE_PROJECT_DIR:-$PWD}}"
@@ -107,4 +109,12 @@ fi
 # Only a minor or major release changes what setup lays down; a patch release doesn't.
 if [[ -n "$repo_version" && -n "$plugin_version" && "${repo_version%.*}" != "${plugin_version%.*}" ]]; then
   echo "- The repo was set up with ${repo_version}; the plugin is ${plugin_version}. Suggest running /ways:setup to update it."
+fi
+# The note /ways:handover left for this checkout. Not after a compaction: the session's own
+# summary is newer than the note, and the note would pull it back to an older state.
+handover="$state/handover.md"
+if [[ $started != compact && -s "$handover" ]]; then
+  echo "- A handover note from an earlier session (.ways/handover.md). Before anything else, read it: it's where the work stood when that session ended. Where git or the tracker has moved on since, they win."
+  echo
+  cat "$handover"
 fi
