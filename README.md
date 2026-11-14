@@ -185,6 +185,23 @@ claude plugin install ways-band@ways-of-working
 
 It's also a small worked example of a [mod](https://code.claude.com/docs/en/plugins/mods/overview): one file, [`register.js`](plugins/ways-band/hooks/register.js), with tests beside it. Mods run with your permissions. This one reads `.claude/ways.json`, `.ways/` and `AGENTS.md`, writes `.ways/last-gate`, runs `git branch` and, on `/gate`, the gate.
 
+## `ways-compass`: a pane that keeps you oriented
+
+An optional plugin that opens a pane beside the chat, for anyone who wants the big picture in view, and especially people new to building as a team:
+
+- **This piece of work:** the goal and its steps from `.ways/goal`, with a progress bar. Claude keeps it current when a repo's `AGENTS.md` asks it to.
+- **The project:** the current GitHub milestone, with a progress bar and its issues (in progress, waiting, free to take) folded away until you want them.
+- **Your learning:** progress from the repo's learning record for you, if `.claude/compass.json` names one (`"learning": "learning/people/{login}.md"`).
+- **Your go-to:** the commands and documents `.claude/compass.json` lists, a click away.
+
+**Minimise** shrinks it to its two bars; `/compass` brings it back, even after you've closed it.
+
+```bash
+claude plugin install ways-compass@ways-of-working
+```
+
+A mod, like `ways-band`: it runs with your permissions. It reads `.ways/goal`, `.claude/compass.json` and the learning record, and runs `gh` to read the milestone, its issues and open PRs.
+
 ## `ways-qa`: for QA teams
 
 A separate plugin for testers who work against a running app through Playwright, without the app's code. It installs ways and the Playwright plugin with it, and adds `/ways-qa:setup` (the QA repo's own setup, in place of `/ways:setup`), `/ways-qa:triage` (duplicates, regressions, severity, routing, browser evidence and a stated confidence for each call) and `/ways-qa:reproduce` (a report to a Playwright test that fails for the right reason).
