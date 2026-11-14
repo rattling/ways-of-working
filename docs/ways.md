@@ -161,7 +161,7 @@ claude plugin install ways@ways-of-working
 claude plugin install ways-band@ways-of-working
 ```
 
-Installing `ways` brings Matt Pocock's skills with it. `ways-band` is optional: the status strip above the prompt, and `/gate`. You also need git, and the GitHub CLI, signed in with permission to push workflow files:
+Installing `ways` brings Matt Pocock's skills with it. `ways-band` is optional: the status strip above the prompt, and `/gate`. So is `ways-compass` (`claude plugin install ways-compass@ways-of-working`): a pane beside the chat with the work under way, the milestone and your go-to list. You also need git, and the GitHub CLI, signed in with permission to push workflow files:
 
 ```
 winget install --id GitHub.cli

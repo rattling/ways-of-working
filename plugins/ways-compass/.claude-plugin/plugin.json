@@ -1,0 +1,13 @@
+{
+  "name": "ways-compass",
+  "displayName": "Ways compass",
+  "version": "0.1.0",
+  "description": "A mod: a pane beside the chat that keeps you oriented. The piece of work under way and its steps (.ways/goal), the project's milestone from GitHub, your learning progress if the repo keeps it, and your go-to commands and documents (.claude/compass.json). /compass brings it back.",
+  "author": {
+    "name": "John Curry"
+  },
+  "repository": "https://github.com/rattling/ways-of-working",
+  "license": "MIT",
+  "keywords": ["mod", "pane", "ways"],
+  "types": "./types/index.d.ts"
+}
