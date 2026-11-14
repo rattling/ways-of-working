@@ -222,8 +222,9 @@ For most teams the right choice is the simplest one: use ways as it is, and keep
 
 ```
 claude plugin marketplace update ways-of-working
-claude plugin update ways@ways-of-working
 ```
+
+In a repo set up with ways, that's all: the repo turns ways on in its own `.claude/settings.json`, and Claude Code loads the newest version from the marketplace. If you installed ways yourself with `claude plugin install`, also run `claude plugin update ways@ways-of-working`. Where ways only comes from the repo's settings, that command says "Plugin "ways" is not installed", which is harmless.
 
 Restart Claude Code, then run `/ways:setup` in each repo. Setup brings the repo up to date: it replaces the sections ways owns, adds anything new to the standards, and leaves your own edits alone.
 

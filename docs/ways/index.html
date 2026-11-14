@@ -266,8 +266,8 @@ gh auth refresh -s workflow
 <p>Much of the method doesn't need git at all: discovery, the requirements grill, mocks, the architecture page and reviews, explaining the code, triage and the brief. When you're on git, move to ways, or keep your own plugin if it suits you better.</p></div>
 <div class="panel prose" role="tabpanel" id="area-getting-started-making-it-yours" aria-labelledby="area-getting-started-making-it-yours-tab" hidden><p>For most teams the right choice is the simplest one: use ways as it is, and keep it up to date. Fixes and improvements arrive with each version, and nobody on your side has to maintain a method. Every so often, update it:</p>
 <pre><code>claude plugin marketplace update ways-of-working
-claude plugin update ways@ways-of-working
 </code></pre>
+<p>In a repo set up with ways, that's all: the repo turns ways on in its own <code>.claude/settings.json</code>, and Claude Code loads the newest version from the marketplace. If you installed ways yourself with <code>claude plugin install</code>, also run <code>claude plugin update ways@ways-of-working</code>. Where ways only comes from the repo's settings, that command says "Plugin "ways" is not installed", which is harmless.</p>
 <p>Restart Claude Code, then run <code>/ways:setup</code> in each repo. Setup brings the repo up to date: it replaces the sections ways owns, adds anything new to the standards, and leaves your own edits alone.</p>
 <p>From there, add what's yours in layers. Each one adds to the layer above it:</p>
 <div class="scroll"><table>

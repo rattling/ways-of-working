@@ -197,7 +197,7 @@ The team's rules live in its own repo, in `docs/standards/qa.md`. [Its README](p
 
 ## Make it yours
 
-For most teams, the right choice is to use ways as it is and keep it up to date: fixes and improvements arrive with each version, and you don't maintain anything. Update it with `claude plugin marketplace update ways-of-working` and `claude plugin update ways@ways-of-working`, restart Claude Code, then run `/ways:setup` in each repo. Setup replaces only what ways owns and leaves your edits alone.
+For most teams, the right choice is to use ways as it is and keep it up to date: fixes and improvements arrive with each version, and you don't maintain anything. Update it with `claude plugin marketplace update ways-of-working`, restart Claude Code, then run `/ways:setup` in each repo. A repo set up with ways turns the plugin on in its own settings, so the marketplace update is all it needs. Only if you installed ways yourself with `claude plugin install` do you also need `claude plugin update ways@ways-of-working`; elsewhere that command says ways "is not installed", which is harmless. Setup replaces only what ways owns and leaves your edits alone.
 
 Then add what's yours in layers:
 
