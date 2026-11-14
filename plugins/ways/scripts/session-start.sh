@@ -68,8 +68,17 @@ read_issue() {
 # An ID as people write it: # only on a bare number.
 show_id() { [[ $1 =~ ^[0-9]+$ ]] && echo "#$1" || echo "$1"; }
 
+# The note /ways:handover left for this checkout. Not after a compaction: the session's own
+# summary is newer than the note, and the note would pull it back to an older state.
+# Named first, so it isn't lost under the orientation; printed last, in full.
+handover="$state/handover.md"
+[[ $started != compact && -s "$handover" ]] || handover=""
+
 echo "This repo works the ways-of-working way on Matt Pocock's skills (ways ${plugin_version}, repo set up at ${repo_version:-unknown})."
 echo
+if [[ -n $handover ]]; then
+  echo "- Picking up from a handover: the last session left a note, printed at the end of this context. Before anything else, read it and check it against git: it's where the work stood when that session ended, and where git or the tracker has moved on since, they win."
+fi
 echo "- Read AGENTS.md first. Specs: specs/ (charter, roadmap, operating-context, brief/, prd/). Language: GLOSSARY.md. Decisions: docs/adr/. ${status_lives}"
 # The flow is written once, in the repo's AGENTS.md ("How work goes"): print that section, not a copy of it.
 flow=""
@@ -110,11 +119,9 @@ fi
 if [[ -n "$repo_version" && -n "$plugin_version" && "${repo_version%.*}" != "${plugin_version%.*}" ]]; then
   echo "- The repo was set up with ${repo_version}; the plugin is ${plugin_version}. Suggest running /ways:setup to update it."
 fi
-# The note /ways:handover left for this checkout. Not after a compaction: the session's own
-# summary is newer than the note, and the note would pull it back to an older state.
-handover="$state/handover.md"
-if [[ $started != compact && -s "$handover" ]]; then
-  echo "- A handover note from an earlier session (.ways/handover.md). Before anything else, read it: it's where the work stood when that session ended. Where git or the tracker has moved on since, they win."
+if [[ -n $handover ]]; then
+  echo
+  echo "## Handover note (.ways/handover.md)"
   echo
   cat "$handover"
 fi

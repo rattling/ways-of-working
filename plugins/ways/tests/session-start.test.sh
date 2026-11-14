@@ -156,7 +156,8 @@ check "no handover note: nothing said about one" '[[ $out != *handover* ]]'
 mkdir -p "$main/.ways"; printf '# Handover · branch 84-handover\n\n## Next\n- write the test\n' > "$main/.ways/handover.md"
 for how in clear startup resume; do
   start_as "$how"
-  check "on $how, the note is printed, with read-it-first" '[[ $out == *"handover note from an earlier session"* && $out == *"Before anything else"* && $out == *"- write the test"* ]]'
+  check "on $how, the note is printed, with read-it-first" '[[ $out == *"## Handover note"* && $out == *"Before anything else"* && $out == *"- write the test"* ]]'
+  check "on $how, it's named near the top, before the orientation" '[[ $(sed -n 3p <<< "$out") == *"Picking up from a handover"* ]]'
 done
 start_as compact
 check "not after a compaction, whose summary is newer" '[[ $out == *"Gate:"* && $out != *"write the test"* ]]'
