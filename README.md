@@ -191,7 +191,7 @@ An optional plugin that opens a pane beside the chat, for anyone who wants the b
 
 - **This piece of work:** the goal and its steps from `.ways/goal`, with a progress bar. Claude keeps it current when a repo's `AGENTS.md` asks it to.
 - **The project:** the current GitHub milestone, with a progress bar and its issues (in progress, waiting, free to take) folded away until you want them.
-- **Your learning:** progress from the repo's learning record for you, if `.claude/compass.json` names one (`"learning": "learning/people/{login}.md"`).
+- **Your learning:** progress from the repo's learning record for you, if `.claude/compass.json` names one (`"learning": "learning/people/{login}.md"`): each challenge's steps (done, understood, again), and, where the record keeps reviews, how many are mastered and due, with a **Quiz me** button when something is waiting.
 - **Your go-to:** the commands and documents `.claude/compass.json` lists, a click away.
 
 **Minimise** shrinks it to its two bars; `/compass` brings it back, even after you've closed it.

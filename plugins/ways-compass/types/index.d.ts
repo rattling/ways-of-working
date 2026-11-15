@@ -32,8 +32,21 @@ export type Learning = {
   name: string
   topicsAtOne: number
   topics: number
+  /** Challenges with all three of Do, Understood and Again filled. */
   challengesDone: number
   challenges: number
+  /** Each step on its own: challenges with Do filled, with Understood filled, with Again filled. */
+  challengesStarted: number
+  challengesUnderstood: number
+  challengesAgain: number
+  /** The record has the review columns (Next review, Rung, Mastered); older records don't. */
+  hasReviews: boolean
+  /** Challenges with a Mastered date. */
+  mastered: number
+  /** Challenges with a Next review on or before today and no Mastered date. */
+  reviewsDue: number
+  /** Challenges done but not yet understood. */
+  toUnderstand: number
   toursDone: number
   tours: number
   badges: string[]
