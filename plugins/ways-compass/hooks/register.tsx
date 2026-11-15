@@ -9,7 +9,7 @@ const TITLE = 'Compass'
 const goal = atom({ plugin: 'ways-compass', key: 'goal' } as const, null, { shape: 'goal-1' })
 const milestone = atom({ plugin: 'ways-compass', key: 'milestone' } as const, null, { shape: 'milestone-1' })
 const config = atom({ plugin: 'ways-compass', key: 'config' } as const, null, { shape: 'config-1' })
-const learning = atom({ plugin: 'ways-compass', key: 'learning' } as const, null, { shape: 'learning-1' })
+const learning = atom({ plugin: 'ways-compass', key: 'learning' } as const, null, { shape: 'learning-2' })
 /** Whether the pane is up; when it isn't, a row above the prompt offers it back. */
 const isOpen = atom({ plugin: 'ways-compass', key: 'open' } as const, false, { shape: 'open-1' })
 /** Minimised: the pane stays put but shows only the two bars and Expand. */
@@ -101,7 +101,18 @@ function tableUnder(md: string, heading: string): string[][] {
   return rows.slice(1)
 }
 
-function parseLearning(md: string): Learning {
+/** Today as YYYY-MM-DD, in the learner's own time zone. */
+function isoDay(ms: number): string {
+  const d = new Date(ms)
+  const pad = (n: number) => String(n).padStart(2, '0')
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`
+}
+
+/**
+ * A learning record. The Challenges table is `| # | Challenge | Do | Understood | Again |`,
+ * and newer records add `| Next review | Rung | Mastered |` (dates YYYY-MM-DD).
+ */
+function parseLearning(md: string, today: string): Learning {
   const name = (md.match(/^# (.+?)(?: \(|$)/m)?.[1] ?? '').trim()
   const topics = tableUnder(md, 'Topics')
   const challenges = tableUnder(md, 'Challenges')
@@ -109,14 +120,23 @@ function parseLearning(md: string): Learning {
   const bStart = md.indexOf('## Badges')
   const bBlock = bStart < 0 ? '' : md.slice(bStart).split(NL).slice(1).join(NL).split(NL + '## ')[0] ?? ''
   const badges = bBlock.split(NL).filter(l => /^\s*[-*] /.test(l)).map(l => (l.replace(/^\s*[-*] /, '').replace(/\*\*/g, '').split(/[:(]/)[0] ?? '').trim()).filter(Boolean)
-  const complete = (row: string[]) => row.slice(2, 5).length === 3 && row.slice(2, 5).every(c => c !== '')
+  const has = (row: string[], i: number) => (row[i] ?? '') !== ''
+  const complete = (row: string[]) => has(row, 2) && has(row, 3) && has(row, 4)
   const next = challenges.find(r => !complete(r))
+  const date = (row: string[], i: number) => (row[i] ?? '').match(/\d{4}-\d{2}-\d{2}/)?.[0]
   return {
     name,
     topicsAtOne: topics.filter(r => Number(r[1]) >= 1).length,
     topics: topics.length,
     challengesDone: challenges.filter(complete).length,
     challenges: challenges.length,
+    challengesStarted: challenges.filter(r => has(r, 2)).length,
+    challengesUnderstood: challenges.filter(r => has(r, 3)).length,
+    challengesAgain: challenges.filter(r => has(r, 4)).length,
+    hasReviews: challenges.some(r => r.length >= 8),
+    mastered: challenges.filter(r => has(r, 7)).length,
+    reviewsDue: challenges.filter(r => !has(r, 7) && (date(r, 5) ?? '9999') <= today).length,
+    toUnderstand: challenges.filter(r => has(r, 2) && !has(r, 3)).length,
     toursDone: tours.filter(r => (r[1] ?? '') !== '').length,
     tours: tours.length,
     badges,
@@ -145,7 +165,7 @@ async function refreshLearning($: Dollar) {
   if (login) {
     const path = (await read($, config))?.learning
     if (path) try {
-      l = parseLearning(await $.fs.read(path.split('{login}').join(login)))
+      l = parseLearning(await $.fs.read(path.split('{login}').join(login)), isoDay(await $.clock.now()))
     } catch {
       l = null
     }
@@ -409,9 +429,19 @@ export const register: Register = on => {
               <Box flexDirection="column">
                 {meter('tours', l.toursDone, l.tours, `Tours ${l.toursDone} of ${l.tours}`)}
                 {meter('topics', l.topicsAtOne, l.topics, `Level 1 in ${l.topicsAtOne} of ${l.topics} topics`)}
-                {meter('challenges', l.challengesDone, l.challenges, `Challenges ${l.challengesDone} of ${l.challenges}`)}
+                {meter(
+                  'challenges',
+                  l.challengesStarted,
+                  l.challenges,
+                  `Challenges of ${l.challenges}: done ${l.challengesStarted} · understood ${l.challengesUnderstood} · again ${l.challengesAgain}`,
+                )}
+                {l.hasReviews ? meter('mastered', l.mastered, l.challenges, `Mastered ${l.mastered} of ${l.challenges}`) : null}
+                {l.hasReviews ? <Text key="due" bold={l.reviewsDue > 0} dimColor={l.reviewsDue === 0}>{`Reviews due: ${l.reviewsDue}`}</Text> : null}
                 <Text dimColor={l.badges.length === 0}>{l.badges.length ? '★ ' + l.badges.join(' · ') : 'No badges yet'}</Text>
                 {l.nextChallenge ? <Text dimColor>Next: {l.nextChallenge}</Text> : null}
+                {l.reviewsDue + l.toUnderstand > 0 ? (
+                  <Button key="quiz" onPress={fill("Quiz me on what's due")}>{`Quiz me (${l.reviewsDue + l.toUnderstand} waiting)`}</Button>
+                ) : null}
                 <Button key="learn" onPress={fill('/learn')}>/learn</Button>
               </Box>,
             )
