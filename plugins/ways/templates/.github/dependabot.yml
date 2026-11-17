@@ -1,0 +1,42 @@
+# Dependabot version updates: the routine-upgrade side. Alerts and security updates are repo
+# settings, separate from this file, and react to published advisories straight away.
+#
+# `cooldown` holds a new release for 14 days before Dependabot proposes it. Supply-chain attacks
+# (a hijacked maintainer, a malicious version) are usually caught within days, so waiting is close
+# to free and being first to adopt a bad release is not. Security updates ignore cooldown, which is
+# what we want. The same hold is set in the package tools too (docs/standards/security.md, "The
+# 14-day hold"), because Dependabot's cooldown only covers Dependabot's own PRs.
+#
+# /ways:setup keeps one entry per ecosystem the repo has: github-actions always, then uv, npm
+# (pnpm repos are "npm" here), composer, nuget. No auto-merge: every PR goes through the gate.
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: monthly
+    open-pull-requests-limit: 5
+    cooldown:
+      default-days: 14
+    commit-message:
+      prefix: "chore(deps)"
+
+  - package-ecosystem: uv
+    directory: /
+    schedule:
+      interval: monthly
+    open-pull-requests-limit: 5
+    cooldown:
+      default-days: 14
+    commit-message:
+      prefix: "chore(deps)"
+
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: monthly
+    open-pull-requests-limit: 5
+    cooldown:
+      default-days: 14
+    commit-message:
+      prefix: "chore(deps)"

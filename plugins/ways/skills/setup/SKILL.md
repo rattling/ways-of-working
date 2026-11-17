@@ -58,6 +58,15 @@ Templates live in `${CLAUDE_PLUGIN_ROOT}/templates/`. For each one, except `over
 
 **Containers and worktrees.** If the repo has a `docker-compose.yml` (or `compose.yaml`), check it against the worktree rules in `${CLAUDE_PLUGIN_ROOT}/templates/docs/standards/delivery.md` ("Every worktree runs its own containers"): no fixed `name:`, published ports from a variable with a default, a gate that needs no host port. Don't change it in the setup PR: where it falls short, create one issue with the fix (or add to an open one that already covers it), in the state `ready-for-agent`, and list it in the report. Do this on every run, not only the first. If the repo's `docs/standards/delivery.md` came from ways and lacks that bullet, add it: it's new since the repo was set up, and the builders' instructions point to it.
 
+**The 14-day hold.** New dependency versions wait 14 days, whoever adds them (`docs/standards/security.md`, "The 14-day hold"). On every run, not only the first:
+
+- `.github/dependabot.yml`: keep one template entry per ecosystem the repo has (`github-actions` always; `uv` where there's a `uv.lock`; `npm` for an npm or pnpm lockfile, with `directory` where the lockfile is; `composer`, `nuget` likewise), and drop the rest. An existing `dependabot.yml` keeps its own entries: add `cooldown: default-days: 14` where one has none, and any missing ecosystem's entry. List what changed.
+- `pyproject.toml` with a `uv.lock` beside it: `exclude-newer = "14 days"` under `[tool.uv]`, unless an `exclude-newer` is already set. In a uv workspace, only the root.
+- `pnpm-workspace.yaml` (create it with just this if the repo uses pnpm and has none): `minimumReleaseAge: 20160`, unless one is set.
+- A `package-lock.json` (npm): npm can't hold releases back. List it in the report and suggest an issue to move the repo to pnpm.
+
+These go in the setup PR. The uv setting only changes what the next `uv lock` may pick, so the lockfile doesn't change now.
+
 `.github/CODEOWNERS`: fill in the high-risk paths this repo actually has, matching `REVIEW.md`. Owners are a judgement call: leave `@owner` and list it as `needs-human` unless the person names them.
 
 `AGENTS.md`: Pocock's setup may already have created it with only the `## Agent skills` section. Add the template's sections around that section; never remove or rewrite it. If the `## Agent skills` section is in `CLAUDE.md` instead, it moves to `AGENTS.md` with the rest of `CLAUDE.md`'s content (below), unchanged. Fill in the gate command, the read order and the merge policy from what the repo shows. Leave genuine judgement calls as placeholders and list them. The `### Issue tracker` line under `## Agent skills` says where this repo's issues live. The template's line is GitHub's. For local markdown it's "Issues live as markdown files under `.scratch/`, committed with the code. See `docs/agents/issue-tracker.md`.", and for other it names the tracker and how Claude reaches it. Change the line only when it names a tracker other than this repo's.
