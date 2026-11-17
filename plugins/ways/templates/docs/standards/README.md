@@ -7,9 +7,9 @@ Copied in by `/ways:setup`. Just enough to be useful. This repo's copy is the on
 | [architecture.md](architecture.md) | Diagrams, contracts, decoupling, proportion, decisions, the NFR walkthrough |
 | [code.md](code.md) | Writing code: size, errors, config, linting |
 | [testing.md](testing.md) | What to test, where, and with what |
-| [security.md](security.md) | Secrets, data, checks at each stage |
+| [security.md](security.md) | Secrets, data, the supply chain, checks at each stage |
 | [delivery.md](delivery.md) | Branches, the gate, CI, environments, deploys |
-| [php.md](php.md) / [dotnet.md](dotnet.md) | The stack: where it is, where it's going, its tools. Only the ones this repo uses |
+| [python.md](python.md) / [node.md](node.md) / [php.md](php.md) / [dotnet.md](dotnet.md) | The stack: where it is, where it's going, its tools. Only the ones this repo uses |
 
 ## Every rule says where it's checked
 
@@ -23,7 +23,11 @@ A rule nothing checks is advice. This is the list of what's enforced and by what
 | A file past ~500 lines is a prompt to split | The `ways` hook (tells the agent once per file); review | While editing; PR |
 | No secrets in the repo | GitHub push protection; secret scan in CI; the agent can't read `.env` | Push; PR; while editing |
 | No dependency with a known high-severity vulnerability | Dependabot alerts and updates; the dependency audit in the gate | Daily; PR |
-| Code scanning finds nothing new at high | CodeQL (C#, JavaScript), Psalm taint analysis or Semgrep (PHP) | PR |
+| Installs match the committed lockfile | A frozen install in the gate (`uv sync --locked`, `pnpm install --frozen-lockfile`, `npm ci`) | PR |
+| No dependency code runs at install unless allowed by name | pnpm `allowBuilds`; uv `no-build` | Every install |
+| A new dependency is named in the PR with a reason | Review, against the lockfile diff | PR |
+| Actions are pinned to a SHA, workflows set minimal `permissions:`, no `pull_request_target` checks out PR code | `/ways:setup`; review of `.github/workflows/` | Setup; PR |
+| Code scanning finds nothing new at high | CodeQL (Python, JavaScript/TypeScript, C#), Psalm taint analysis or Semgrep (PHP) | PR |
 | Hard-to-reverse decisions have an ADR | Review: `CODEOWNERS` on `docs/adr/` | PR |
 | Public contracts change by addition only, unless a PRD says otherwise | A contract test in the gate; `CODEOWNERS` on the contract | PR |
 | High-risk paths get a second person and `/security-review` | `CODEOWNERS`; the risk tier in `REVIEW.md` | PR |
