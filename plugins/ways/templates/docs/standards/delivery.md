@@ -25,12 +25,27 @@
   | Stack | `runs-on` | Before the gate |
   |---|---|---|
   | Gate in Docker Compose (any stack) | `ubuntu-latest` | Nothing: the runner has Docker |
-  | Node with pnpm: React, Next.js, Vite, an Express API | `ubuntu-latest` | `pnpm/action-setup@v4` (reads `packageManager`), `actions/setup-node@v4` (`node-version-file: .nvmrc` or `package.json`, `cache: pnpm`), then `pnpm install --frozen-lockfile` |
-  | Node still on npm | `ubuntu-latest` | `actions/setup-node@v4` (as above, `cache: npm`), then `npm ci` |
-  | Python | `ubuntu-latest` | `astral-sh/setup-uv@v5`, then `uv sync --locked` |
-  | .NET 6 and later | `ubuntu-latest` | `actions/setup-dotnet@v4` (`global-json-file: global.json` if there is one) |
-  | .NET Framework | `windows-latest`: MSBuild and `vstest` run only on Windows | `microsoft/setup-msbuild@v2`, `NuGet/setup-nuget@v2`, then `nuget restore` |
-  | PHP, outside Docker | `ubuntu-latest` | `shivammathur/setup-php@v2` (the version the stack file names), then `composer install` |
+  | Node with pnpm: React, Next.js, Vite, an Express API | `ubuntu-latest` | `pnpm/action-setup` (reads `packageManager`), `actions/setup-node` (`node-version-file: .nvmrc` or `package.json`, `cache: pnpm`), then `pnpm install --frozen-lockfile` |
+  | Node still on npm | `ubuntu-latest` | `actions/setup-node` (as above, `cache: npm`), then `npm ci` |
+  | Python | `ubuntu-latest` | `astral-sh/setup-uv`, then `uv sync --locked` |
+  | .NET 6 and later | `ubuntu-latest` | `actions/setup-dotnet` (`global-json-file: global.json` if there is one) |
+  | .NET Framework | `windows-latest`: MSBuild and `vstest` run only on Windows | `microsoft/setup-msbuild`, `NuGet/setup-nuget`, then `nuget restore` |
+  | PHP, outside Docker | `ubuntu-latest` | `shivammathur/setup-php` (the version the stack file names), then `composer install` |
+
+  Each action is pinned to a commit SHA with its version in a comment (`security.md`, "The supply chain"): copy the line from here, and Dependabot's `github-actions` entry moves the SHA and the comment together after that. These are the versions ways was last checked against:
+
+  ```yaml
+  - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+  - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+  - uses: pnpm/action-setup@ea17c68df8912ef543352723c149a84f56e3d413 # v6.1.0
+  - uses: astral-sh/setup-uv@68559e99cc807c1eb7e9238fd43a15bba460eec2 # v10.3.3
+  - uses: actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68 # v6.0.0
+  - uses: microsoft/setup-msbuild@30375c66a4eea26614e0d39710365f22f8b0af57 # v3
+  - uses: NuGet/setup-nuget@fd55a6f3b34392fa83fde1454582407d8c714123 # v4.0
+  - uses: shivammathur/setup-php@eb7c497e18156a6bbabfef1d3a82760b9eda3962 # 2.40.0
+  ```
+
+  For an action not listed, resolve the release's tag to its commit (`gh api repos/<owner>/<action>/commits/<tag> --jq .sha`), taking a release at least 14 days old.
 
   The install before the gate is always the frozen one (`docs/standards/security.md`, "The supply chain"): it fails when the lockfile and the manifest disagree, where a plain install would quietly fix the lockfile on the runner and test something no one committed. The gate command starts with the same install, so a laptop catches it first.
 
