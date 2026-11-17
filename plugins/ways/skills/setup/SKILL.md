@@ -30,7 +30,7 @@ Tell the person, in one short list, what you will add, what you will move, and w
 
 ## 3. Seed from the templates
 
-Templates live in `${CLAUDE_PLUGIN_ROOT}/templates/`. For each one, except `overlays/` and `labels.txt` (and `.github/ISSUE_TEMPLATE/` when issues aren't in GitHub):
+Templates live in `${CLAUDE_PLUGIN_ROOT}/templates/`. For each one, except `overlays/` and `labels.txt` (and `.github/ISSUE_TEMPLATE/` when issues aren't in GitHub; `.github/workflows/codeql.yml` and `.githooks/` follow "Secrets and code scanning" below):
 
 - **Missing:** copy it in.
 - **Present:** never overwrite. Merge what's missing into it, or leave it and list it in the report.
@@ -84,6 +84,28 @@ List what changed, and every question the person answered, in the report.
 - **`pr-target-checkout`:** a `pull_request_target` workflow that checks out the PR's code runs that code with the base repo's secrets and a write token. Don't fix it: it needs a person who knows why it's there. List it first in the report as `needs-human`, and suggest moving the job to `pull_request`, or splitting it so the part that needs secrets never runs the PR's code.
 
 The templates' own workflows are pinned already. When the gate's steps come from "CI by stack" in `docs/standards/delivery.md`, copy the pinned lines from there.
+
+**Secrets and code scanning.** On every run, `bash ${CLAUDE_PLUGIN_ROOT}/scripts/check-security-settings.sh` reads the repo's settings: Dependabot alerts, Dependabot security updates, secret scanning, push protection, and whether code scanning can take CodeQL results. Then:
+
+- **A setting that's `off`:** list it and offer to turn it on now, all at once or one by one. These change the repo, not a file, so they aren't in the PR: say which you turned on in the report. The calls:
+  - `gh api -X PUT repos/<owner>/<repo>/vulnerability-alerts`
+  - `gh api -X PUT repos/<owner>/<repo>/automated-security-fixes`
+  - `gh api -X PATCH repos/<owner>/<repo> --input -` with `{"security_and_analysis":{"secret_scanning":{"status":"enabled"},"secret_scanning_push_protection":{"status":"enabled"}}}`
+- **`unavailable`:** a private repo without GitHub's paid add-ons (Secret Protection, Code Security). Say so plainly, point at the cost note in `docs/standards/security.md`, and carry on: gitleaks below is the free fallback for secrets. Don't list it as a failure.
+- **`unknown`:** the person running setup isn't a repo admin. List the settings as `needs-human` for an admin, with the script to re-run.
+
+gitleaks, the secret scan at commit and in CI:
+
+- **The hook.** If the repo has no hook manager of its own (no `core.hooksPath` set, no `.husky/`, `lefthook.yml` or `.pre-commit-config.yaml`), copy `.githooks/pre-commit`, add it with `git add --chmod=+x` so it's executable on every OS, run `git config core.hooksPath .githooks` in this clone, and add a line to the README's setup steps saying each clone runs that once. Where a hook manager is there, add gitleaks to it instead (`gitleaks git --pre-commit --staged --redact`) and say where in the report. The hook skips with a message when gitleaks isn't installed: check with `gitleaks version`, and if it's missing, list installing it as `needs-human`.
+- **In CI.** The template `gate.yml` has a "Secret scan" step. A `gate.yml` without one (seeded before it existed, or the repo's own) gets that step after checkout; checkout needs `fetch-depth: 0`. A gate on `windows-latest` gets it as a separate `secrets` job on `ubuntu-latest` with its own checkout, and branch protection requires that job as well: list it.
+- **First run on an old repo.** The CI step only scans new commits. Offer to run `gitleaks git --redact` once over the whole history and put what it finds in the report for a person: a leaked secret is rotated, not just removed (`docs/standards/security.md`).
+
+CodeQL, `.github/workflows/codeql.yml`:
+
+- Seed it only where `code-scanning` is `on`. Where it's `unavailable`, don't: every run would fail at the upload. List the choice for a person instead: the Code Security add-on, or Semgrep's free rules as a gate step.
+- Keep one `language` entry per language the repo has: `python`, `javascript-typescript` (both are one CodeQL language), `csharp`. A repo with none of them (PHP only) gets no `codeql.yml`: Psalm or Semgrep, as `php.md` says.
+- An existing CodeQL workflow (GitHub's "default setup" or the repo's own file) stays. Compare its languages with the repo's and list what's missing.
+- List as `needs-human`: a code scanning rule on `main` that blocks new high or critical alerts, in the same ruleset as the `Gate` check.
 
 `.github/CODEOWNERS`: fill in the high-risk paths this repo actually has, matching `REVIEW.md`. Owners are a judgement call: leave `@owner` and list it as `needs-human` unless the person names them.
 

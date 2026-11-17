@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+# Secret scan of what's about to be committed (docs/standards/security.md: gitleaks at commit).
+# A convenience, not the guard: push protection and the scan in CI are. Git runs it because
+# /ways:setup set `git config core.hooksPath .githooks`; each clone runs that once (README).
+#
+# A false positive: add `gitleaks:allow` as a comment on the line, or its fingerprint to
+# .gitleaksignore, with a comment saying why. Skipping it once: `git commit --no-verify`.
+
+if ! command -v gitleaks >/dev/null 2>&1; then
+  echo "pre-commit: gitleaks isn't installed, so this commit wasn't scanned for secrets." >&2
+  echo "  Install it: brew install gitleaks, or a release binary from github.com/gitleaks/gitleaks/releases" >&2
+  exit 0
+fi
+exec gitleaks git --pre-commit --staged --redact --no-banner

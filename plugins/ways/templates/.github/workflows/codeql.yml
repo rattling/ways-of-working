@@ -1,0 +1,56 @@
+# Code scanning with CodeQL (docs/standards/security.md, "Checks, by stage").
+#
+# /ways:setup keeps one matrix entry per language the repo has, and seeds this file only where
+# GitHub will take the results: public repos, or private ones with the Code Security add-on.
+# CodeQL doesn't read PHP: a PHP repo uses Psalm --taint-analysis or Semgrep in the gate instead.
+#
+# build-mode: none reads the source without building it, so C# (.NET Framework too) runs on
+# ubuntu-latest instead of a Windows runner. It can miss findings in generated code.
+#
+# Sized like gate.yml: PRs into main (not drafts, newer pushes cancel), pushes to main, and a
+# weekly run so new CodeQL queries reach code nobody has touched. Each language is its own job,
+# billed by the minute. New high findings block a PR through a code scanning rule on main
+# (branch protection), not through this workflow failing.
+
+name: CodeQL
+
+on:
+  pull_request:
+    branches: [main]
+    types: [opened, synchronize, reopened, ready_for_review]
+  push:
+    branches: [main]
+  schedule:
+    - cron: '23 4 * * 1'
+
+# Minimal token at the top; the job adds what uploading results needs. Actions are pinned to a
+# commit SHA with the version in a comment; Dependabot's github-actions entry keeps them current.
+permissions:
+  contents: read
+
+concurrency:
+  group: codeql-${{ github.event.pull_request.number || github.sha }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  analyze:
+    runs-on: ubuntu-latest
+    if: ${{ !github.event.pull_request.draft }}
+    timeout-minutes: 30
+    permissions:
+      contents: read
+      security-events: write # upload results
+      actions: read # needed on private repos
+    strategy:
+      fail-fast: false
+      matrix:
+        language: [python, javascript-typescript, csharp]
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: github/codeql-action/init@9b3254085494b55a0f7c4c2b3d2d52cc712ce370 # v4.39.1
+        with:
+          languages: ${{ matrix.language }}
+          build-mode: none
+      - uses: github/codeql-action/analyze@9b3254085494b55a0f7c4c2b3d2d52cc712ce370 # v4.39.1
+        with:
+          category: /language:${{ matrix.language }}

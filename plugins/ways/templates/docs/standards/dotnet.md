@@ -7,7 +7,7 @@
 |---|---|---|
 | Style | `.editorconfig` in the repo | Build warnings |
 | Analysis | Roslyn analyzers (`Microsoft.CodeAnalysis.NetAnalyzers` package); warnings as errors in new projects, a baseline in old ones | MSBuild |
-| Security analysis | CodeQL for C# (needs a build, so a Windows runner) | Required check |
+| Security analysis | CodeQL for C#, without a build (`build-mode: none`), so it runs on `ubuntu-latest` even for .NET Framework | A code scanning rule on `main` |
 | Tests | One framework per repo (MSTest, NUnit or xUnit, recorded in an ADR); integration tests against SQL Server LocalDB | `vstest` / `dotnet test` |
 | Dependencies | NuGet audit; Dependabot for NuGet. Move `packages.config` to `PackageReference` as projects are touched | Restore warnings as errors |
 
