@@ -113,6 +113,8 @@ CodeQL, `.github/workflows/codeql.yml`:
 
 `.github/pull_request_template.md` starts `Closes #` for GitHub. For local markdown or other, the first line is `Closes ` with no `#`.
 
+On every run, a PR template without a **Dependencies added** line gets the template's, after **Docs:** (or at the end of the evidence), and a `REVIEW.md` without an `## Every PR` section gets the template's, above `## What we care about here`. `/ways:work`, `/ways:build` and review all look for them (`docs/standards/security.md`, "The supply chain"). List both in the report.
+
 The one exception to "never overwrite": `## How work goes` and `## Working an issue` belong to the plugin, since they name its commands and files, and go stale when it changes. On every run, replace each section, from its heading to the next `## `, with the template's current one, so the SessionStart hook (which prints it) shows the flow this plugin version has. If the repo's copy had changes of its own, say so in the report and point them to `## Rules for this repo`; the setup PR's diff shows what was replaced.
 
 `CLAUDE.md`: should contain `@AGENTS.md`. If it has other content, move that content into `AGENTS.md` and leave the import.

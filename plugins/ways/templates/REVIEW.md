@@ -12,6 +12,10 @@ Changes touching these are high risk: a senior approval, a rollback plan, and `/
 - <data where an error causes harm (safety, health, money), if this repo has any>
 - <areas specific to this repo>
 
+## Every PR
+
+- **Dependencies added** names each new direct dependency with a reason, and the lockfile diff agrees with it. One that isn't named is a finding (`docs/standards/security.md`, "The supply chain").
+
 ## What we care about here
 
 <Repo-specific judgement calls, one line each. Added when a review or an incident teaches something a check can't catch.>
