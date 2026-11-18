@@ -25,11 +25,14 @@
   | Stack | `runs-on` | Before the gate |
   |---|---|---|
   | Gate in Docker Compose (any stack) | `ubuntu-latest` | Nothing: the runner has Docker |
-  | Node: React, Next.js, Vite, an Express API | `ubuntu-latest` | `actions/setup-node@v4` (`node-version-file: .nvmrc` or `package.json`, `cache: npm`), then `npm ci` |
-  | Python | `ubuntu-latest` | `astral-sh/setup-uv@v5`; `uv run` installs from the lock file |
+  | Node with pnpm: React, Next.js, Vite, an Express API | `ubuntu-latest` | `pnpm/action-setup@v4` (reads `packageManager`), `actions/setup-node@v4` (`node-version-file: .nvmrc` or `package.json`, `cache: pnpm`), then `pnpm install --frozen-lockfile` |
+  | Node still on npm | `ubuntu-latest` | `actions/setup-node@v4` (as above, `cache: npm`), then `npm ci` |
+  | Python | `ubuntu-latest` | `astral-sh/setup-uv@v5`, then `uv sync --locked` |
   | .NET 6 and later | `ubuntu-latest` | `actions/setup-dotnet@v4` (`global-json-file: global.json` if there is one) |
   | .NET Framework | `windows-latest`: MSBuild and `vstest` run only on Windows | `microsoft/setup-msbuild@v2`, `NuGet/setup-nuget@v2`, then `nuget restore` |
   | PHP, outside Docker | `ubuntu-latest` | `shivammathur/setup-php@v2` (the version the stack file names), then `composer install` |
+
+  The install before the gate is always the frozen one (`docs/standards/security.md`, "The supply chain"): it fails when the lockfile and the manifest disagree, where a plain install would quietly fix the lockfile on the runner and test something no one committed. The gate command starts with the same install, so a laptop catches it first.
 
   Windows minutes bill at twice the rate on private repos, so on `windows-latest` the draft skip and the cancelling matter twice as much. A repo with two stacks puts both toolchains in the one job when they share a runner; when they don't (a .NET Framework API and a Node front end), it's two jobs, each running the part of the gate it can, and both required.
 - **Local development runs the same way for everyone**, so a new starter, CI and the agent all have the same environment: in containers, or on native services (a local Postgres or MySQL) that one setup script installs and checks. Either is fine. Containers make the environment easy to copy; native services start faster and make a lighter gate (in one repo, moving the gate's database from Docker to a native Postgres took it from 150 seconds to 90). Pick one and write it in the README.

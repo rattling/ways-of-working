@@ -22,7 +22,9 @@ A Node version past end of life ([nodejs.org/about/previous-releases](https://no
 minimumReleaseAge: 20160      # the 14-day hold, in minutes
 
 # Build scripts (preinstall, install, postinstall) run only for packages listed true.
-# pnpm fails an install that meets an unlisted one, so every package is a decision.
+# strictDepBuilds fails an install that meets an unlisted one, so every package is a decision.
+# (pnpm 11 and later do this by default; 10.26 needs the line.)
+strictDepBuilds: true
 allowBuilds:
   esbuild: true               # downloads its platform binary; needed by the build
   # some-package: false       # has a script it doesn't need here
@@ -57,3 +59,4 @@ npm can't do the 14-day hold, can't allow build scripts one package at a time, a
 
 - `pnpm dlx` and `npx` fetch the newest version of a tool, outside the lockfile and the hold. Put tools in `devDependencies` and run them through `pnpm`.
 - Corepack picks pnpm's version from `packageManager` in `package.json`. Set it, so CI, the agent and every laptop use the same pnpm.
+- `allowBuilds` needs pnpm 10.26 or later. Older pnpm ignores it without an error (10.12 just warns that it skipped the scripts), so on an older pnpm the list looks set and does nothing. Raise `packageManager` first.
