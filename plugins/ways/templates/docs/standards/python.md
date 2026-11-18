@@ -48,5 +48,6 @@ no-build = true             # wheels only: building a source distribution runs i
 
 ## Gotchas
 
+- Adding or changing `exclude-newer` needs a `uv lock`: uv stores the hold in `uv.lock`, and `uv sync --locked` fails until it's there. Commit the lockfile with the setting. (`no-build` isn't stored, so it needs nothing.)
 - `uv run` syncs before running. In the gate, run `uv sync --locked` first so a stale lockfile fails there and not as a confusing import error later.
 - `uvx` runs tools outside the project, so `[tool.uv]` settings (the hold, `no-build`) don't reach it. Pin tool versions, or set the hold in `~/.config/uv/uv.toml` as well.

@@ -65,7 +65,7 @@ Templates live in `${CLAUDE_PLUGIN_ROOT}/templates/`. For each one, except `over
 - `pnpm-workspace.yaml` (create it with just this if the repo uses pnpm and has none): `minimumReleaseAge: 20160`, unless one is set.
 - A `package-lock.json` (npm): npm can't hold releases back. List it in the report and suggest an issue to move the repo to pnpm.
 
-These go in the setup PR. The uv setting only changes what the next `uv lock` may pick, so the lockfile doesn't change now.
+These go in the setup PR. After adding `exclude-newer`, run `uv lock` and commit the `uv.lock` change with it: uv records the hold in the lockfile, and until it's there `uv sync --locked` (the gate's first step) fails. The diff is only an `[options]` block holding the hold as a span (`exclude-newer-span = "P14D"`); no versions change. If it changes any, stop and show the person.
 
 **The supply chain.** Dependencies come in locked, audited, and without running their code at install (`docs/standards/security.md`, "The supply chain"; the exact config is in `python.md` and `node.md`). On every run, for each Python (uv) and Node project in the repo, in a workspace at its root. Each item says what to leave alone, so a second run changes nothing.
 
@@ -96,9 +96,9 @@ The templates' own workflows are pinned already. When the gate's steps come from
 
 gitleaks, the secret scan at commit and in CI:
 
-- **The hook.** If the repo has no hook manager of its own (no `core.hooksPath` set, no `.husky/`, `lefthook.yml` or `.pre-commit-config.yaml`), copy `.githooks/pre-commit`, add it with `git add --chmod=+x` so it's executable on every OS, run `git config core.hooksPath .githooks` in this clone, and add a line to the README's setup steps saying each clone runs that once. Where a hook manager is there, add gitleaks to it instead (`gitleaks git --pre-commit --staged --redact`) and say where in the report. The hook skips with a message when gitleaks isn't installed: check with `gitleaks version`, and if it's missing, list installing it as `needs-human`.
+- **The hook.** If the repo has no hook manager of its own (no `core.hooksPath` set, no `.husky/`, `lefthook.yml` or `.pre-commit-config.yaml`), copy `.githooks/pre-commit`, add it with `git add --chmod=+x` so it's executable on every OS, run `git config core.hooksPath .githooks` in this clone, and add a line to the README's setup steps saying each clone runs that once. Where a hook manager is there, add gitleaks to it instead (`gitleaks git --pre-commit --staged --redact --verbose`) and say where in the report. The hook skips with a message when gitleaks isn't installed: check with `gitleaks version`, and if it's missing, list installing it as `needs-human`.
 - **In CI.** The template `gate.yml` has a "Secret scan" step. A `gate.yml` without one (seeded before it existed, or the repo's own) gets that step after checkout; checkout needs `fetch-depth: 0`. A gate on `windows-latest` gets it as a separate `secrets` job on `ubuntu-latest` with its own checkout, and branch protection requires that job as well: list it.
-- **First run on an old repo.** The CI step only scans new commits. Offer to run `gitleaks git --redact` once over the whole history and put what it finds in the report for a person: a leaked secret is rotated, not just removed (`docs/standards/security.md`).
+- **First run on an old repo.** The CI step only scans new commits. Offer to run `gitleaks git --redact --verbose` once over the whole history and put what it finds in the report for a person: a leaked secret is rotated, not just removed (`docs/standards/security.md`).
 
 CodeQL, `.github/workflows/codeql.yml`:
 

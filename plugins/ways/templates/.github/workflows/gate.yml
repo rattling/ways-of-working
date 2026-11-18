@@ -74,7 +74,7 @@ jobs:
           elif [ -n "$BEFORE" ] && ! printf '%s' "$BEFORE" | grep -qE '^0+$'; then range="$BEFORE..HEAD"
           else range="-1"
           fi
-          "$RUNNER_TEMP/gitleaks" git --log-opts="$range" --redact --no-banner .
+          "$RUNNER_TEMP/gitleaks" git --log-opts="$range" --redact --verbose --no-banner .
       # The stack's toolchain goes here, each step with the same `if:` as the gate
       # (delivery.md, "CI by stack"). None for a gate that runs in Docker Compose.
       - name: Run the gate

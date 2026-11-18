@@ -5,10 +5,15 @@
 #
 # A false positive: add `gitleaks:allow` as a comment on the line, or its fingerprint to
 # .gitleaksignore, with a comment saying why. Skipping it once: `git commit --no-verify`.
+#
+# To see it work, commit a fake AWS key. gitleaks only matches AKIA followed by 16 characters
+# from A-Z and 2-7, so a key with 0, 1, 8 or 9 in it passes and looks like a broken hook:
+#   printf 'AKIA%s\n' QX7RZ2M4KP6WT3BN > fake-key.txt && git add fake-key.txt && git commit -m test
 
 if ! command -v gitleaks >/dev/null 2>&1; then
   echo "pre-commit: gitleaks isn't installed, so this commit wasn't scanned for secrets." >&2
   echo "  Install it: brew install gitleaks, or a release binary from github.com/gitleaks/gitleaks/releases" >&2
   exit 0
 fi
-exec gitleaks git --pre-commit --staged --redact --no-banner
+# --verbose names the file, line and rule; --redact keeps the secret itself out of the output.
+exec gitleaks git --pre-commit --staged --redact --verbose --no-banner
