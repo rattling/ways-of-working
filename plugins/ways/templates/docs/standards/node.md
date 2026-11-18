@@ -12,7 +12,7 @@ A Node version past end of life ([nodejs.org/about/previous-releases](https://no
 | Types | TypeScript, `strict` on new code | `pnpm tsc --noEmit` |
 | Tests | One runner per repo (Vitest, Jest or `node --test`) | `pnpm test` |
 | Dependencies | `pnpm audit`; Dependabot for npm/pnpm | `pnpm audit --audit-level high` |
-| Security analysis | CodeQL for JavaScript/TypeScript | Required check |
+| Security analysis | CodeQL for JavaScript/TypeScript (`codeql.yml`) | A code scanning rule on `main` |
 
 ## Supply chain
 

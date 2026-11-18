@@ -12,7 +12,7 @@ A Python version past the end of security support ([devguide.python.org/versions
 | Types | A type checker per repo (mypy or pyright), strict on new modules, the strict list only growing | `uv run mypy` / `uv run pyright` |
 | Tests | pytest | `uv run pytest` |
 | Dependencies | `pip-audit` on the locked set; Dependabot for uv | Below |
-| Security analysis | CodeQL for Python | Required check |
+| Security analysis | CodeQL for Python (`codeql.yml`) | A code scanning rule on `main` |
 
 ## Supply chain
 

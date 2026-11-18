@@ -53,6 +53,28 @@ jobs:
             echo "Only documentation changed: the gate passes without running."
             echo "only=true" >> "$GITHUB_OUTPUT"
           fi
+      # Secret scan of the commits this PR or push adds: catches what the pre-commit hook missed
+      # or was skipped for. It runs on documentation-only PRs too, since a secret can be in a .md.
+      # gitleaks is pinned by version and checksum; Dependabot can't update it, so bump both at the
+      # routine upgrade (the checksum is in the release's gitleaks_<version>_checksums.txt).
+      # Linux only: on a windows-latest gate, this step moves to a small ubuntu-latest job.
+      - name: Secret scan
+        if: runner.os == 'Linux'
+        env:
+          GITLEAKS_VERSION: 8.30.1
+          GITLEAKS_SHA256: 551f6fc83ea457d62a0d98237cbad105af8d557003051f41f3e7ca7b3f2470eb
+          BASE_REF: ${{ github.base_ref }}
+          BEFORE: ${{ github.event.before }}
+        run: |
+          tgz="$RUNNER_TEMP/gitleaks.tar.gz"
+          curl -sSfL -o "$tgz" "https://github.com/gitleaks/gitleaks/releases/download/v${GITLEAKS_VERSION}/gitleaks_${GITLEAKS_VERSION}_linux_x64.tar.gz"
+          echo "${GITLEAKS_SHA256}  $tgz" | sha256sum -c -
+          tar -xzf "$tgz" -C "$RUNNER_TEMP" gitleaks
+          if [ -n "$BASE_REF" ]; then range="origin/$BASE_REF..HEAD"
+          elif [ -n "$BEFORE" ] && ! printf '%s' "$BEFORE" | grep -qE '^0+$'; then range="$BEFORE..HEAD"
+          else range="-1"
+          fi
+          "$RUNNER_TEMP/gitleaks" git --log-opts="$range" --redact --no-banner .
       # The stack's toolchain goes here, each step with the same `if:` as the gate
       # (delivery.md, "CI by stack"). None for a gate that runs in Docker Compose.
       - name: Run the gate

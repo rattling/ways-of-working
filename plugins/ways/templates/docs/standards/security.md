@@ -42,7 +42,7 @@ Agents add and upgrade packages all day, so what a dependency can do on the way 
 | Stage | Check | Tool | Notes |
 |---|---|---|---|
 | While the agent works | Can't read `.env` or secret files; high-risk changes get `/security-review` | Claude Code settings; the risk tier in `REVIEW.md` | |
-| Commit | Secret scan | gitleaks, as a pre-commit hook | Convenience: can be skipped |
+| Commit | Secret scan | gitleaks, as a pre-commit hook (`.githooks/pre-commit`) | Convenience: can be skipped. A false positive gets `gitleaks:allow` on the line, or its fingerprint in `.gitleaksignore`, with the reason |
 | Push | Secret push protection | GitHub | Blocks the push |
 | Install, any time | No version younger than 14 days | uv `exclude-newer`; pnpm `minimumReleaseAge` | The 14-day hold, above |
 | Install, any time | No dependency code runs at install | pnpm `allowBuilds`; uv `no-build` | Exceptions named in the config |
@@ -50,12 +50,12 @@ Agents add and upgrade packages all day, so what a dependency can do on the way 
 | PR | Dependency audit | `pnpm audit --audit-level high`; `pip-audit`; `composer audit`; NuGet audit | In the gate |
 | PR | New dependencies named, with a reason | Review, against the lockfile diff | "Dependencies added" in the PR body |
 | PR | Actions pinned to SHAs, minimal `permissions:`, no `pull_request_target` checkout | `/ways:setup` lists breaches; review | |
-| PR | Code scanning | **CodeQL** for Python, JavaScript/TypeScript and C#. **CodeQL doesn't support PHP**: Psalm `--taint-analysis` or Semgrep | Required check; new high findings block |
-| PR | Secret scan | gitleaks in CI | Catches what pre-commit missed |
+| PR | Code scanning | **CodeQL** for Python, JavaScript/TypeScript and C# (`codeql.yml`, without a build). **CodeQL doesn't support PHP**: Psalm `--taint-analysis` or Semgrep | A code scanning rule on `main` blocks new high findings |
+| PR | Secret scan | gitleaks in CI, a step in `gate.yml` pinned by version and checksum | Catches what pre-commit missed; runs on documentation-only PRs too |
 | Daily | Vulnerable dependencies | **Dependabot** alerts and security updates (uv, npm/pnpm, Composer, NuGet, Actions) | Updates arrive as PRs and go through the gate |
 | Monthly | Routine upgrades | **Dependabot** version updates, `cooldown` 14 days | `.github/dependabot.yml`, from the ways template |
 
-**Cost:** Dependabot is free. On private repos, code scanning and push protection need GitHub's paid add-ons (Code Security, Secret Protection), priced per active committer. Check the price before committing to them. Semgrep and gitleaks in CI are the free fallback.
+**Cost:** Dependabot is free. On private repos, code scanning and push protection need GitHub's paid add-ons (Code Security, Secret Protection), priced per active committer. Check the price before committing to them. Semgrep and gitleaks in CI are the free fallback. `/ways:setup` reads which of these a repo has and says which are off, which it can't have, and which need an admin to check.
 
 ## AI-specific
 
