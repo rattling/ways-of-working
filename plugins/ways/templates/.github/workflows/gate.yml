@@ -23,6 +23,9 @@ on:
   push:
     branches: [main]
 
+# Minimal token: the gate only reads the code. Widen per job, never here (security.md, "The supply
+# chain"). Actions are pinned to a commit SHA with the version in a comment; Dependabot's
+# github-actions entry keeps them current.
 permissions:
   contents: read
 
@@ -38,7 +41,7 @@ jobs:
       run:
         shell: bash # Git Bash on windows-latest, whose default is PowerShell
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           fetch-depth: 0
       - name: Documentation only?

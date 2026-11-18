@@ -77,6 +77,14 @@ These go in the setup PR. The uv setting only changes what the next `uv lock` ma
 
 List what changed, and every question the person answered, in the report.
 
+**GitHub Actions.** On every run, `bash ${CLAUDE_PLUGIN_ROOT}/scripts/check-workflows.sh` lists the repo's workflows that break the Actions rule (`docs/standards/security.md`, "The supply chain"), one line each with the file and line. Put them in the report under three headings, and offer to fix the first two in the setup PR:
+
+- **`unpinned`:** an action by tag or branch. The fix pins the version it already uses, so nothing changes in what runs: resolve the tag to its commit (`gh api repos/<owner>/<action>/commits/<tag> --jq .sha`) and write `uses: <action>@<sha> # <tag>`. A branch (`@main`) has no version to keep: ask which release to pin, at least 14 days old. Moving to a newer version is Dependabot's job afterwards, not setup's.
+- **`no-permissions`:** read what the workflow's jobs do, and add the smallest top-level `permissions:` that covers them (`contents: read` for a build or test), with any write a job needs set on that job. Show the person the block before writing it.
+- **`pr-target-checkout`:** a `pull_request_target` workflow that checks out the PR's code runs that code with the base repo's secrets and a write token. Don't fix it: it needs a person who knows why it's there. List it first in the report as `needs-human`, and suggest moving the job to `pull_request`, or splitting it so the part that needs secrets never runs the PR's code.
+
+The templates' own workflows are pinned already. When the gate's steps come from "CI by stack" in `docs/standards/delivery.md`, copy the pinned lines from there.
+
 `.github/CODEOWNERS`: fill in the high-risk paths this repo actually has, matching `REVIEW.md`. Owners are a judgement call: leave `@owner` and list it as `needs-human` unless the person names them.
 
 `AGENTS.md`: Pocock's setup may already have created it with only the `## Agent skills` section. Add the template's sections around that section; never remove or rewrite it. If the `## Agent skills` section is in `CLAUDE.md` instead, it moves to `AGENTS.md` with the rest of `CLAUDE.md`'s content (below), unchanged. Fill in the gate command, the read order and the merge policy from what the repo shows. Leave genuine judgement calls as placeholders and list them. The `### Issue tracker` line under `## Agent skills` says where this repo's issues live. The template's line is GitHub's. For local markdown it's "Issues live as markdown files under `.scratch/`, committed with the code. See `docs/agents/issue-tracker.md`.", and for other it names the tracker and how Claude reaches it. Change the line only when it names a tracker other than this repo's.
