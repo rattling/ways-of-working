@@ -38,6 +38,7 @@ A revert or an incident in an area moves that area up a tier, and can move the r
 - At most three review rounds. After the first, re-review only the new diff.
 - Flag a class of bug once, not every instance.
 - **In proportion.** An abstraction nothing needs yet, a class per value or row, a test file per class, or code well past the PRD's **Size** or the closest feature is a finding (`docs/standards/architecture.md`, "Proportion"). The other way round too: **a fix doesn't add structure.** Fix the defect in place; a finding whose fix would add a class, a layer or a feature goes on the issue's Later list or a new issue, not into this PR.
+- **New dependencies are named.** Read the lockfile diff against the PR's **Dependencies added**. A new direct dependency it doesn't name, or names without a reason, is a finding, and so is one where the standard library or something already in the repo would do (`docs/standards/security.md`, "The supply chain"). Transitive changes don't need naming; a surprisingly large one is worth a question.
 - **The docs match the change.** A PR that changes how the system runs, its parts, a contract or a term updates `docs/ARCHITECTURE.md`, the README, `GLOSSARY.md` or the standards' stack lines with it, or says it checked them. A reviewer who finds them now untrue treats it as a finding, not a follow-up.
 
 ## Branching

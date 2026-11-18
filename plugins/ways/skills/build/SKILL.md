@@ -46,6 +46,8 @@ Every ticket gets a **Human verification** line, which `to-tickets`' template la
 
 **Check the docs across the whole feature.** Each ticket kept the docs true to its own diff, but drift can show only across tickets (three of them together moving a responsibility to another part), and the build may have landed somewhere other than the design. Read the whole `main...integration/<feature-slug>` diff against `/ways:work`'s step 4.2 list, and against the PRD's design. Fix what's untrue on the integration branch; where the build departed from the design, say so in the integration PR and update the PRD's Implementation Decisions to what was built.
 
+**Collect the dependencies.** The integration PR's **Dependencies added** lists every direct dependency the branch adds, from the `main...integration/<feature-slug>` lockfile diff, each with the reason its ticket's PR gave. One with no reason is a finding: give it one or take it out before marking the PR ready.
+
 **Compare the size with the estimate.** Count the `main...integration/<feature-slug>` diff as the PRD's **Size** table does (files, new classes, lines of code and of tests, leaving out specs, docs and the mock) and put the actual beside the estimate in the integration PR. More than about a third over: say so at the top of the PR, with where the extra went, so the reviewer can ask for cuts rather than find them.
 
 Delete `.ways/autonomous`, `.ways/progress` and `.ways/part`, and stop what the integration worktree started (containers, a dev server). Mark the integration PR ready. Say what was built and what's left in a few lines, with anything set to `needs-human` and why.
