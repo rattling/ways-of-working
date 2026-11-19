@@ -1,8 +1,13 @@
 import { expect, mock, test } from 'claude-code/testing'
 
-// Paths reach the stubs resolved against the working directory, with `\` on Windows;
-// compare them repo-relative, with `/`.
-const rel = (p: string) => p.replace(/\\/g, '/').replace(/^.*?(?=(\.claude\/|\.ways\/|learning\/))/, '')
+// Paths reach the stubs resolved against the working directory, with `\` on Windows.
+// Find the stubbed file the path ends with. Don't cut at the first `.claude/` or `.ways/`:
+// the checkout itself may sit under one (a worktree in `.claude/worktrees/`).
+const lookup = (files: Record<string, string>, p: string) => {
+  const path = p.replace(/\\/g, '/')
+  const key = Object.keys(files).find(k => path === k || path.endsWith('/' + k))
+  return key === undefined ? undefined : files[key]
+}
 
 const MILESTONES = [{ number: 1, title: '1: CRM live', state: 'open', html_url: 'https://github.com/o/r/milestone/1' }]
 const ISSUES = [
@@ -14,7 +19,7 @@ const ISSUES = [
 // A GitHub repo signed in as `ana`. `runs` collects the argv of every command the mod starts.
 function stubRepo(on: any, files: Record<string, string>, { runs = [] as string[][], ghRepo = 'o/r', now = 0 } = {}) {
   on('fs.read', ($: any, e: any) => {
-    const text = files[rel(e.path)]
+    const text = lookup(files, e.path)
     if (text === undefined) throw new Error('ENOENT ' + e.path)
     return { value: text }
   })
