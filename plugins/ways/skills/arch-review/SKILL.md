@@ -47,7 +47,7 @@ When the pillars are done, write it up in this order:
 
 1. **What holds.** The two or three things the design gets right, and why they matter. Say what's strong so it isn't undone later.
 2. **The one that would sink it.** The single risk that matters most, stated plainly, with what you saw and where, and the questions it raises. If nothing is that serious, say so.
-3. **Gaps.** By pillar. Each with a title that would work as an issue title, what you saw and where (file, line, issue), and why it matters.
+3. **Gaps.** By pillar. Each with a title that reads as an issue title, what you saw and where (file, line, issue), and why it matters.
 4. **Smaller questions to ask yourself.** Trade-offs that may be deliberate: ask rather than assert.
 5. **Open going into the next review**, and what should trigger it.
 

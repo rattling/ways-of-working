@@ -71,7 +71,7 @@ const RECORD = `# Ana (ana)
 
 ## Badges
 
-- **Up and running**: ran mick
+- **Up and running**: ran orchard-app
 `
 
 // The refreshes run in the background: let them settle before drawing.
