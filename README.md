@@ -1,5 +1,7 @@
 # Ways of working
 
+> **Frozen at 0.41.2.** Ways has moved to a private repo and this one is archived. It still installs, for repos that haven't moved yet, but gets no more changes.
+
 **A Claude Code plugin that gives a team one agreed way to take work from an issue to a merged PR. Claude does the building. People make the decisions.**
 
 It sits on top of [Matt Pocock's skills](https://github.com/mattpocock/skills), which cover the engineering disciplines (grilling a plan, writing a spec, cutting tickets, test-driven development, code review). Ways adds what a team has to agree on once: where specs live, how big work is planned, when Claude works on its own, what has to pass before anything merges, and who approves what.
